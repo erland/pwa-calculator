@@ -1,9 +1,9 @@
 schema_version: 1
 active_work:
-  mode: CREATE
+  mode: RELEASE
   plan: docs/development-plan.md
   change_request: null
-  selected_step: DEV-011
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -20,10 +20,11 @@ progress:
     - DEV-008
     - DEV-009
     - DEV-010
-  in_progress: DEV-011
+    - DEV-011
+  in_progress: null
   next:
-    recommended: DEV-011
-    reason: "Implementera och verifiera release-styrd GitHub Pages-publicering enligt användarens tillägg."
+    recommended: null
+    reason: "Samtliga planerade CRT- och DEV-steg är slutförda. Skapa en GitHub Release för att starta Pages-publiceringen."
 blockers:
   - id: BLK-001
     description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
@@ -37,9 +38,10 @@ verification:
     - "npm run test (passed: 39 tests in 5 files)"
     - "npm run build (passed; manifest and service worker generated)"
     - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles)"
+    - "npm run build:pages (passed; /pwa-calculator/ base and PWA scope verified)"
     - "npm audit --audit-level=high (passed: 0 vulnerabilities)"
-    - "GitHub Actions run 34673215168 (passed: verify and e2e)"
-  notes: "CRT-001–CRT-004 och DEV-001–DEV-010 är slutförda. DEV-011 pågår för automatisk GitHub Pages-publicering vid ny release."
+    - "GitHub Actions run 34673716922 (passed: verify, Pages build and e2e)"
+  notes: "CRT-001–CRT-004 och DEV-001–DEV-011 är slutförda. Release readiness är READY_WITH_WARNINGS: välj GitHub Actions som Pages-källa om repositoryt inte redan är konfigurerat och kör en manuell visuell/installationskontroll på riktiga målplattformar före stabil 1.0.0."
 source_state:
   drift: none
-  reference: "GitHub main; DEV-010 commit bbb1bca09342869abcb7e44f7985b419e0fa9296 verified by Actions run 34673215168; DEV-011 local changes in progress"
+  reference: "GitHub main; DEV-011 commit ca0ac9146120b430a527917f516b670f5cf1a3bd verified by Actions run 34673716922"
