@@ -15,6 +15,7 @@ Alla betydande förändringar dokumenteras här.
 - Enhets-, komponent-, tillgänglighets- och Playwright E2E-tester.
 - GitHub Actions för full verifiering i desktop- och mobilprofil.
 - Release-styrd publicering till GitHub Pages med repository-korrekt basväg.
+- Release-publiceringen dispatchar Pages-jobbet från `main` så att miljöns taggskydd respekteras.
 
 ### Kända begränsningar
 

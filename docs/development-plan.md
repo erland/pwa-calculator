@@ -36,6 +36,7 @@ För varje steg gäller:
 | DEV-009 | End-to-end, felhantering och härdning | Verifierade huvudflöden och robust edge-case-hantering |
 | DEV-010 | Release readiness v1 | Slutlig dokumentation, verifiering och release-kandidat |
 | DEV-011 | Release-styrd GitHub Pages-publicering | Automatisk driftsättning vid publicerad GitHub Release |
+| DEV-012 | Pages miljöskydd | Release-trigger som deployar från en tillåten `main`-referens |
 
 ## 4. Detaljerade utvecklingssteg
 
@@ -321,6 +322,27 @@ För varje steg gäller:
 
 **Klart när:** En publicerad GitHub Release startar ett reproducerbart Pages-deployment och den förväntade adressen är dokumenterad.
 
+---
+
+### DEV-012 – Pages miljöskydd
+
+**Mål:** Låta release-publiceringen fungera med `github-pages`-miljöns regel som endast tillåter deployment från `main`.
+
+**Omfattning:**
+
+- Separera release-triggern från deployment-workflowen.
+- Låt release-jobbet dispatcha deployment-workflowen med `ref: main`.
+- Begränsa release-jobbets token till `actions: write` och `contents: read`.
+- Dokumentera det tvåstegade Actions-flödet.
+
+**Verifiering:**
+
+- workflow-YAML valideras,
+- full CI passerar,
+- en ny publicerad release startar dispatcher-jobbet och därefter Pages-deploymenten från `main`.
+
+**Klart när:** Release-taggen behöver inte längre godkännas av Pages-miljöns deployment-regel.
+
 ## 5. Beroenden mellan steg
 
 ```text
@@ -335,6 +357,7 @@ DEV-001
                               -> DEV-009
                                   -> DEV-010
                                       -> DEV-011
+                                          -> DEV-012
 ```
 
 Ordningen är avsiktlig: matematik och state byggs och verifieras innan UI:t blir komplext, medan PWA-lagret läggs på först när den vanliga webbapplikationen är stabil.

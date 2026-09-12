@@ -51,7 +51,7 @@ GitHub Actions kör båda verifieringsnivåerna automatiskt för push till `main
 
 ## Publicering på GitHub Pages
 
-När en GitHub Release publiceras bygger workflowen `Deploy GitHub Pages` appen med basvägen `/pwa-calculator/` och publicerar resultatet till GitHub Pages. Workflowen kan även startas manuellt från fliken Actions.
+När en GitHub Release publiceras startar `Publish release to GitHub Pages` en separat `Deploy GitHub Pages`-körning från `main`. Deploymenten körs från `main` för att uppfylla Pages-miljöns skyddsregel, bygger appen med basvägen `/pwa-calculator/` och publicerar resultatet. `Deploy GitHub Pages` kan även startas manuellt från fliken Actions.
 
 Repositoryts Pages-källa ska vara **GitHub Actions**. Den publicerade appen finns på [https://erland.github.io/pwa-calculator/](https://erland.github.io/pwa-calculator/).
 

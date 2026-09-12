@@ -1,9 +1,9 @@
 schema_version: 1
 active_work:
-  mode: RELEASE
+  mode: CREATE
   plan: docs/development-plan.md
   change_request: null
-  selected_step: null
+  selected_step: DEV-012
 progress:
   completed:
     - CRT-001
@@ -21,10 +21,10 @@ progress:
     - DEV-009
     - DEV-010
     - DEV-011
-  in_progress: null
+  in_progress: DEV-012
   next:
-    recommended: null
-    reason: "Samtliga planerade CRT- och DEV-steg är slutförda. Skapa en GitHub Release för att starta Pages-publiceringen."
+    recommended: DEV-012
+    reason: "Reparera release-publiceringen så Pages-deploymenten dispatchas från den tillåtna main-referensen."
 blockers:
   - id: BLK-001
     description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
@@ -41,7 +41,7 @@ verification:
     - "npm run build:pages (passed; /pwa-calculator/ base and PWA scope verified)"
     - "npm audit --audit-level=high (passed: 0 vulnerabilities)"
     - "GitHub Actions run 34673716922 (passed: verify, Pages build and e2e)"
-  notes: "CRT-001–CRT-004 och DEV-001–DEV-011 är slutförda. Release readiness är READY_WITH_WARNINGS: välj GitHub Actions som Pages-källa om repositoryt inte redan är konfigurerat och kör en manuell visuell/installationskontroll på riktiga målplattformar före stabil 1.0.0."
+  notes: "Release v1.0.0 startade Actions run 34673970100 men github-pages-miljön avvisade taggreferensen innan runnern startade. DEV-012 pågår med en release-trigger som dispatchar deployment från main."
 source_state:
   drift: none
-  reference: "GitHub main; DEV-011 commit ca0ac9146120b430a527917f516b670f5cf1a3bd verified by Actions run 34673716922"
+  reference: "GitHub main at 6496d01db50a30797f6ccfd41183e496832acb84; failed release run 34673970100 diagnosed; DEV-012 local changes in progress"

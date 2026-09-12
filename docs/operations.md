@@ -25,6 +25,6 @@ Det finns ingen central användardata att säkerhetskopiera. Source och releaser
 
 Publicera en komplett ny build. Appen meddelar användaren när en ny service worker är klar och låter användaren välja kontrollerad omladdning.
 
-För GitHub Pages skapas en GitHub Release. Händelsen `release.published` startar `Deploy GitHub Pages`, som bygger och publicerar `dist/`. Följ körningen under Actions och kontrollera därefter [den publicerade appen](https://erland.github.io/pwa-calculator/). Workflowen kan också köras manuellt med `workflow_dispatch`.
+För GitHub Pages skapas en GitHub Release. Händelsen `release.published` startar `Publish release to GitHub Pages`, som skickar en `workflow_dispatch` till `Deploy GitHub Pages` på `main`. Indirektionen krävs eftersom Pages-miljön accepterar `main`, inte release-taggen. Följ båda körningarna under Actions och kontrollera därefter [den publicerade appen](https://erland.github.io/pwa-calculator/). Deployment-workflowen kan också köras manuellt.
 
 För rollback: publicera om en känd fungerande tagg som en ny release eller kör workflowen manuellt från den fungerande committen/branchen.
