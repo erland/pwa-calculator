@@ -1,0 +1,40 @@
+schema_version: 1
+active_work:
+  mode: CREATE
+  plan: docs/development-plan.md
+  change_request: null
+  selected_step: DEV-008
+progress:
+  completed:
+    - CRT-001
+    - CRT-002
+    - CRT-003
+    - CRT-004
+    - DEV-001
+    - DEV-002
+    - DEV-003
+    - DEV-004
+    - DEV-005
+    - DEV-006
+    - DEV-007
+  in_progress: DEV-008
+  next:
+    recommended: DEV-008
+    reason: "Återuppta offline-/installationsverifieringen i en miljö där Chromium kan installeras eller en webbläsare kan nå den lokala preview-servern. Gå inte vidare till DEV-009 innan detta är verifierat."
+blockers:
+  - id: BLK-001
+    description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
+    status: open
+verification:
+  last_status: blocked
+  baseline: green
+  commands:
+    - "npm run lint (passed)"
+    - "npm run typecheck (passed)"
+    - "npm run test (passed: 39 tests in 5 files)"
+    - "npm run build (passed; manifest and service worker generated)"
+    - "npm run test:e2e (blocked: Chromium unavailable)"
+  notes: "DEV-001–DEV-007 är implementerade och verifierade. DEV-008 är implementerad och produktionens PWA-output byggs, men verklig browser/offline-verifiering är blockerad efter fem separata reparationsstrategier. DEV-009 och DEV-010 är inte slutförda."
+source_state:
+  drift: none
+  reference: "GitHub work branch system-builder/calculator-v1; DEV-008 awaits CI browser/offline verification"

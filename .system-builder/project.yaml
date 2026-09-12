@@ -1,0 +1,20 @@
+schema_version: 1
+project:
+  name: calculator-pwa
+  type: pwa
+  description: "Responsiv och offlinekapabel miniräknare med Enkel och Avancerad nivå."
+source:
+  mode: github
+  repository: "https://github.com/erland/pwa-calculator"
+  default_branch: main
+complexity: small
+stack:
+  languages:
+    - TypeScript
+  frontend: "React + Vite"
+  backend: null
+  database: null
+delivery:
+  packaging: complete-project-zip
+  target: "static HTTPS hosting as installable PWA for modern mobile and desktop browsers"
+  registry: null
