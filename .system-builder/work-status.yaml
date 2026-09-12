@@ -1,9 +1,9 @@
 schema_version: 1
 active_work:
-  mode: CREATE
+  mode: RELEASE
   plan: docs/development-plan.md
   change_request: null
-  selected_step: DEV-012
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -21,10 +21,11 @@ progress:
     - DEV-009
     - DEV-010
     - DEV-011
-  in_progress: DEV-012
+    - DEV-012
+  in_progress: null
   next:
-    recommended: DEV-012
-    reason: "Reparera release-publiceringen så Pages-deploymenten dispatchas från den tillåtna main-referensen."
+    recommended: null
+    reason: "Samtliga steg är slutförda. Framtida publicerade releaser dispatchar Pages-deployment från main."
 blockers:
   - id: BLK-001
     description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
@@ -41,7 +42,9 @@ verification:
     - "npm run build:pages (passed; /pwa-calculator/ base and PWA scope verified)"
     - "npm audit --audit-level=high (passed: 0 vulnerabilities)"
     - "GitHub Actions run 34673716922 (passed: verify, Pages build and e2e)"
-  notes: "Release v1.0.0 startade Actions run 34673970100 men github-pages-miljön avvisade taggreferensen innan runnern startade. DEV-012 pågår med en release-trigger som dispatchar deployment från main."
+    - "GitHub Pages run 34674351270 (passed: deployment from main)"
+    - "Live smoke check https://erland.github.io/pwa-calculator/ (HTTP 200, correct title and manifest path)"
+  notes: "DEV-012 är slutfört. Det ursprungliga v1.0.0-felet berodde på att taggen avvisades av github-pages-miljön; release-triggern dispatchar nu deployment från main. En engångsdeployment från main verifierade hela Pages-flödet och den publicerade appen."
 source_state:
   drift: none
-  reference: "GitHub main at 6496d01db50a30797f6ccfd41183e496832acb84; failed release run 34673970100 diagnosed; DEV-012 local changes in progress"
+  reference: "GitHub main; DEV-012 fix db093b0d4c4551209b5347967798d93fcf143244 passed CI run 34674272194; Pages verified from bd1c9661b5226c54321baca5d200128007d016c7 in run 34674351270"
