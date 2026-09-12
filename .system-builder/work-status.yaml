@@ -3,7 +3,7 @@ active_work:
   mode: CREATE
   plan: docs/development-plan.md
   change_request: null
-  selected_step: DEV-008
+  selected_step: DEV-010
 progress:
   completed:
     - CRT-001
@@ -17,24 +17,27 @@ progress:
     - DEV-005
     - DEV-006
     - DEV-007
-  in_progress: DEV-008
+    - DEV-008
+    - DEV-009
+  in_progress: DEV-010
   next:
-    recommended: DEV-008
-    reason: "Återuppta offline-/installationsverifieringen i en miljö där Chromium kan installeras eller en webbläsare kan nå den lokala preview-servern. Gå inte vidare till DEV-009 innan detta är verifierat."
+    recommended: DEV-010
+    reason: "Slutför release readiness-dokumentation och kör slutlig ren CI-verifiering för 1.0.0-rc.1."
 blockers:
   - id: BLK-001
     description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
-    status: open
+    status: resolved
 verification:
-  last_status: blocked
+  last_status: passed
   baseline: green
   commands:
     - "npm run lint (passed)"
     - "npm run typecheck (passed)"
     - "npm run test (passed: 39 tests in 5 files)"
     - "npm run build (passed; manifest and service worker generated)"
-    - "npm run test:e2e (blocked: Chromium unavailable)"
-  notes: "DEV-001–DEV-007 är implementerade och verifierade. DEV-008 är implementerad och produktionens PWA-output byggs, men verklig browser/offline-verifiering är blockerad efter fem separata reparationsstrategier. DEV-009 och DEV-010 är inte slutförda."
+    - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles)"
+    - "npm audit --audit-level=high (passed: 0 vulnerabilities)"
+  notes: "DEV-001–DEV-009 är implementerade och verifierade. Den tidigare lokala browserblockeraren löstes genom GitHub Actions. DEV-010 pågår med release readiness och slutlig CI."
 source_state:
   drift: none
-  reference: "GitHub work branch system-builder/calculator-v1; DEV-008 awaits CI browser/offline verification"
+  reference: "GitHub main at DEV-009 completion; DEV-010 release readiness in progress"

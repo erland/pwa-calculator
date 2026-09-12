@@ -327,6 +327,6 @@ Ett steg får markeras `completed` först när:
 - inga nya blockerare lämnas odokumenterade,
 - en komplett uppdaterad projekt-zip kan levereras.
 
-## 7. Nästa steg
+## 7. Exekveringsstatus
 
-**DEV-001 – Projektbootstrap och kvalitetsbas** är nästa rekommenderade steg.
+Aktuell och maskinläsbar exekveringsstatus finns i `.system-builder/work-status.yaml`. Planen behålls som definition av stegens scope, beroenden, verifiering och klart-kriterier.

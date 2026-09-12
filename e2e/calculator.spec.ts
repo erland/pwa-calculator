@@ -54,6 +54,10 @@ test('mathematical errors are recoverable without reloading', async ({ page }) =
   await page.keyboard.type('7*8')
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('56')
+  await page.keyboard.press('Escape')
+  await page.keyboard.type('12.5+2,5')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('status')).toContainText('15')
 })
 
 test('app shell works offline after the service worker takes control', async ({ page, context }) => {

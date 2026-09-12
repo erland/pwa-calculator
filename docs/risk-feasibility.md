@@ -66,16 +66,16 @@ Historik, minne och inställningar kan lagras lokalt. För v1 är datamängden l
 
 | ID | Kategori | Risk / antagande | Sannolikhet | Konsekvens | Nivå | Hantering | Status |
 |---|---|---|---|---|---|---|---|
-| RISK-001 | Technical | Fel i parser/evaluator ger felaktig operatorprioritet eller fel resultat | medium | high | high | Isolera beräkningsmotor, undvik `eval`, enhetstesta uttryck och AC-fall | open |
-| RISK-002 | Technical / Data | Flyttalsrepresentation ger oväntade decimalresultat | high | medium | high | Central resultatformatterare, definierad avrundning och tester för kända flyttalsfall | open |
+| RISK-001 | Technical | Fel i parser/evaluator ger felaktig operatorprioritet eller fel resultat | medium | high | high | Isolera beräkningsmotor, undvik `eval`, enhetstesta uttryck och AC-fall | mitigated |
+| RISK-002 | Technical / Data | Flyttalsrepresentation ger oväntade decimalresultat | high | medium | high | Central resultatformatterare, definierad avrundning och tester för kända flyttalsfall | mitigated |
 | RISK-003 | UX | Avancerade funktioner gör appen svår för yngre användare | medium | medium | medium | Strikt separation Enkel/Avancerad; BR-001 behandlas som designregel | mitigated |
-| RISK-004 | Operations / PWA | Offlinecache eller uppdatering fungerar inkonsekvent mellan webbläsare | medium | medium | medium | Standardiserad service worker/PWA-plugin, explicit offline- och update-test | open |
+| RISK-004 | Operations / PWA | Offlinecache eller uppdatering fungerar inkonsekvent mellan webbläsare | medium | medium | medium | Standardiserad service worker/PWA-plugin, explicit offline- och update-test | mitigated |
 | RISK-005 | Platform | PWA-installation ser olika ut eller saknar explicit prompt på vissa plattformar | high | low | medium | Graceful degradation; installation är plattformsberoende men webbappen förblir fullt användbar | accepted |
 | RISK-006 | Data | Lokal historik/minne försvinner eller storage är otillgänglig | medium | low | low/medium | Felisolering och fallback till sessionsfunktion utan persistens; ingen kärnfunktion blockeras | mitigated |
-| RISK-007 | Accessibility | Tät knappmatris blir svår med tangentbord/skärmläsare eller små pekytor | medium | medium | medium | Semantiska kontroller, fokusordning, labels, tangentbords- och mobiltester | open |
-| RISK-008 | Technical | Trigonometri/DEG-RAD/procent får inkonsekventa semantiker | medium | medium | medium | Central domänlogik och explicita tester mot FR-012, FR-015, FR-016 och AC-004–006 | open |
+| RISK-007 | Accessibility | Tät knappmatris blir svår med tangentbord/skärmläsare eller små pekytor | medium | medium | medium | Semantiska kontroller, fokusordning, labels, tangentbords- och mobiltester | mitigated |
+| RISK-008 | Technical | Trigonometri/DEG-RAD/procent får inkonsekventa semantiker | medium | medium | medium | Central domänlogik och explicita tester mot FR-012, FR-015, FR-016 och AC-004–006 | mitigated |
 | RISK-009 | Security | Uttrycksutvärdering via generell JavaScript-exekvering skapar kodinjektionsrisk | low om designregeln följs | high | medium | Arkitekturregel: ingen `eval`/`Function`; endast tokeniserad/parserstyrd matematik | mitigated |
-| RISK-010 | Dependency | Ett externt matematikbibliotek kan öka bundle-storlek eller medföra licens-/supply-chain-risk | medium | low | low/medium | Välj liten, aktiv och kompatibelt licensierad dependency eller implementera begränsad egen evaluator; lås versioner | open |
+| RISK-010 | Dependency | Ett externt matematikbibliotek kan öka bundle-storlek eller medföra licens-/supply-chain-risk | medium | low | low/medium | Välj liten, aktiv och kompatibelt licensierad dependency eller implementera begränsad egen evaluator; lås versioner | mitigated |
 
 ## 4. Säkerhet och integritet
 
