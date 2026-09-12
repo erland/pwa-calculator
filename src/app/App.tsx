@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useReducer } from 'react'
 import { calculatorReducer, createCalculatorState, type CalculatorAction } from '../calculator/state/calculatorState'
 import { AdvancedKeypad } from '../components/AdvancedKeypad'
 import { BasicKeypad } from '../components/BasicKeypad'
@@ -18,7 +18,7 @@ export function App() {
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
   useEffect(() => applyTheme(state.theme), [state.theme])
-  useEffect(() => bindKeyboard(dispatch), [])
+  useLayoutEffect(() => bindKeyboard(dispatch), [])
 
   return (
     <>

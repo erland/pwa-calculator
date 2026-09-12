@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('simple mode calculates with operator precedence and keyboard', async ({ page }) => {
   await page.goto('/')
+  await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
   await page.keyboard.type('2+3*4')
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('14')
@@ -11,8 +12,11 @@ test('simple mode calculates with operator precedence and keyboard', async ({ pa
 test('advanced mode handles science, history, memory and persistence', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Avancerad' }).click()
-  await page.keyboard.type('sin(30)')
-  await page.keyboard.press('Enter')
+  await page.getByRole('button', { name: 'sin' }).click()
+  await page.getByRole('button', { name: '3' }).click()
+  await page.getByRole('button', { name: '0' }).click()
+  await page.getByRole('button', { name: ')' }).click()
+  await page.getByRole('button', { name: 'Beräkna' }).click()
   await expect(page.getByRole('status')).toContainText('0,5')
   await page.getByRole('button', { name: 'M+' }).click()
   await expect(page.getByText('M', { exact: true })).toBeVisible()
@@ -25,6 +29,7 @@ test('advanced mode handles science, history, memory and persistence', async ({ 
 
 test('mode switch preserves a pending calculation', async ({ page }) => {
   await page.goto('/')
+  await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
   await page.keyboard.type('12+7')
   await page.getByRole('button', { name: 'Avancerad' }).click()
   await page.getByRole('button', { name: 'Enkel' }).click()
@@ -40,7 +45,7 @@ test('theme persists after reload', async ({ page }) => {
 
 test('app shell works offline after the service worker takes control', async ({ page, context }) => {
   await page.goto('/')
-  await page.waitForFunction(() => 'serviceWorker' in navigator)
+  await page.evaluate(async () => { await navigator.serviceWorker.ready })
   await page.reload()
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
   await context.setOffline(true)
