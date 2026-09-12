@@ -2,6 +2,10 @@
 
 En responsiv och installerbar PWA med två tydliga nivåer:
 
+**Publicerad app:** [https://erland.github.io/pwa-calculator/](https://erland.github.io/pwa-calculator/)
+
+Länken blir aktiv när den första GitHub-releasen har publicerats och Pages-workflowen har slutförts.
+
 - **Enkel** för traditionell vardagsräkning.
 - **Avancerad** för parenteser, procent, potens, kvadratrot, trigonometri, logaritmer, konstanter, minne och historik.
 
@@ -44,6 +48,12 @@ npx playwright install --with-deps chromium
 ```
 
 GitHub Actions kör båda verifieringsnivåerna automatiskt för push till `main` och pull requests.
+
+## Publicering på GitHub Pages
+
+När en GitHub Release publiceras bygger workflowen `Deploy GitHub Pages` appen med basvägen `/pwa-calculator/` och publicerar resultatet till GitHub Pages. Workflowen kan även startas manuellt från fliken Actions.
+
+Repositoryts Pages-källa ska vara **GitHub Actions**. Den publicerade appen finns på [https://erland.github.io/pwa-calculator/](https://erland.github.io/pwa-calculator/).
 
 ## Produktion och PWA
 

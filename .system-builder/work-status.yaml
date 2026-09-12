@@ -3,7 +3,7 @@ active_work:
   mode: CREATE
   plan: docs/development-plan.md
   change_request: null
-  selected_step: DEV-010
+  selected_step: DEV-011
 progress:
   completed:
     - CRT-001
@@ -19,10 +19,11 @@ progress:
     - DEV-007
     - DEV-008
     - DEV-009
-  in_progress: DEV-010
+    - DEV-010
+  in_progress: DEV-011
   next:
-    recommended: DEV-010
-    reason: "Slutför release readiness-dokumentation och kör slutlig ren CI-verifiering för 1.0.0-rc.1."
+    recommended: DEV-011
+    reason: "Implementera och verifiera release-styrd GitHub Pages-publicering enligt användarens tillägg."
 blockers:
   - id: BLK-001
     description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
@@ -37,7 +38,8 @@ verification:
     - "npm run build (passed; manifest and service worker generated)"
     - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles)"
     - "npm audit --audit-level=high (passed: 0 vulnerabilities)"
-  notes: "DEV-001–DEV-009 är implementerade och verifierade. Den tidigare lokala browserblockeraren löstes genom GitHub Actions. DEV-010 pågår med release readiness och slutlig CI."
+    - "GitHub Actions run 34673215168 (passed: verify and e2e)"
+  notes: "CRT-001–CRT-004 och DEV-001–DEV-010 är slutförda. DEV-011 pågår för automatisk GitHub Pages-publicering vid ny release."
 source_state:
   drift: none
-  reference: "GitHub main at DEV-009 completion; DEV-010 release readiness in progress"
+  reference: "GitHub main; DEV-010 commit bbb1bca09342869abcb7e44f7985b419e0fa9296 verified by Actions run 34673215168; DEV-011 local changes in progress"

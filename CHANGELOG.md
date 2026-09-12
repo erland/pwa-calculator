@@ -14,6 +14,7 @@ Alla betydande förändringar dokumenteras här.
 - Installerbar PWA med app-shell-cache och kontrollerad uppdateringsprompt.
 - Enhets-, komponent-, tillgänglighets- och Playwright E2E-tester.
 - GitHub Actions för full verifiering i desktop- och mobilprofil.
+- Release-styrd publicering till GitHub Pages med repository-korrekt basväg.
 
 ### Kända begränsningar
 

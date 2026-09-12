@@ -35,6 +35,7 @@ För varje steg gäller:
 | DEV-008 | PWA, installation och offline | Installerbar PWA som fungerar offline efter första laddning |
 | DEV-009 | End-to-end, felhantering och härdning | Verifierade huvudflöden och robust edge-case-hantering |
 | DEV-010 | Release readiness v1 | Slutlig dokumentation, verifiering och release-kandidat |
+| DEV-011 | Release-styrd GitHub Pages-publicering | Automatisk driftsättning vid publicerad GitHub Release |
 
 ## 4. Detaljerade utvecklingssteg
 
@@ -298,6 +299,28 @@ För varje steg gäller:
 
 **Klart när:** Projektet kan märkas som release candidate för v1 och distribueras till statisk HTTPS-hosting.
 
+---
+
+### DEV-011 – Release-styrd GitHub Pages-publicering
+
+**Mål:** Publicera den färdiga PWA:n automatiskt när en GitHub Release publiceras.
+
+**Omfattning:**
+
+- GitHub Actions-workflow för `release.published` och manuell reservstart.
+- Pages-behörigheter, artefaktuppladdning och deployment environment.
+- Produktionsbygge med repository-korrekt basväg `/pwa-calculator/`.
+- Publik Pages-länk och publiceringsinstruktioner i README och driftdokumentation.
+
+**Verifiering:**
+
+- vanlig verifieringssvit passerar,
+- separat Pages-build genereras med korrekt basväg,
+- workflow-YAML valideras,
+- GitHub Actions på slutlig commit passerar.
+
+**Klart när:** En publicerad GitHub Release startar ett reproducerbart Pages-deployment och den förväntade adressen är dokumenterad.
+
 ## 5. Beroenden mellan steg
 
 ```text
@@ -311,6 +334,7 @@ DEV-001
                           -> DEV-008
                               -> DEV-009
                                   -> DEV-010
+                                      -> DEV-011
 ```
 
 Ordningen är avsiktlig: matematik och state byggs och verifieras innan UI:t blir komplext, medan PWA-lagret läggs på först när den vanliga webbapplikationen är stabil.

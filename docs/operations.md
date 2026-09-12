@@ -4,7 +4,7 @@ Calculator PWA är en statisk klientapplikation utan backend, databas eller cent
 
 ## Hälsokontroll
 
-Kontrollera att hosting svarar med lyckad HTTP-status för `/` och att en grundberäkning fungerar. Manifest och service-worker-filer ska också vara åtkomliga.
+Kontrollera att hosting svarar med lyckad HTTP-status för appens basväg (`/pwa-calculator/` på GitHub Pages) och att en grundberäkning fungerar. Manifest och service-worker-filer ska också vara åtkomliga.
 
 ## Loggar och felsökning
 
@@ -24,3 +24,7 @@ Det finns ingen central användardata att säkerhetskopiera. Source och releaser
 ## Uppgradering
 
 Publicera en komplett ny build. Appen meddelar användaren när en ny service worker är klar och låter användaren välja kontrollerad omladdning.
+
+För GitHub Pages skapas en GitHub Release. Händelsen `release.published` startar `Deploy GitHub Pages`, som bygger och publicerar `dist/`. Följ körningen under Actions och kontrollera därefter [den publicerade appen](https://erland.github.io/pwa-calculator/). Workflowen kan också köras manuellt med `workflow_dispatch`.
+
+För rollback: publicera om en känd fungerande tagg som en ny release eller kör workflowen manuellt från den fungerande committen/branchen.

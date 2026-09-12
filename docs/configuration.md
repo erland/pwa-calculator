@@ -21,3 +21,5 @@ Data är lokal för aktuell webbläsarprofil. Privat läge, användarrensning el
 ## Hosting
 
 Hosting ska leverera `dist/` över HTTPS med korrekta MIME-typer. Ingen serverkonfiguration, databas eller persistent volym behövs.
+
+GitHub Pages-bygget använder `npm run build:pages`, vilket sätter Vites basväg till `/pwa-calculator/`. Om repositoryt byter namn måste sökvägen i scriptet uppdateras.
