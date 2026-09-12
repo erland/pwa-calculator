@@ -7,6 +7,7 @@ test('simple mode calculates with operator precedence and keyboard', async ({ pa
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('14')
   await expect(page.getByRole('button', { name: 'Kvadratrot' })).toHaveCount(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
 test('advanced mode handles science, history, memory and persistence', async ({ page }) => {
@@ -43,8 +44,23 @@ test('theme persists after reload', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
 })
 
+test('mathematical errors are recoverable without reloading', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
+  await page.keyboard.type('1/0')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('status')).toContainText('Det går inte att dividera med noll.')
+  await page.keyboard.press('Escape')
+  await page.keyboard.type('7*8')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('status')).toContainText('56')
+})
+
 test('app shell works offline after the service worker takes control', async ({ page, context }) => {
   await page.goto('/')
+  const manifest = await page.evaluate(async () => fetch('/manifest.webmanifest').then((response) => response.json()))
+  expect(manifest.name).toContain('Miniräknaren')
+  expect(manifest.icons).toHaveLength(2)
   await page.evaluate(async () => { await navigator.serviceWorker.ready })
   await page.reload()
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
