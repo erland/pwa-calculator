@@ -3,11 +3,29 @@ import { expect, test } from '@playwright/test'
 test('simple mode calculates with operator precedence and keyboard', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
+  await expect(page.getByText('Installera eller använd offline')).toHaveCount(0)
   await page.keyboard.type('2+3*4')
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('14')
   await expect(page.getByRole('button', { name: 'Kvadratrot' })).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('simple mode fits a small phone landscape viewport inside safe-area padding', async ({ page }) => {
+  await page.setViewportSize({ width: 812, height: 375 })
+  await page.goto('/')
+
+  const layout = page.locator('.app-layout')
+  const calculator = page.locator('.calculator-card')
+  const [layoutBox, calculatorBox] = await Promise.all([layout.boundingBox(), calculator.boundingBox()])
+
+  expect(layoutBox).not.toBeNull()
+  expect(calculatorBox).not.toBeNull()
+  await expect(page.locator('.app-header')).toBeHidden()
+  expect(calculatorBox!.x).toBeGreaterThan(layoutBox!.x)
+  expect(calculatorBox!.x + calculatorBox!.width).toBeLessThan(layoutBox!.x + layoutBox!.width)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })
 
 test('advanced mode handles science, history, memory and persistence', async ({ page }) => {
