@@ -83,7 +83,7 @@ function updateMemory(state: CalculatorState, direction: 1 | -1): CalculatorStat
 }
 
 function startsNewExpression(value: string): boolean {
-  return /^[0-9.,(πe]|^(sin|cos|tan|log|ln|sqrt|inv|sqr)\($/.test(value)
+  return /^[0-9.,(πex]|^(sin|cos|tan|log|ln|sqrt|inv|sqr)\($/.test(value)
 }
 
 function normalizeForInput(value: string): string {
