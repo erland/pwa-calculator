@@ -1,7 +1,7 @@
 import { evaluateExpression } from '../engine/evaluate'
 import { CalculatorError, type AngleMode } from '../engine/types'
 import { formatNumber } from '../formatting/formatNumber'
-import type { CalculatorMode, HistoryEntry, PersistedState, Theme } from '../../persistence/storage'
+import type { HistoryEntry, PersistedState, Theme } from '../../persistence/storage'
 
 export interface CalculatorState extends PersistedState {
   expression: string
@@ -17,7 +17,6 @@ export type CalculatorAction =
   | { type: 'clear' }
   | { type: 'backspace' }
   | { type: 'toggle-sign' }
-  | { type: 'set-mode'; mode: CalculatorMode }
   | { type: 'set-angle'; angleMode: AngleMode }
   | { type: 'set-theme'; theme: Theme }
   | { type: 'memory-clear' }
@@ -47,7 +46,6 @@ export function calculatorReducer(state: CalculatorState, action: CalculatorActi
     case 'clear': return { ...state, expression: '', result: '0', rawResult: null, error: null, justEvaluated: false }
     case 'backspace': return { ...state, expression: state.expression.slice(0, -1), error: null, justEvaluated: false }
     case 'toggle-sign': return { ...state, expression: state.expression ? `-(${state.expression})` : '-', error: null, justEvaluated: false }
-    case 'set-mode': return { ...state, mode: action.mode }
     case 'set-angle': return { ...state, angleMode: action.angleMode }
     case 'set-theme': return { ...state, theme: action.theme }
     case 'memory-clear': return { ...state, memory: null }
@@ -67,9 +65,7 @@ function evaluateState(state: CalculatorState): CalculatorState {
   try {
     const rawResult = evaluateExpression(state.expression, state.angleMode)
     const result = formatNumber(rawResult)
-    const history: HistoryEntry[] = state.mode === 'advanced'
-      ? [{ id: createId(), expression: state.expression, result, createdAt: Date.now() }, ...state.history].slice(0, 100)
-      : state.history
+    const history: HistoryEntry[] = [{ id: createId(), expression: state.expression, result, createdAt: Date.now() }, ...state.history].slice(0, 100)
     return { ...state, expression: normalizeForInput(result), result, rawResult, error: null, justEvaluated: true, history }
   } catch (error) {
     const message = error instanceof CalculatorError ? error.message : 'Beräkningen kunde inte genomföras.'
