@@ -268,10 +268,10 @@ Close the change series with regression coverage, documentation and releasable c
 
 #### Done criteria
 
-- [ ] All Must graphing acceptance behavior is implemented and verified.
-- [ ] Existing calculator acceptance remains green.
-- [ ] Canonical docs describe the implemented current state.
-- [ ] Change series is ready to merge/release.
+- [x] All Must graphing acceptance behavior is implemented and verified.
+- [x] Existing calculator acceptance remains green.
+- [x] Canonical docs describe the implemented current state.
+- [x] Change series is ready to merge/release.
 
 #### Dependencies
 
