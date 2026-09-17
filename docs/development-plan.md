@@ -99,10 +99,10 @@ Make landscape feel more natural by placing the active calculator on the right a
 
 #### Done criteria
 
-- [ ] Secondary workspace is left of the calculator in landscape.
-- [ ] Calculator/numeric keypad remains fixed through graph/function transitions.
-- [ ] Scientific controls are bottom-aligned relative to numeric keypad.
-- [ ] Safe-area/no-scroll behavior remains green.
+- [x] Secondary workspace is left of the calculator in landscape.
+- [x] Calculator/numeric keypad remains fixed through graph/function transitions.
+- [x] Scientific controls are bottom-aligned relative to numeric keypad.
+- [x] Safe-area/no-scroll behavior remains green.
 
 #### Dependencies
 
