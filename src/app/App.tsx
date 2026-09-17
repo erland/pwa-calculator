@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useReducer, useState } from 'react'
 import { GraphCanvas } from '../calculator/graph/GraphCanvas'
 import { sampleGraph } from '../calculator/graph/sampleGraph'
+import { DEFAULT_GRAPH_VIEWPORT, isDefaultGraphViewport, panGraphViewport, zoomGraphViewport } from '../calculator/graph/viewport'
 import { calculatorReducer, createCalculatorState, type CalculatorAction } from '../calculator/state/calculatorState'
 import { AdvancedKeypad } from '../components/AdvancedKeypad'
 import { BasicKeypad } from '../components/BasicKeypad'
@@ -8,21 +9,20 @@ import { HistoryPanel } from '../components/HistoryPanel'
 import { UpdatePrompt } from '../components/UpdatePrompt'
 import { loadPersistedState, savePersistedState, type PersistedState, type Theme } from '../persistence/storage'
 
-const DEFAULT_GRAPH_VIEWPORT = { xMin: -10, xMax: 10, yMin: -10, yMax: 10 }
-
 export function App() {
   const [state, dispatch] = useReducer(calculatorReducer, undefined, () => createCalculatorState(loadPersistedState()))
   const [functionsOpen, setFunctionsOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [graphViewport, setGraphViewport] = useState(DEFAULT_GRAPH_VIEWPORT)
   const graphActive = containsVariableX(state.expression)
   const graphSample = useMemo(() => {
     if (!graphActive) return null
     try {
-      return sampleGraph(state.expression, { ...DEFAULT_GRAPH_VIEWPORT, width: 720 }, state.angleMode)
+      return sampleGraph(state.expression, { ...graphViewport, width: 720 }, state.angleMode)
     } catch {
       return { segments: [], sampleCount: 0 }
     }
-  }, [graphActive, state.angleMode, state.expression])
+  }, [graphActive, graphViewport, state.angleMode, state.expression])
   const persisted = useMemo<PersistedState>(() => ({
     angleMode: state.angleMode,
     theme: state.theme,
@@ -32,6 +32,9 @@ export function App() {
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
   useEffect(() => applyTheme(state.theme), [state.theme])
+  useEffect(() => {
+    if (!graphActive) setGraphViewport(DEFAULT_GRAPH_VIEWPORT)
+  }, [graphActive])
   useLayoutEffect(() => bindKeyboard(dispatch), [])
 
   return (
@@ -92,8 +95,12 @@ export function App() {
               {graphActive && (
                 <GraphCanvas
                   expression={state.expression}
-                  viewport={DEFAULT_GRAPH_VIEWPORT}
+                  viewport={graphViewport}
                   segments={graphSample?.segments ?? []}
+                  onPan={(deltaPixels, size) => setGraphViewport((viewport) => panGraphViewport(viewport, deltaPixels, size))}
+                  onZoom={(factor, anchor) => setGraphViewport((viewport) => zoomGraphViewport(viewport, factor, anchor))}
+                  onReset={() => setGraphViewport(DEFAULT_GRAPH_VIEWPORT)}
+                  resetDisabled={isDefaultGraphViewport(graphViewport)}
                 />
               )}
             </div>
