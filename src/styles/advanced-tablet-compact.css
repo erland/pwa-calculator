@@ -46,6 +46,7 @@
 
   .mode-advanced .advanced-controls {
     padding: .45rem;
+    padding-bottom: 0;
   }
 
   .mode-advanced .setting-row,
