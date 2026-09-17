@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/graphing-support.md
-  selected_step: DEV-013
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -23,19 +23,21 @@ progress:
     - DEV-011
     - DEV-012
     - CHG-UNIFIED-CALCULATOR
-  in_progress: DEV-013
+    - DEV-013
+  in_progress: null
   next:
-    recommended: DEV-013
-    reason: "Variabelstöd i expression engine är första riskreducerande grunden för grafprovtagning. Steget är implementerat på work branch men väntar på required CI-verifiering."
+    recommended: DEV-014
+    reason: "Variabeln x är verifierat stödd i expression engine. Nästa riskreducerande steg är en ren graph sampler som hanterar domänfel och diskontinuiteter innan Canvas/UI integreras."
 blockers: []
 verification:
-  last_status: pending
+  last_status: passed
   baseline: green
   commands:
     - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
-    - "DEV-013 expression-engine tests: pending CI"
-    - "DEV-013 lint/typecheck/full tests/build: pending CI"
-  notes: "Graphing CHANGE-serien använder ett stabilt vänsterområde för kalkylatorn och en sekundär landskapsyta för functions/graph. DEV-013 introducerar endast explicit x-variabelcontext i expression engine; ingen graph UI exponeras ännu."
+    - "DEV-013 npm run verify in GitHub Actions CI #30: passed"
+    - "DEV-013 npm run build:pages in GitHub Actions CI #30: passed"
+    - "DEV-013 npm run test:e2e in GitHub Actions CI #30: passed"
+  notes: "DEV-013 introduces EvaluationVariables with optional x, resolves x through explicit evaluation context, preserves existing numeric-expression callers through a default empty context, and returns controlled VARIABLE errors for missing/non-finite x values. No graph UI is exposed yet."
 source_state:
   drift: none
-  reference: "GitHub branch feature/graphing-support from main 7061ba865bad3dc104bddfff7f7d3bb3176a4d24; active graphing change CHG-GRAPHING-SUPPORT."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-013 verified by CI #30 on commit cd00ee311c856e10b6536e25615c1174188e64b8."
