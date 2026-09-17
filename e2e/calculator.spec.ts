@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test'
 test('calculator handles basic arithmetic and keyboard input without a mode selector', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('navigation', { name: 'Miniräknarläge' })).toHaveCount(0)
+  await expect(page.locator('.app-header')).toHaveCount(0)
+  await expect(page.getByRole('combobox', { name: 'Tema' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
   await expect(page.getByText('Installera eller använd offline')).toHaveCount(0)
   await page.keyboard.type('2+3*4')
@@ -83,7 +85,7 @@ test('phone landscape keeps numeric keypad fixed when x activates the graph', as
   expect(functionsBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
   expect(functionsBasic!.y).toBeCloseTo(beforeBasic!.y, 0)
 
-  await expect(page.locator('.app-header')).toBeHidden()
+  await expect(page.locator('.app-header')).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })
@@ -155,11 +157,19 @@ test('graph viewport can zoom, pan and reset without moving the keypad', async (
   expect(keypadAfterReset!.y).toBeCloseTo(keypadBefore!.y, 0)
 })
 
-test('theme persists after reload', async ({ page }) => {
+test('theme follows the system color-scheme preference without persisted user state', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' })
   await page.goto('/')
-  await page.getByRole('combobox', { name: 'Tema' }).selectOption('dark')
-  await page.reload()
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  const lightPage = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--page').trim())
+  expect(await page.locator('html').getAttribute('data-theme')).toBeNull()
+  await expect(page.getByRole('combobox', { name: 'Tema' })).toHaveCount(0)
+
+  await page.emulateMedia({ colorScheme: 'dark' })
+  const darkPage = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--page').trim())
+  expect(darkPage).not.toBe(lightPage)
+
+  const persisted = await page.evaluate(() => window.localStorage.getItem('calculator-pwa:v1'))
+  expect(persisted).not.toContain('"theme"')
 })
 
 test('mathematical errors are recoverable without reloading', async ({ page }) => {
