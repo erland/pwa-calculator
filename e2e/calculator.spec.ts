@@ -54,22 +54,29 @@ test('small portrait phone keeps graphing compact and collapses functions after 
   await expect(page.getByRole('button', { name: '7' })).toBeVisible()
 })
 
-test('phone landscape keeps numeric keypad fixed when x activates the graph', async ({ page }) => {
+test('phone landscape keeps calculator right and fixed while secondary workspace changes', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/')
 
   const advanced = page.locator('.advanced-controls')
+  const advancedKeypad = page.locator('.advanced-keypad')
   const basic = page.locator('.basic-keypad')
   const beforeBasic = await basic.boundingBox()
   const advancedBox = await advanced.boundingBox()
+  const advancedKeypadBox = await advancedKeypad.boundingBox()
   expect(beforeBasic).not.toBeNull()
   expect(advancedBox).not.toBeNull()
-  expect(advancedBox!.x).toBeGreaterThan(beforeBasic!.x)
+  expect(advancedKeypadBox).not.toBeNull()
+  expect(advancedBox!.x).toBeLessThan(beforeBasic!.x)
+  expect(Math.abs((advancedKeypadBox!.y + advancedKeypadBox!.height) - (beforeBasic!.y + beforeBasic!.height))).toBeLessThanOrEqual(2)
 
   await page.getByRole('button', { name: 'Variabel x' }).click()
   const graph = page.getByRole('img', { name: /Graf för uttrycket x/ })
   await expect(graph).toBeVisible()
   await expect(advanced).toBeHidden()
+  const graphBox = await graph.boundingBox()
+  expect(graphBox).not.toBeNull()
+  expect(graphBox!.x).toBeLessThan(beforeBasic!.x)
 
   const afterBasic = await basic.boundingBox()
   expect(afterBasic).not.toBeNull()
@@ -82,27 +89,39 @@ test('phone landscape keeps numeric keypad fixed when x activates the graph', as
   await expect(advanced).toBeVisible()
   await expect(graph).toBeHidden()
   const functionsBasic = await basic.boundingBox()
+  const reopenedAdvancedKeypad = await advancedKeypad.boundingBox()
   expect(functionsBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
   expect(functionsBasic!.y).toBeCloseTo(beforeBasic!.y, 0)
+  expect(reopenedAdvancedKeypad).not.toBeNull()
+  expect(Math.abs((reopenedAdvancedKeypad!.y + reopenedAdvancedKeypad!.height) - (functionsBasic!.y + functionsBasic!.height))).toBeLessThanOrEqual(2)
 
-  await expect(page.locator('.app-header')).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })
 
-test('iPad-sized landscape viewport renders graph in the secondary workspace without moving keypad', async ({ page }) => {
+test('iPad-sized landscape keeps secondary workspace left and scientific keypad bottom-aligned', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 768 })
   await page.goto('/')
 
   const basic = page.locator('.basic-keypad')
+  const advanced = page.locator('.advanced-controls')
+  const advancedKeypad = page.locator('.advanced-keypad')
   const beforeBasic = await basic.boundingBox()
-  const advancedBox = await page.locator('.advanced-controls').boundingBox()
+  const advancedBox = await advanced.boundingBox()
+  const advancedKeypadBox = await advancedKeypad.boundingBox()
   expect(beforeBasic).not.toBeNull()
   expect(advancedBox).not.toBeNull()
-  expect(advancedBox!.x).toBeGreaterThan(beforeBasic!.x)
+  expect(advancedKeypadBox).not.toBeNull()
+  expect(advancedBox!.x).toBeLessThan(beforeBasic!.x)
+  expect(Math.abs((advancedKeypadBox!.y + advancedKeypadBox!.height) - (beforeBasic!.y + beforeBasic!.height))).toBeLessThanOrEqual(2)
 
   await page.getByRole('button', { name: 'Variabel x' }).click()
-  await expect(page.getByRole('img', { name: /Graf för uttrycket x/ })).toBeVisible()
+  const graph = page.getByRole('img', { name: /Graf för uttrycket x/ })
+  await expect(graph).toBeVisible()
+  const graphBox = await graph.boundingBox()
+  expect(graphBox).not.toBeNull()
+  expect(graphBox!.x).toBeLessThan(beforeBasic!.x)
+
   const afterBasic = await basic.boundingBox()
   expect(afterBasic).not.toBeNull()
   expect(afterBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
