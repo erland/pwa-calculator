@@ -1,76 +1,80 @@
-# Release readiness – Graphing support
+# Release readiness – Compact responsive layout
 
 ## Bedömning
 
 **READY_WITH_DEVICE_CHECK**
 
-Graphing change-serien är automatiskt verifierad och redo att mergeas. Den kvarvarande kontrollen är en rekommenderad manuell real-device-genomgång av touch/pan/zoom och safe-area på representativa iPhone/iPad-enheter. Den kontrollen är inte ett känt kodblockerande fel och automatiserad Playwright-täckning är grön.
+Compact-responsive change-serien är automatiskt verifierad genom DEV-019–DEV-021 och avslutas i DEV-022 med full PR-head-verifiering. Kvarvarande kontroll är en rekommenderad manuell real-device-genomgång på representativ iPhone/iPad för faktisk safe-area/touchkänsla. Den är inte ett känt kodblockerande fel.
 
 ## Gates
 
 | Gate | Status | Evidens |
 |---|---|---|
-| Graphing Must-scope | PASS | Funktionell specifikation AC-015–AC-020 samt DEV-013–DEV-017 |
-| Viewportinteraktion | PASS | AC-021, viewport-unit tests och Playwright pan/zoom/reset |
-| Lint och typkontroll | PASS | `npm run verify`, CI #63 och efterföljande grön PR-head |
-| Enhets-/komponenttest | PASS | Expression engine, sampler, viewport och GraphCanvas-tester |
-| E2E desktop och mobil | PASS | Playwright i Chromium desktop/mobile-profiler |
-| Responsiv landskapslayout | PASS | Telefon/iPad-landskap, stabil keypad-position och overflow-assertions |
-| PWA-build och offline | PASS | Pages-build och befintlig offline-E2E |
-| Lokal/offline graphing | PASS | Ingen backend eller extern graph-/math-tjänst; graphing ingår i statisk bundle |
-| Persistenskompatibilitet | PASS | Graph viewport kräver ingen schemaändring; legacy `mode` ignoreras fortsatt |
-| Dokumentationsdrift | PASS | README, funktionell specifikation, arkitektur, changelog, change record och System Builder-status synkas i DEV-018 |
-| Manuell touch/device-kontroll | RECOMMENDED | Checklista nedan; ska inte markeras utförd utan verklig enhetskontroll |
+| Header/theme removal | PASS | DEV-019 + component/E2E |
+| System theme | PASS | `prefers-color-scheme`-E2E och ingen `theme` i ny persistens |
+| Legacy persistence | PASS | legacy `theme`/`mode` accepteras och ignoreras med angleMode/memory/history bevarade |
+| Reversed landscape | PASS | DEV-020 Playwright 844×390 och 1024×768 |
+| Stable numeric keypad | PASS | koordinatassertions genom graph/functions-växling |
+| Scientific bottom alignment | PASS | lower-edge geometry assertions; initial offset reparerad i DEV-020 |
+| Compact portrait 375×812 | PASS | DEV-021 Playwright med fullt expanderade Funktioner och komplett numeric keypad utan page scroll |
+| Graph regression | PASS | graph activation, pan/zoom/reset och portrait hint ingår i E2E |
+| Calculator regression | PASS | arithmetic, science, DEG/RAD, history, memory och error recovery |
+| PWA/offline | PASS | Pages-build + service-worker/offline E2E |
+| Dokumentationsdrift | PASS | README, spec, architecture, changelog, readiness, change record och status synkas i DEV-022 |
+| Manuell touch/device-kontroll | RECOMMENDED | Checklista nedan; inte markerad utförd utan verklig enhetskontroll |
 
-## Graphing acceptance
+## Compact responsive acceptance
 
 | Kriterium | Status | Primär evidens |
 |---|---|---|
-| AC-015 x-utvärdering | PASS | Expression engine unit tests |
-| AC-016 Automatisk graf | PASS | Playwright landscape graph activation |
-| AC-017 Stabil knappsats | PASS | Playwright jämför keypad-koordinater före/efter graph activation |
-| AC-018 Funktioner under graf | PASS | Playwright secondary-workspace-växling utan keypad-flytt |
-| AC-019 Porträtt | PASS | Playwright phone portrait: `x` kan matas in, grafyta dold, hint visas |
-| AC-020 Diskontinuitet | PASS | Sampler tests för `1/x`, `tan(x)` och domänfel |
-| AC-021 Viewportinteraktion | PASS | Unit tests + Playwright pan/zoom/reset |
+| Ingen header/temaväljare | PASS | DOM/E2E |
+| Systemtema utan persistens | PASS | media-emulation + localStorage assertion |
+| Legacy theme/mode migration | PASS | persistence unit tests |
+| Secondary workspace vänster | PASS | phone/iPad geometry assertions |
+| Calculator/numeric keypad höger och stabil | PASS | före/efter graph/functions coordinate assertions |
+| Scientific keypad bottom-aligned | PASS | phone/iPad lower-edge assertions |
+| 375×812 expanded Functions fit | PASS | dedicated portrait E2E |
+| x auto-collapse + portrait hint | PASS | portrait E2E |
+| No page overflow | PASS | portrait/landscape document geometry assertions |
 
 ## Regression
 
-Följande befintliga beteenden ingår fortsatt i den gröna regressionssviten:
+Följande beteenden ingår fortsatt i den gröna regressionssviten:
 
 - grundläggande aritmetik och operatorprioritet,
 - vetenskapliga funktioner och DEG/RAD,
 - historik och reload-persistens,
 - minne,
-- tema och reload-persistens,
-- tangentbordsinmatning,
+- systemtema,
+- tangentbordsinmatning inklusive `x`,
 - felåterhämtning,
 - telefonporträtt,
 - telefon- och surfplattelandskap,
+- graph activation och graph viewport interaction,
 - PWA-manifest/service worker och offlinekörning.
 
 ## Kända begränsningar
 
 - JavaScript `Number`/IEEE-754 används; ingen godtycklig precision.
 - En realvärd funktion av `x` visas åt gången.
-- Grafen använder numerisk sampling. Domänfel och uppenbara hopp segmenteras, men symbolisk identifiering av alla asymptoter garanteras inte.
-- Full grafyta är i initial scope en landskapsfunktion; telefonporträtt visar uttrycket och en diskret landskapsindikering.
-- Grafviewporten är temporär och persisteras inte mellan sessioner.
-- Flera samtidiga grafer, tabeller, nollställen, skärningspunkter, extrempunkter, derivator, symbolisk algebra och komplexa tal ligger utanför scope.
-- Touch-/wheel-detaljer kan variera mellan browser/OS även om pointer- och wheel-flöden verifieras automatiskt.
+- Grafen använder numerisk sampling och garanterar inte symbolisk identifiering av alla asymptoter.
+- Full grafyta är en landskapsfunktion; telefonporträtt visar uttrycket och en diskret landskapsindikering.
+- Grafviewporten persisteras inte mellan sessioner.
+- Appens tema kan inte väljas oberoende av systemets färgschema.
+- Touch-/wheel-/safe-area-detaljer kan variera mellan browser/OS även om automatiserad geometri och pointer/wheel-flöden är verifierade.
 
 ## Manuell real-device-checklista
 
 Före eller strax efter merge rekommenderas följande på faktisk hårdvara:
 
-- [ ] iPhone porträtt: vanlig kalkylator ryms utan oönskad scroll; `x` under Funktioner ger endast diskret grafhint.
-- [ ] iPhone landskap: `x^2-4` visar grafen; sifferknappsatsen ligger kvar; safe-area/notch respekteras.
-- [ ] iPhone landskap: dra grafen med finger och verifiera att sidan inte panoreras i stället.
-- [ ] iPhone/iPad landskap: pinch/zoom där browsern levererar motsvarande pointer/wheel-input; verifiera användbar känsla.
-- [ ] iPad landskap: graf + kalkylator utnyttjar bredden utan page overflow.
-- [ ] Ljust/mörkt tema: grid, axlar och kurva är läsbara.
-- [ ] Återställ graf: viewport återgår till standard utan att kalkylatorkolumnen flyttar sig.
+- [ ] iPhone 13 mini porträtt: öppna Funktioner och verifiera att hela funktionspanelen + hela sifferknappsatsen ryms utan oönskad page scroll.
+- [ ] iPhone porträtt: välj `x`; Funktioner fälls ihop och endast diskret grafhint visas.
+- [ ] iPhone landskap: secondary graph/scientific-yta ligger vänster, calculator/numeric keypad höger och notch/safe-area respekteras.
+- [ ] iPhone landskap: dra/zooma grafen och verifiera att sidan inte panoreras i stället.
+- [ ] iPad landskap: samma vänster/höger-modell och bottom alignment känns visuellt balanserad.
+- [ ] Ljust/mörkt systemtema: kalkylator, scientific-kontroller, grid, axlar och kurva är läsbara.
+- [ ] Historik/minne/DEG-RAD: verifiera normal användning efter uppgradering från tidigare sparad appdata.
 
 ## Merge/release
 
-DEV-018 kräver ingen ny backend, migration eller deploymentskonfiguration. När sista PR-headen har full grön CI och dokumentations-/statussynken är committad är graphing change-serien merge-ready. En separat versions-/releaseändring kan göras efter merge enligt projektets normala releaseflöde.
+DEV-022 kräver ingen backend, migration eller deploymentskonfiguration. När sista PR-headen har full grön CI och System Builder-statusen markerar DEV-022 samt `CHG-COMPACT-RESPONSIVE-LAYOUT` completed är PR #6 merge-ready. En separat versions-/releaseändring kan göras efter merge enligt projektets normala releaseflöde.
