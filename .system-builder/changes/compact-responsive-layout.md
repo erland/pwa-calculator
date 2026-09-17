@@ -6,7 +6,7 @@
 - Change ID: CHG-COMPACT-RESPONSIVE-LAYOUT
 - Blast radius: UI layout + calculator state/persistence
 - Baseline: `main` at `27a27a9646576c37b4eeec6ecf451ba5de49e88f`
-- Baseline graphing support was complete and deployed successfully before this change series.
+- Status: completed, merge-ready after final PR-head CI
 
 ## Goal
 
@@ -59,19 +59,21 @@ Make the calculator more space-efficient and visually balanced after graphing su
 
 ### DEV-022 – Responsive acceptance and docs
 
-- Canonical README/spec/architecture/changelog/release-readiness/change record are synchronized to final behavior.
-- Final CI must be green on the synchronized PR head before this step/change is marked completed.
+- Synchronized README, functional specification, architecture, changelog, release-readiness, development plan, change record and System Builder status.
+- Final synchronized implementation/docs head CI #110 passed `npm run verify`, Pages-build and Playwright E2E.
+- DEV-022 and `CHG-COMPACT-RESPONSIVE-LAYOUT` are completed.
 - Real-device iPhone/iPad checks remain recommended follow-up and are not claimed as already performed.
 
-## Acceptance focus
+## Acceptance result
 
-- iPhone 13 mini-sized portrait: expanded Functions plus numeric keypad fits without vertical page scrolling.
-- Phone landscape: secondary workspace left, calculator right, no overflow, safe areas preserved.
-- iPad landscape: same left/right model with aligned scientific and numeric keypad baselines.
-- Graph activation and Functions switching do not move the numeric keypad.
-- App has no visible title/header or theme selector.
-- Theme follows system light/dark preference.
-- Existing persisted angle mode, memory and history survive upgrade from data that contains legacy theme/mode fields.
+- iPhone 13 mini-sized portrait: expanded Functions plus numeric keypad fits without vertical page scrolling — PASS.
+- Phone landscape: secondary workspace left, calculator right, no overflow, safe areas preserved — PASS in automated geometry/regression.
+- iPad landscape: same left/right model with aligned scientific and numeric keypad baselines — PASS.
+- Graph activation and Functions switching do not move the numeric keypad — PASS.
+- App has no visible title/header or theme selector — PASS.
+- Theme follows system light/dark preference — PASS.
+- Existing persisted angle mode, memory and history survive upgrade from data containing legacy theme/mode fields — PASS.
+- Calculator/graph/PWA regressions — PASS.
 
 ## Automated evidence
 
@@ -79,7 +81,7 @@ Make the calculator more space-efficient and visually balanced after graphing su
 - DEV-020 repaired CI #89: passed.
 - DEV-021 CI #101: passed.
 - DEV-021 closing head CI #103: passed.
-- Final DEV-022 synchronized-head CI: pending at time of this documentation commit.
+- DEV-022 synchronized implementation/docs CI #110: passed.
 
 ## Manual follow-up
 
