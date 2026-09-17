@@ -9,6 +9,10 @@ export interface GraphCanvasProps {
   viewport: GraphRenderViewport
   segments: GraphSegment[]
   className?: string
+  onPan?: (deltaPixels: { x: number; y: number }, size: { width: number; height: number }) => void
+  onZoom?: (factor: number, anchor: { x: number; y: number }) => void
+  onReset?: () => void
+  resetDisabled?: boolean
 }
 
 interface CanvasSize {
@@ -16,8 +20,18 @@ interface CanvasSize {
   height: number
 }
 
-export function GraphCanvas({ expression, viewport, segments, className = '' }: GraphCanvasProps) {
+export function GraphCanvas({
+  expression,
+  viewport,
+  segments,
+  className = '',
+  onPan,
+  onZoom,
+  onReset,
+  resetDisabled = false,
+}: GraphCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const dragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null)
   const graphableExpression = expression.trim()
 
   useEffect(() => {
@@ -58,13 +72,58 @@ export function GraphCanvas({ expression, viewport, segments, className = '' }: 
     ? `Graf för uttrycket ${graphableExpression}`
     : `Graf för uttrycket ${graphableExpression}. Ingen kurva är synlig i det aktuella området.`
 
+  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!onPan) return
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY }
+  }
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    const drag = dragRef.current
+    if (!onPan || !drag || drag.pointerId !== event.pointerId) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const delta = { x: event.clientX - drag.x, y: event.clientY - drag.y }
+    dragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY }
+    onPan(delta, { width: Math.max(1, rect.width), height: Math.max(1, rect.height) })
+  }
+
+  const finishPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (dragRef.current?.pointerId === event.pointerId) dragRef.current = null
+  }
+
+  const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
+    if (!onZoom) return
+    event.preventDefault()
+    const rect = event.currentTarget.getBoundingClientRect()
+    const factor = Math.exp(event.deltaY * 0.0015)
+    onZoom(factor, {
+      x: (event.clientX - rect.left) / Math.max(1, rect.width),
+      y: (event.clientY - rect.top) / Math.max(1, rect.height),
+    })
+  }
+
   return (
     <figure className={classes}>
+      {onReset && (
+        <button
+          type="button"
+          className="graph-canvas__reset"
+          onClick={onReset}
+          disabled={resetDisabled}
+        >
+          Återställ graf
+        </button>
+      )}
       <canvas
         ref={canvasRef}
         className="graph-canvas__surface"
         role="img"
         aria-label={curveDescription}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishPointer}
+        onPointerCancel={finishPointer}
+        onWheel={handleWheel}
       />
       <figcaption className="graph-canvas__caption">{curveDescription}</figcaption>
     </figure>
