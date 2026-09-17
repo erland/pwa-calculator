@@ -9,11 +9,11 @@ Arkitekturen ska prioritera:
 3. stabil responsiv layout där grundknappsatsen inte flyttar sig när sekundär funktionalitet ändras,
 4. helt lokal/offlinekapabel funktion utan backend,
 5. liten dependency- och drift-yta,
-6. tydliga domängränser mellan beräkning, grafprovtagning och rendering.
+6. tydliga domängränser mellan beräkning, grafprovtagning, viewportinteraktion och rendering.
 
 ## 2. Systemkontext
 
-Calculator PWA är en klientbaserad React/TypeScript-applikation som levereras statiskt och kör all matematik, grafprovtagning, rendering och persistens lokalt i webbläsaren.
+Calculator PWA är en klientbaserad React/TypeScript-applikation som levereras statiskt och kör all matematik, grafprovtagning, rendering, viewportinteraktion och persistens lokalt i webbläsaren.
 
 ```mermaid
 flowchart LR
@@ -21,8 +21,10 @@ flowchart LR
     UI --> State[Calculator State]
     State --> Engine[Expression Engine]
     UI --> Graph[Graph Workspace]
+    Graph --> Viewport[Graph Viewport]
     Graph --> Sampler[Graph Sampler]
     Sampler --> Engine
+    Graph --> Canvas[Graph Canvas]
     UI --> Storage[(localStorage)]
     Browser[Service Worker / PWA] --> UI
 ```
@@ -95,7 +97,7 @@ Graph Sampler är ett rent domänlager mellan expression engine och rendering.
 Ansvar:
 
 - ta emot uttryck, angle mode och matematisk viewport,
-- generera representativa x-samples,
+- generera representativa x-samples med begränsad densitet,
 - utvärdera uttrycket genom Expression Engine med `{ x }`,
 - behandla domän-/resultatfel som avbrott i kurvan,
 - dela output i drawable segments,
@@ -110,22 +112,37 @@ GraphSampleResult
     points[] { x, y }
 ```
 
-Sampler-strategin ska kunna bytas utan att UI/Canvas behöver känna till parserdetaljer.
+Sampler-strategin kan bytas utan att UI/Canvas behöver känna till parserdetaljer.
 
-### 3.6 Graph Canvas
+### 3.6 Graph Viewport
 
-Graph Canvas ansvarar endast för visning:
+Viewportlagret är ren matematik och ansvarar för:
+
+- standardviewport `x/y = -10..10`,
+- översättning av drag i pixlar till matematisk panorering,
+- zoom runt en normaliserad pekarposition,
+- min/max-gränser för viewportens spann,
+- kontroll av om viewporten är i standardläge.
+
+Viewporten är temporär och persisteras inte i initial scope.
+
+### 3.7 Graph Canvas
+
+Graph Canvas ansvarar för visning och browserinteraktion:
 
 - matematisk koordinat → pixelkoordinat,
 - axlar och grid,
 - rendering av segment,
 - device pixel ratio,
 - tema,
-- viewportinteraktion i senare steg.
+- pointer-drag för panorering,
+- hjulzoom runt pekarens position,
+- reset-kontroll,
+- confinement av touchgest till graph surface via `touch-action`.
 
-Canvas ska inte själv evaluera uttryck eller försöka avgöra matematiska diskontinuiteter.
+Canvas evaluerar inte uttryck och avgör inte matematiska diskontinuiteter. Interaktionen skickar viewportförändringar till applikationslagret, vilket provar om grafen och renderar om den.
 
-### 3.7 Persistence Adapter
+### 3.8 Persistence Adapter
 
 `localStorage` kapslas bakom befintlig adapter och lagrar:
 
@@ -134,11 +151,11 @@ Canvas ska inte själv evaluera uttryck eller försöka avgöra matematiska disk
 - minne,
 - max 100 historikposter.
 
-Initial graphing-scope kräver ingen schemaändring. Aktuellt uttryck, graph samples och viewport är session-/UI-state och behöver inte persisteras.
+Grafstödet kräver ingen schemaändring. Aktuellt uttryck, graph samples och viewport är session-/UI-state och persisteras inte.
 
 Legacy-data som innehåller äldre mode-fält ska fortsatt kunna läsas defensivt och ignoreras.
 
-### 3.8 PWA / Service Worker
+### 3.9 PWA / Service Worker
 
 `vite-plugin-pwa`/Workbox levererar app shell och resurser offline. Grafstöd kräver inga nya nätverksanrop och ingår därför i samma statiska/offlinekapabla bundle.
 
@@ -171,7 +188,7 @@ Utan `x` visar secondary workspace vetenskapliga funktioner permanent.
 
 Med `x` visas grafen som standard. `Funktioner` ersätter då grafen tillfälligt i secondary workspace utan att flytta numeric keypad. Historik förblir on demand som overlay/drawer.
 
-Denna geometri är verifierad i Playwright genom att sifferknappsatsens position jämförs före och efter grafaktivering samt när funktionspanelen öppnas ovanpå grafytan.
+Denna geometri verifieras i Playwright genom att sifferknappsatsens position jämförs före och efter grafaktivering samt när funktionspanelen öppnas ovanpå grafytan.
 
 ## 5. Dataflöden
 
@@ -201,16 +218,16 @@ Enskilda evaluation errors under sampling blir segmentavbrott och inte ett globa
 
 ### 5.3 Viewportinteraktion
 
-I DEV-017:
-
 ```text
-pointer/wheel/touch
-→ viewport transform
+pointer drag / wheel
+→ Graph Canvas interaction
+→ pure viewport transform
+→ application viewport state
 → Graph Sampler
 → Graph Canvas repaint
 ```
 
-Graph gestures ska vara begränsade till graph surface och inte förändra calculator controls.
+Graph gestures är begränsade till graph surface och förändrar inte calculator controls. Reset återgår deterministiskt till standardviewporten.
 
 ## 6. Data och ägarskap
 
@@ -226,7 +243,7 @@ Temporära graph-objekt:
 - mathematical viewport,
 - sampled segments.
 
-Expression engine äger matematiksemantik. Graph Sampler äger sampling/discontinuity-policy. Canvas äger pixelrendering. UI äger layout/presentation.
+Expression engine äger matematiksemantik. Graph Sampler äger sampling/discontinuity-policy. Viewportlagret äger koordinattransformation för pan/zoom. Canvas äger pixelrendering och browsergesttolkning. UI äger layout/presentation.
 
 ## 7. Felmodell
 
@@ -251,12 +268,10 @@ Ett programmerings-/systemfel får inte döljas som en matematisk diskontinuitet
 Graphing introducerar upprepad expression evaluation. Därför gäller:
 
 - sampling density är begränsad/proportionerlig till viewport,
-- omritning ska undvika onödigt arbete,
-- pan/zoom får throttlas via browser rendering cadence när det behövs,
+- viewportens spann är begränsat för att undvika patologiska zoomlägen,
 - DOM-element per graph sample undviks; Canvas används,
-- prestanda ska verifieras på mobilklassad viewport/hårdvara i acceptans.
-
-Web Worker införs inte initialt men kan övervägas om mätning visar UI-blockering.
+- omprovtagning sker efter viewportförändring,
+- Web Worker införs inte initialt men kan övervägas om mätning på verklig mobil hårdvara visar UI-blockering.
 
 ## 10. Deployment och drift
 
@@ -292,9 +307,11 @@ Ett externt plottingbibliotek ska endast införas om den interna Canvas-lösning
 - ARCH-007: Vitest + RTL + Playwright.
 - ARCH-008: graphing använder samma Expression Engine med explicit variable context.
 - ARCH-009: Graph Sampler är ett separat rent domänlager mellan evaluator och renderer.
-- ARCH-010: Canvas 2D är default-renderer för initial graphing-scope.
+- ARCH-010: Canvas 2D är renderer för initial graphing-scope.
 - ARCH-011: graph presentation är expression-/viewport-driven och inte ett separat calculator mode.
 - ARCH-012: landscape calculator column är spatialt stabil; secondary workspace byter mellan functions och graph.
+- ARCH-013: graph viewport-transformationer är rena domänfunktioner; pointer/wheel events stannar i Canvas/UI-lagret.
+- ARCH-014: graph viewport är temporär och återställs deterministiskt, inte persisterad.
 
 ## 13. Viktiga trade-offs
 
@@ -310,6 +327,10 @@ Canvas ger liten dependency-yta och lämpar sig för många sampled points. Det 
 
 Initial version provar funktionen numeriskt i stället för att analysera den symboliskt. Det håller scope rimligt men kräver försiktig discontinuity-policy och betyder att perfekt identifiering av alla asymptoter inte garanteras.
 
+### Temporär viewport kontra persistens
+
+Viewporten återställs när grafsessionen lämnas och sparas inte mellan sessioner. Det minskar state-/migrationsytan och ger ett förutsägbart startläge, på bekostnad av att användaren inte kan återuppta en tidigare pan/zoom-position.
+
 ## 14. Öppna arkitekturfrågor
 
-Inga blockerande frågor efter DEV-016. DEV-017 ska avgöra den slutliga viewport-state-/gesture-modellen för pan, zoom och reset innan release readiness.
+Inga blockerande arkitekturfrågor återstår för den initiala graphing-serien. Verklig touchkänsla och prestanda på olika mobila enheter ska fortsatt följas upp som manuell acceptans och kan motivera framtida optimering utan att ändra nuvarande domängränser.
