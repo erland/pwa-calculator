@@ -1,13 +1,10 @@
 # Miniräknaren
 
-En responsiv och installerbar PWA med två tydliga nivåer:
+En responsiv och installerbar PWA som kombinerar traditionell vardagsräkning med vetenskapliga funktioner i ett enda adaptivt gränssnitt.
 
 **Publicerad app:** [https://erland.github.io/pwa-calculator/](https://erland.github.io/pwa-calculator/)
 
-Länken blir aktiv när den första GitHub-releasen har publicerats och Pages-workflowen har slutförts.
-
-- **Enkel** för traditionell vardagsräkning.
-- **Avancerad** för parenteser, procent, potens, kvadratrot, trigonometri, logaritmer, konstanter, minne och historik.
+Grundläggande siffer- och operatorfunktioner är alltid direkt tillgängliga. Vetenskapliga funktioner, DEG/RAD, minne och historik visas eller fälls fram utifrån tillgängligt skärmutrymme: på små porträttskärmar hålls de sekundära funktionerna undan tills de behövs, medan landskap och större skärmar kan visa mer samtidigt.
 
 Appen är helt lokal, saknar backend och kan användas offline efter den första fullständiga laddningen. Matematiska uttryck tolkas av en explicit parser utan `eval` eller dynamisk kodexekvering.
 
@@ -74,7 +71,7 @@ För att kontrollera offlinefunktionen:
 
 ## Lokal data
 
-Läge, tema, vinkelenhet, minne och de 100 senaste avancerade beräkningarna lagras versionsmärkt i `localStorage`. Korrupt eller blockerad lagring återställs defensivt och får inte hindra kärnberäkningen.
+Tema, vinkelenhet, minne och de 100 senaste slutförda beräkningarna lagras versionsmärkt i `localStorage`. Äldre lagringsdata som innehåller det tidigare fältet `mode` accepteras defensivt och fältet ignoreras. Korrupt eller blockerad lagring återställs defensivt och får inte hindra kärnberäkningen.
 
 ## Kända begränsningar
 

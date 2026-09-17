@@ -1,6 +1,5 @@
 import type { AngleMode } from '../calculator/engine/types'
 
-export type CalculatorMode = 'simple' | 'advanced'
 export type Theme = 'system' | 'light' | 'dark'
 
 export interface HistoryEntry {
@@ -11,7 +10,6 @@ export interface HistoryEntry {
 }
 
 export interface PersistedState {
-  mode: CalculatorMode
   angleMode: AngleMode
   theme: Theme
   memory: number | null
@@ -23,8 +21,12 @@ interface Envelope {
   state: PersistedState
 }
 
+interface LegacyEnvelope {
+  version: 1
+  state: PersistedState & { mode?: 'simple' | 'advanced' }
+}
+
 export const DEFAULT_PERSISTED_STATE: PersistedState = {
-  mode: 'simple',
   angleMode: 'DEG',
   theme: 'system',
   memory: null,
@@ -45,7 +47,8 @@ export function loadPersistedState(storage: StorageLike | null = getBrowserStora
     if (!raw) return { ...DEFAULT_PERSISTED_STATE }
     const value: unknown = JSON.parse(raw)
     if (!isEnvelope(value)) return { ...DEFAULT_PERSISTED_STATE }
-    return { ...value.state, history: value.state.history.slice(0, 100) }
+    const { angleMode, theme, memory, history } = value.state
+    return { angleMode, theme, memory, history: history.slice(0, 100) }
   } catch {
     return { ...DEFAULT_PERSISTED_STATE }
   }
@@ -70,13 +73,14 @@ function getBrowserStorage(): StorageLike | null {
   }
 }
 
-function isEnvelope(value: unknown): value is Envelope {
+function isEnvelope(value: unknown): value is LegacyEnvelope {
   if (!value || typeof value !== 'object') return false
-  const envelope = value as Partial<Envelope>
+  const envelope = value as Partial<LegacyEnvelope>
   if (envelope.version !== 1 || !envelope.state || typeof envelope.state !== 'object') return false
-  const state = envelope.state as Partial<PersistedState>
+  const state = envelope.state as Partial<LegacyEnvelope['state']>
+  const modeIsCompatible = state.mode === undefined || state.mode === 'simple' || state.mode === 'advanced'
   return (
-    (state.mode === 'simple' || state.mode === 'advanced') &&
+    modeIsCompatible &&
     (state.angleMode === 'DEG' || state.angleMode === 'RAD') &&
     (state.theme === 'system' || state.theme === 'light' || state.theme === 'dark') &&
     (state.memory === null || typeof state.memory === 'number') &&

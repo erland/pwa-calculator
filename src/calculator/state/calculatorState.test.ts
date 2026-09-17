@@ -18,15 +18,12 @@ describe('calculator state', () => {
     expect(state.error).toBeNull()
   })
 
-  it('preserves expressions across mode changes and stores advanced history', () => {
+  it('stores calculation history in the unified calculator mode', () => {
     vi.spyOn(Date, 'now').mockReturnValue(123)
     let state = createCalculatorState(DEFAULT_PERSISTED_STATE)
     state = calculatorReducer(state, { type: 'append', value: '2+2' })
-    state = calculatorReducer(state, { type: 'set-mode', mode: 'advanced' })
-    expect(state.expression).toBe('2+2')
     state = calculatorReducer(state, { type: 'evaluate' })
     expect(state.history[0]).toMatchObject({ expression: '2+2', result: '4' })
-    state = calculatorReducer(state, { type: 'set-mode', mode: 'simple' })
     expect(state.expression).toBe('4')
   })
 

@@ -11,27 +11,20 @@ export function App() {
   const [functionsOpen, setFunctionsOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
   const persisted = useMemo<PersistedState>(() => ({
-    mode: state.mode,
     angleMode: state.angleMode,
     theme: state.theme,
     memory: state.memory,
     history: state.history,
-  }), [state.mode, state.angleMode, state.theme, state.memory, state.history])
+  }), [state.angleMode, state.theme, state.memory, state.history])
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
   useEffect(() => applyTheme(state.theme), [state.theme])
   useLayoutEffect(() => bindKeyboard(dispatch), [])
 
-  const switchToSimple = () => {
-    setFunctionsOpen(false)
-    setHistoryOpen(false)
-    dispatch({ type: 'set-mode', mode: 'simple' })
-  }
-
   return (
     <>
       <a className="skip-link" href="#calculator">Hoppa till miniräknaren</a>
-      <main className={`app-layout mode-${state.mode}`}>
+      <main className="app-layout mode-advanced">
         <header className="app-header">
           <h1>Miniräknaren</h1>
           <label className="theme-picker">
@@ -44,54 +37,45 @@ export function App() {
           </label>
         </header>
 
-        <nav className="segmented mode-switch" aria-label="Miniräknarläge">
-          <button type="button" aria-pressed={state.mode === 'simple'} onClick={switchToSimple}>Enkel</button>
-          <button type="button" aria-pressed={state.mode === 'advanced'} onClick={() => dispatch({ type: 'set-mode', mode: 'advanced' })}>Avancerad</button>
-        </nav>
-
         <div className="workspace">
-          <section id="calculator" className="calculator-card" aria-label={`${state.mode === 'simple' ? 'Enkel' : 'Avancerad'} miniräknare`}>
+          <section id="calculator" className="calculator-card" aria-label="Miniräknare">
             <div className="display" role="status" aria-live="polite" aria-atomic="true">
               <span className="expression">{displayExpression(state.expression) || 'Skriv en beräkning'}</span>
               {state.error ? <strong className="error">{state.error}</strong> : <strong className="result">{state.result}</strong>}
             </div>
-            {state.mode === 'advanced' && (
-              <>
-                <div className="advanced-toolbar">
-                  <button
-                    type="button"
-                    className="panel-toggle functions-toggle"
-                    aria-expanded={functionsOpen}
-                    aria-controls="advanced-functions-panel"
-                    onClick={() => setFunctionsOpen((open) => !open)}
-                  >
-                    Funktioner <span aria-hidden="true">{functionsOpen ? '▴' : '▾'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="panel-toggle history-toggle"
-                    aria-expanded={historyOpen}
-                    aria-controls="history-panel"
-                    onClick={() => setHistoryOpen(true)}
-                  >
-                    Historik
-                  </button>
-                </div>
-                <div id="advanced-functions-panel" className="advanced-panel" data-open={functionsOpen ? 'true' : 'false'}>
-                  <AdvancedKeypad
-                    dispatch={dispatch}
-                    angleMode={state.angleMode}
-                    hasMemory={state.memory !== null}
-                    onFunctionChosen={() => setFunctionsOpen(false)}
-                  />
-                </div>
-              </>
-            )}
+            <div className="advanced-toolbar">
+              <button
+                type="button"
+                className="panel-toggle functions-toggle"
+                aria-expanded={functionsOpen}
+                aria-controls="advanced-functions-panel"
+                onClick={() => setFunctionsOpen((open) => !open)}
+              >
+                Funktioner <span aria-hidden="true">{functionsOpen ? '▴' : '▾'}</span>
+              </button>
+              <button
+                type="button"
+                className="panel-toggle history-toggle"
+                aria-expanded={historyOpen}
+                aria-controls="history-panel"
+                onClick={() => setHistoryOpen(true)}
+              >
+                Historik
+              </button>
+            </div>
+            <div id="advanced-functions-panel" className="advanced-panel" data-open={functionsOpen ? 'true' : 'false'}>
+              <AdvancedKeypad
+                dispatch={dispatch}
+                angleMode={state.angleMode}
+                hasMemory={state.memory !== null}
+                onFunctionChosen={() => setFunctionsOpen(false)}
+              />
+            </div>
             <BasicKeypad dispatch={dispatch} />
           </section>
         </div>
       </main>
-      {state.mode === 'advanced' && historyOpen && (
+      {historyOpen && (
         <div className="history-overlay">
           <button type="button" className="history-backdrop" aria-label="Stäng historik" onClick={() => setHistoryOpen(false)} />
           <HistoryPanel history={state.history} dispatch={dispatch} onClose={() => setHistoryOpen(false)} />

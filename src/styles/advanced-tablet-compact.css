@@ -1,5 +1,6 @@
-/* Keep the advanced calculator within shorter tablet landscape viewports. */
-@media (orientation: landscape) and (min-width: 761px) and (min-height: 601px) and (max-height: 820px) {
+/* Keep the unified calculator within shorter tablet landscape viewports without
+ * treating ordinary desktop/laptop landscape windows as tablets. */
+@media (orientation: landscape) and (min-width: 761px) and (max-width: 1100px) and (min-height: 601px) and (max-height: 820px) {
   .app-layout.mode-advanced {
     width: min(100% - 1rem, 70rem);
     padding: .45rem 0;

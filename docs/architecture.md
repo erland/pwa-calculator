@@ -5,9 +5,9 @@
 Arkitekturen ska stödja följande mål i prioriterad ordning:
 
 1. **Korrekt och testbar beräkningslogik** – matematiska regler ska vara isolerade från presentationen och kunna verifieras med omfattande enhetstester.
-2. **Mycket enkel användning i Enkel-läge** – avancerade funktioner ska inte skapa visuell eller teknisk komplexitet i grundflödet.
+2. **Enkelt grundflöde utan separata användarlägen** – grundläggande räkning ska vara direkt tillgänglig, medan vetenskapliga funktioner exponeras responsivt eller på begäran.
 3. **Full lokal funktion** – all kärnfunktionalitet ska fungera utan backend och, efter första lyckade laddningen, utan nätverk.
-4. **Responsivt och tillgängligt gränssnitt** – samma kodbas ska fungera på mobil och desktop med både pekskärm och tangentbord.
+4. **Responsivt och tillgängligt gränssnitt** – samma kodbas ska fungera på mobil, surfplatta och desktop med både pekskärm och tangentbord.
 5. **Liten drift- och beroendeyta** – inga serverkomponenter, databaser eller externa API:er ska krävas för v1.
 6. **Förutsägbar uppdatering** – en ny PWA-version ska inte bytas mitt under en pågående beräkning.
 
@@ -39,16 +39,18 @@ Webbserver/CDN används endast för att leverera den statiska applikationen och 
 Ansvarar för:
 
 - huvudlayout,
-- Enkel/Avancerad-växling,
 - display för uttryck/resultat/fel,
-- knappsatser,
-- historikpanel,
+- grundläggande och vetenskapliga knappsatser,
+- responsiv funktionspanel,
+- historik som on-demand-panel/drawer,
 - minnesindikering,
 - tema och DEG/RAD-kontroll,
-- responsiv layout,
+- responsiv layout inklusive safe-area-hantering i landskap,
 - tillgänglig semantik och fokusbeteende.
 
 UI:t ska inte implementera matematiska regler. Det skickar användarens avsikt till calculator state/domain-lagret och renderar resultatet.
+
+Presentationen styrs av tillgängligt skärmutrymme, inte av ett användarvalt Enkel/Avancerad-läge. På små porträttskärmar kan vetenskapliga funktioner vara hopfällda. I landskap och på större skärmar kan de visas permanent tillsammans med den vanliga knappsatsen.
 
 ### 3.2 Calculator State / Application Logic
 
@@ -59,9 +61,10 @@ Ansvarar för det interaktiva miniräknartillståndet:
 - resultat/feltillstånd,
 - efterföljande beräkning efter `=`,
 - radering/nollställning,
-- val av Enkel/Avancerad,
 - DEG/RAD,
 - koordinering av historik och minne.
+
+Calculator state innehåller inte längre något användarläge för Enkel/Avancerad. Visningen av vetenskapliga funktioner är ett presentationsansvar och får inte ändra den matematiska domänmodellen.
 
 Lagret ska vara oberoende av React-komponenternas visuella struktur så långt det är praktiskt.
 
@@ -84,8 +87,6 @@ Motorn ska använda explicit parser/evaluator och får inte använda `eval`, `Fu
 
 För v1 implementeras den begränsade syntaxen internt i projektet i stället för att införa ett generellt matematikbibliotek. Detta minskar bundle-storlek och dependency-/supply-chain-yta och gör procentsemantiken helt kontrollerbar.
 
-En Pratt-parser eller shunting-yard-baserad parser är lämplig. Exakt intern parseralgoritm är en implementationsdetalj så länge operatorprioritet, associativitet och funktionssyntax är explicit och testad.
-
 ### 3.4 Numeric Formatter
 
 Ansvarar för att separera intern beräkning från presentation:
@@ -101,7 +102,6 @@ V1 använder JavaScript `Number` och lovar inte godtycklig precision.
 
 Ett litet adapterlager kapslar webbläsarlagring och ansvarar för:
 
-- senast valda läge,
 - tema,
 - DEG/RAD,
 - minnesvärde,
@@ -109,7 +109,9 @@ Ett litet adapterlager kapslar webbläsarlagring och ansvarar för:
 
 `localStorage` är förstahandsval eftersom datamängden är liten och strukturen enkel. Åtkomst ska kapslas och felhanteras så att miniräknaren fortfarande fungerar om lagring är blockerad, full eller rensad.
 
-Historiken begränsas i v1 till de **100 senaste** slutförda avancerade beräkningarna. När gränsen överskrids tas äldsta posten bort.
+Historiken begränsas i v1 till de **100 senaste** slutförda beräkningarna. När gränsen överskrids tas äldsta posten bort.
+
+Äldre lagringsformat kan innehålla `mode: simple` eller `mode: advanced`. Adaptern ska acceptera sådana data defensivt och ignorera det föråldrade fältet så att uppgraderingen inte bryter befintlig lokal data.
 
 ### 3.6 PWA / Service Worker
 
@@ -145,6 +147,7 @@ Regler:
 - Numeric Formatter ska vara ren och testbar utan browser.
 - Persistence Adapter får inte innehålla matematik- eller UI-regler.
 - React-komponenter får inte duplicera operatorprioritet eller annan uttryckssemantik.
+- Responsiva media queries och paneltillstånd får inte ändra beräkningssemantik.
 - Service worker får inte vara en förutsättning för att appen fungerar online i vanlig webbläsare.
 
 ## 5. Viktiga dataflöden
@@ -162,21 +165,38 @@ Användare
 -> UI-display
 ```
 
-### 5.2 Slutförd avancerad beräkning
+### 5.2 Vetenskaplig beräkning
 
 ```text
-Expression Engine
--> resultat
+Användare
+-> öppnar vid behov funktionspanel
+-> väljer vetenskaplig funktion
+-> Calculator State
+-> Expression Engine
 -> Numeric Formatter
+-> resultat + historikpost
+```
+
+På små porträttskärmar kan funktionspanelen fällas ihop efter vald vetenskaplig funktion. Det är endast presentationsstate och påverkar inte uttrycket eller beräkningsresultatet.
+
+### 5.3 Historik
+
+```text
+Slutförd beräkning
 -> Calculator State
 -> historikpost
 -> Persistence Adapter
 -> localStorage
+
+Användare
+-> öppnar Historik
+-> on-demand drawer/panel
+-> väljer eller rensar historik
 ```
 
 Historikskrivning är sekundär. Ett storage-fel får inte göra en lyckad matematisk beräkning till ett fel.
 
-### 5.3 Offline-start
+### 5.4 Offline-start
 
 ```text
 Browser navigation
@@ -196,7 +216,6 @@ All användardata ägs lokalt av applikationen i användarens webbläsarprofil.
 ### Persistenta informationsobjekt
 
 - `settings`
-  - mode: simple/advanced
   - angleMode: DEG/RAD
   - theme: system/light/dark
 - `memory`
@@ -206,7 +225,7 @@ All användardata ägs lokalt av applikationen i användarens webbläsarprofil.
   - formatterat resultat
   - tidsstämpel/ordning
 
-Aktuellt, ännu inte slutfört uttryck behöver inte persisteras i v1.
+Aktuellt, ännu inte slutfört uttryck behöver inte persisteras i v1. Presentationstillstånd såsom öppen/stängd funktionspanel eller historikpanel persisteras inte.
 
 Persistensformatet ska versionsmärkas eller kunna migreras defensivt om strukturen senare ändras. Ogiltig lokal data ska ignoreras/återställas utan att appen kraschar.
 
@@ -220,9 +239,10 @@ Den enda plattformsintegrationen är webbläsarens standard-API:er för:
 - localStorage,
 - Service Worker,
 - Web App Manifest,
-- media query för systemtema.
+- media queries för skärmstorlek/orientering och systemtema,
+- CSS `env(safe-area-inset-*)` för skärmutskärningar i landskap.
 
-PWA-installations-UI betraktas som progressive enhancement och varierar mellan plattformar.
+PWA-installations-UI betraktas som progressive enhancement och varierar mellan plattformar. Applikationen visar inte en permanent installationssektion i kalkylatorgränssnittet.
 
 ## 8. Säkerhetsarkitektur
 
@@ -240,7 +260,7 @@ En rimlig initial gräns är **1 000 tecken per uttryck**, vilket vida överstig
 
 ## 9. Deploymentmodell
 
-Applikationen byggs till statiska filer och kan distribueras på valfri HTTPS-kapabel statisk webbhosting/CDN.
+Applikationen byggs till statiska filer och distribueras på GitHub Pages eller annan HTTPS-kapabel statisk webbhosting/CDN.
 
 ```text
 Source
@@ -250,16 +270,15 @@ Source
 -> browser + service worker cache
 ```
 
-Ingen container krävs för runtime i v1. En container kan senare användas som paketerings-/hostingalternativ utan att applikationsarkitekturen behöver ändras.
+Ingen container krävs för runtime i v1.
 
 Krav på driftmiljön:
 
 - HTTPS i produktion (för PWA/service worker),
-- korrekt fallback till `index.html` om klientrouting senare införs,
 - korrekta MIME-typer,
 - möjlighet att leverera manifest, ikoner och service worker-filer.
 
-V1 behöver ingen server-side health endpoint. Tillgänglighet övervakas i så fall på hosting-/HTTP-nivå.
+V1 behöver ingen server-side health endpoint. Tillgänglighet övervakas på hosting-/HTTP-nivå.
 
 ## 10. Observability och operability
 
@@ -270,6 +289,7 @@ Operativa principer:
 - build/test ska vara deterministiska,
 - produktionsbygget ska kunna verifieras lokalt via preview-server,
 - PWA-manifest och service worker ska verifieras i test/acceptans,
+- responsiva huvudlägen ska verifieras med automatiserade viewporttester,
 - runtime-fel får loggas till browser console i utvecklingsläge men ingen extern felinsamling är krav i v1,
 - en uppdateringsindikering ska ge användaren möjlighet att ladda om när ny version är klar.
 
@@ -279,34 +299,21 @@ Operativa principer:
 
 **TypeScript** för all applikationskod.
 
-Motiv:
-
-- starkare kontrakt mellan UI, state och expression engine,
-- lämpligt för explicit token-/AST-modell,
-- stödjer refaktorering och testbarhet utan extra runtime.
-
 ### 11.2 UI
 
 **React**.
 
 Motiv:
 
-- komponentbaserad struktur passar de två UI-lägena och responsiva delarna,
+- komponentbaserad struktur passar responsiva paneler och knappsatser,
 - state/rendering kan hållas separerad från den rena matematikdomänen,
 - mogen test- och tillgänglighetsekosystem.
 
-Ingen separat global state-management-dependency införs initialt. React state/reducer och små rena domänmoduler är tillräckligt för v1.
+Ingen separat global state-management-dependency behövs. React state/reducer och små rena domänmoduler är tillräckligt för v1.
 
 ### 11.3 Build/dev server
 
 **Vite**.
-
-Motiv:
-
-- liten konfiguration för React/TypeScript,
-- snabb lokal utveckling,
-- statiskt produktionsbygge,
-- enkel integration med vald PWA-plugin.
 
 ### 11.4 PWA
 
@@ -330,8 +337,6 @@ Motiv:
 - full kontroll över procent, DEG/RAD och felmodell,
 - färre runtime-dependencies.
 
-Om utvecklingen visar att parsern blir väsentligt större eller mer riskfylld än beräknat ska beslutet omprövas innan scope utökas.
-
 ### 11.6 Persistens
 
 **localStorage bakom adapter**.
@@ -352,12 +357,15 @@ IndexedDB bedöms vara onödigt för den lilla datamängden i v1.
 
 **Playwright** används för end-to-end-flöden:
 
-- Enkel/Avancerad,
+- grundläggande och vetenskaplig beräkning i samma UI,
 - tangentbord,
-- responsiva vyer,
+- smalt porträtt med hopfälld funktionspanel,
+- telefonlandskap med tvåkolumnslayout och safe area,
+- surfplattelandskap,
 - historik/persistens,
-- PWA/offline-verifiering,
-- grundläggande cross-browser-verifiering.
+- tema,
+- felåterhämtning,
+- PWA/offline-verifiering.
 
 Service-worker-specifika assertions koncentreras till Chromium där testverktygets service-worker-inspektion har bäst direktstöd; kärn-UI och matematik ska även testas utan beroende av service worker.
 
@@ -365,11 +373,8 @@ Service-worker-specifika assertions koncentreras till Chromium där testverktyge
 
 - ESLint för statisk kodkontroll.
 - TypeScript strict mode.
-- Formatteringsverktyg kan införas i baseline-steget; det är inte ett arkitekturbeslut.
 
-## 12. Föreslagen källkodsstruktur
-
-Detta är en riktning, inte ett krav på exakt filstruktur:
+## 12. Källkodsstruktur
 
 ```text
 src/
@@ -377,26 +382,25 @@ src/
     App.tsx
   calculator/
     engine/
-      tokenizer.ts
-      parser.ts
-      evaluator.ts
-      types.ts
     state/
     formatting/
   components/
   persistence/
   pwa/
   styles/
-  test/
 ```
 
 Principen är viktigare än mapparna: ren matematikdomän ska inte blandas med React eller browserpersistens.
 
 ## 13. Trade-offs och constraints
 
+### Ett adaptivt UI kontra separata lägen
+
+Ett adaptivt UI minskar användarens val och förenklar runtime-state, men kräver mer omsorg i responsiv CSS och viewporttester. För v1 är detta att föredra eftersom samma funktioner kan göras tillgängliga utan att nybörjaren först måste förstå ett lägesval.
+
 ### Egen parser kontra matematikbibliotek
 
-Egen parser innebär mer kod som måste verifieras noggrant, men scope är tillräckligt begränsad för att vinsten i kontroll och liten dependency-yta väger tyngre i v1. RISK-001 hanteras därför med test-first-liknande utveckling av expression engine och en stor tabell av acceptansfall.
+Egen parser innebär mer kod som måste verifieras noggrant, men scope är tillräckligt begränsad för att vinsten i kontroll och liten dependency-yta väger tyngre i v1.
 
 ### `Number` kontra godtycklig precision
 
@@ -418,34 +422,36 @@ Följande beslut betraktas som låsta för v1 tills ett konkret problem motivera
 - ARCH-002: React + TypeScript + Vite.
 - ARCH-003: egen explicit expression parser/evaluator; ingen dynamisk kodexekvering.
 - ARCH-004: JavaScript `Number` + central resultatformatterare.
-- ARCH-005: localStorage bakom adapter, historik max 100 poster.
+- ARCH-005: localStorage bakom adapter, historik max 100 poster och defensiv läsning av äldre lagringsformat.
 - ARCH-006: `vite-plugin-pwa`/Workbox med promptbaserad uppdatering.
 - ARCH-007: Vitest + React Testing Library + Playwright som testbas.
+- ARCH-008: ett enhetligt responsivt kalkylatorgränssnitt; presentationen styrs av viewport och tillgängligt utrymme, inte användarvalt Simple/Advanced-mode.
+- ARCH-009: historik visas on demand och tar inte permanent layoututrymme.
+- ARCH-010: landskapslayout respekterar CSS safe-area-insets.
 
 Separata ADR-filer behövs inte ännu eftersom projektet är litet och besluten är dokumenterade här. Om ett av besluten senare ändras eller blir omtvistat ska separat ADR skapas.
 
 ## 15. Öppna arkitekturfrågor
 
-Inga blockerande frågor återstår före utvecklingsplanering.
+Inga blockerande arkitekturfrågor återstår för v1.
 
-Detaljer som ska bestämmas i implementation/development plan, utan att de ändrar arkitekturen:
+Framtida förbättringar kan bland annat omfatta:
 
-- exakt parseralgoritm,
-- exakt visningsprecision/avrundningspolicy,
-- exakt responsiv breakpoint-layout,
-- ikon-/manifestgrafik,
-- eventuell formatterare utöver ESLint.
+- ytterligare vetenskapliga funktioner,
+- fler verifierade viewportprofiler,
+- eventuell förenkling/omdöpning av äldre interna CSS-klassnamn när det kan göras utan regressionsrisk,
+- ytterligare tillgänglighetsanpassningar.
 
-## 16. Konsekvenser för nästa steg
+## 16. Aktuell verifieringsstrategi
 
-Development plan ska prioritera riskreduktion i denna ordning:
+För den enhetliga responsiva modellen ska CI minst verifiera:
 
-1. skapa körbar React/TypeScript/Vite-baseline med test/lint/typecheck,
-2. implementera och verifiera expression engine + formattering tidigt,
-3. bygga Enkel-lägets kompletta flöde,
-4. lägga till avancerad matematik och DEG/RAD,
-5. införa lokal persistens, minne och historik,
-6. färdigställa responsiv/tillgänglig UI-design och tangentbord,
-7. lägga till PWA/offline och uppdateringsflöde,
-8. end-to-end-, cross-browser- och acceptansverifiering,
-9. paketering/release readiness.
+1. lint, typecheck, enhets-/komponenttester och produktionsbygge,
+2. grundläggande beräkning utan lägesväljare,
+3. vetenskapliga funktioner, minne och historik i samma kalkylator,
+4. smal porträttvy med hopfälld funktionspanel,
+5. telefonlandskap utan sidscrollning,
+6. surfplattelandskap utan sidscrollning,
+7. tema och persistens,
+8. matematisk felåterhämtning,
+9. offlinefunktion via service worker.

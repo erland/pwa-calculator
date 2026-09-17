@@ -1,8 +1,8 @@
 schema_version: 1
 active_work:
-  mode: RELEASE
+  mode: CHANGE
   plan: docs/development-plan.md
-  change_request: null
+  change_request: .system-builder/changes/unified-calculator-mode.md
   selected_step: null
 progress:
   completed:
@@ -22,29 +22,24 @@ progress:
     - DEV-010
     - DEV-011
     - DEV-012
+    - CHG-UNIFIED-CALCULATOR
   in_progress: null
   next:
     recommended: null
-    reason: "Samtliga steg är slutförda. Framtida publicerade releaser dispatchar Pages-deployment från main."
-blockers:
-  - id: BLK-001
-    description: "E2E-/offlineverifieringen kan inte köras i aktuell arbetsmiljö: Playwrights Chromium-hämtningar gav timeout eller tomma/trunkerade arkiv, systempaketinstallation blockerades av sandboxrättigheter och cloud-browsern blockerade localhost."
-    status: resolved
+    reason: "Ändringen till ett enhetligt responsivt kalkylatorgränssnitt är implementerad, dokumenterad och verifierad. PR #4 är redo för merge när senaste CI-körningen är grön."
+blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
-    - "npm run lint (passed)"
-    - "npm run typecheck (passed)"
-    - "npm run test (passed: 39 tests in 5 files)"
-    - "npm run build (passed; manifest and service worker generated)"
-    - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles)"
-    - "npm run build:pages (passed; /pwa-calculator/ base and PWA scope verified)"
-    - "npm audit --audit-level=high (passed: 0 vulnerabilities)"
-    - "GitHub Actions run 34673716922 (passed: verify, Pages build and e2e)"
-    - "GitHub Pages run 34674351270 (passed: deployment from main)"
-    - "Live smoke check https://erland.github.io/pwa-calculator/ (HTTP 200, correct title and manifest path)"
-  notes: "DEV-012 är slutfört. Det ursprungliga v1.0.0-felet berodde på att taggen avvisades av github-pages-miljön; release-triggern dispatchar nu deployment från main. En engångsdeployment från main verifierade hela Pages-flödet och den publicerade appen."
+    - "npm run lint (passed in GitHub Actions PR #4)"
+    - "npm run typecheck (passed in GitHub Actions PR #4)"
+    - "npm run test (passed: 40 tests in 5 files in GitHub Actions PR #4)"
+    - "npm run build (passed; manifest and service worker generated in GitHub Actions PR #4)"
+    - "npm run build:pages (passed in GitHub Actions PR #4)"
+    - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles after responsive desktop/tablet fix)"
+    - "GitHub Actions run 35250393495 / CI #24 (passed on commit 81df538b3c3a659dc37c12a3c17ac70b7dc456aa before documentation-only cleanup)"
+  notes: "PR #4 tar bort användarvalet Enkel/Avancerad och mode-state, gör vetenskapliga funktioner responsivt tillgängliga, visar historik on demand och behåller kompatibilitet med äldre localStorage-data som innehåller mode. Dokumentationssynken efter CI #24 ändrar endast README, funktionell specifikation, arkitektur och denna statusfil; en sista CI-körning ska verifiera PR-head före merge."
 source_state:
   drift: none
-  reference: "GitHub main; DEV-012 fix db093b0d4c4551209b5347967798d93fcf143244 passed CI run 34674272194; Pages verified from bd1c9661b5226c54321baca5d200128007d016c7 in run 34674351270"
+  reference: "GitHub PR #4 feature/unified-calculator-mode; funktionell kod verifierad i CI #24 på 81df538b3c3a659dc37c12a3c17ac70b7dc456aa. Dokumentationscleanup pågår på samma PR-head."
