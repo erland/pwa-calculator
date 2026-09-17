@@ -1,0 +1,21 @@
+:root {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page: #09111f;
+    --surface: #111d31;
+    --surface-soft: #17253d;
+    --text: #f5f8ff;
+    --muted: #aebbd0;
+    --border: #33445f;
+    --accent: #7ba5ff;
+    --accent-dark: #5689f5;
+    --operator: #20365e;
+    --function: #243149;
+    --danger: #ff9d91;
+    --shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
+  }
+}
