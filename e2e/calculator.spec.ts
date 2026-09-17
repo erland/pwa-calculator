@@ -11,6 +11,7 @@ test('simple mode calculates with operator precedence and keyboard', async ({ pa
 })
 
 test('advanced mode handles science, history, memory and persistence', async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 900 })
   await page.goto('/')
   await page.getByRole('button', { name: 'Avancerad' }).click()
   await page.getByRole('button', { name: 'sin' }).click()
@@ -21,11 +22,36 @@ test('advanced mode handles science, history, memory and persistence', async ({ 
   await expect(page.getByRole('status')).toContainText('0,5')
   await page.getByRole('button', { name: 'M+' }).click()
   await expect(page.getByText('M', { exact: true })).toBeVisible()
+
+  await expect(page.getByRole('dialog', { name: 'Historik' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Historik' }).click()
   await expect(page.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Stäng historik' }).last().click()
+
   await page.reload()
   await expect(page.getByRole('button', { name: 'Avancerad' })).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeVisible()
   await expect(page.getByText('M', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Historik' }).click()
+  await expect(page.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeVisible()
+})
+
+test('small portrait phone keeps numeric keypad available and collapses functions after a choice', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Avancerad' }).click()
+
+  await expect(page.getByText('Offlineklar PWA')).toHaveCount(0)
+  const functions = page.getByRole('button', { name: /Funktioner/ })
+  await expect(functions).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.getByRole('button', { name: 'sin' })).toBeHidden()
+  await expect(page.getByRole('button', { name: '7' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
+
+  await functions.click()
+  await expect(functions).toHaveAttribute('aria-expanded', 'true')
+  await page.getByRole('button', { name: 'sin' }).click()
+  await expect(functions).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.getByRole('button', { name: '7' })).toBeVisible()
 })
 
 test('advanced mode uses a compact two-column layout on a phone in landscape', async ({ page }) => {
@@ -36,22 +62,36 @@ test('advanced mode uses a compact two-column layout on a phone in landscape', a
   const calculator = page.locator('.calculator-card')
   const advanced = page.locator('.advanced-controls')
   const basic = page.locator('.basic-keypad')
-  const history = page.locator('.history-panel')
-
-  const [calculatorBox, advancedBox, basicBox, historyBox] = await Promise.all([
+  const [calculatorBox, advancedBox, basicBox] = await Promise.all([
     calculator.boundingBox(),
     advanced.boundingBox(),
     basic.boundingBox(),
-    history.boundingBox(),
   ])
 
   expect(calculatorBox).not.toBeNull()
   expect(advancedBox).not.toBeNull()
   expect(basicBox).not.toBeNull()
-  expect(historyBox).not.toBeNull()
   expect(advancedBox!.y).toBeCloseTo(basicBox!.y, 0)
   expect(advancedBox!.x).toBeLessThan(basicBox!.x)
-  expect(historyBox!.x).toBeGreaterThan(calculatorBox!.x + calculatorBox!.width - 1)
+  await expect(page.getByRole('dialog', { name: 'Historik' })).toHaveCount(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
+
+  await page.getByRole('button', { name: 'Historik' }).click()
+  await expect(page.getByRole('dialog', { name: 'Historik' })).toBeVisible()
+})
+
+test('advanced mode fits an iPad-sized landscape viewport without page scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 768 })
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Avancerad' }).click()
+
+  const advancedBox = await page.locator('.advanced-controls').boundingBox()
+  const basicBox = await page.locator('.basic-keypad').boundingBox()
+  expect(advancedBox).not.toBeNull()
+  expect(basicBox).not.toBeNull()
+  expect(advancedBox!.y).toBeCloseTo(basicBox!.y, 0)
+  expect(advancedBox!.x).toBeLessThan(basicBox!.x)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })

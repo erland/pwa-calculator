@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { describe, expect, it } from 'vitest'
@@ -27,7 +27,12 @@ describe('Calculator UI', () => {
     await user.click(screen.getByRole('button', { name: ')' }))
     await user.click(screen.getByRole('button', { name: 'Beräkna' }))
     expect(screen.getByRole('status')).toHaveTextContent('0,5')
-    expect(screen.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Historik' }))
+    const historyDialog = screen.getByRole('dialog', { name: 'Historik' })
+    expect(within(historyDialog).getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeInTheDocument()
+    await user.click(within(historyDialog).getByRole('button', { name: 'Stäng historik' }))
+
     await user.click(screen.getByRole('button', { name: 'M+' }))
     expect(screen.getByText('M')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'MC' }))

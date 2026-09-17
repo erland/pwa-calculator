@@ -1,0 +1,76 @@
+/* Keep the advanced calculator within shorter tablet landscape viewports. */
+@media (orientation: landscape) and (min-width: 761px) and (min-height: 601px) and (max-height: 820px) {
+  .app-layout.mode-advanced {
+    width: min(100% - 1rem, 70rem);
+    padding: .45rem 0;
+  }
+
+  .mode-advanced .app-header {
+    display: none;
+  }
+
+  .mode-advanced .mode-switch {
+    width: min(100%, 28rem);
+    margin-bottom: .4rem;
+    padding: .2rem;
+  }
+
+  .mode-advanced .mode-switch button {
+    min-height: 2rem;
+  }
+
+  .mode-advanced .calculator-card {
+    gap: .45rem;
+    padding: .55rem;
+  }
+
+  .mode-advanced .display {
+    min-height: 4.5rem;
+    margin-bottom: 0;
+    padding: .5rem .75rem;
+  }
+
+  .mode-advanced .result {
+    margin-top: .2rem;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+  }
+
+  .mode-advanced .advanced-toolbar {
+    margin-bottom: 0;
+  }
+
+  .mode-advanced .panel-toggle {
+    min-height: 2.05rem;
+  }
+
+  .mode-advanced .advanced-controls {
+    padding: .45rem;
+  }
+
+  .mode-advanced .setting-row,
+  .mode-advanced .memory-row {
+    margin-bottom: .3rem;
+  }
+
+  .mode-advanced .segmented.compact button,
+  .mode-advanced .memory-row button {
+    min-height: 2.05rem;
+  }
+
+  .mode-advanced .advanced-keypad {
+    gap: .3rem;
+  }
+
+  .mode-advanced .basic-keypad {
+    gap: .35rem;
+  }
+
+  .mode-advanced .calculator-key,
+  .mode-advanced .key-function {
+    min-height: 2.55rem;
+  }
+
+  .mode-advanced .install-help {
+    display: none;
+  }
+}

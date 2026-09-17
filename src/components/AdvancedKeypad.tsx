@@ -6,10 +6,15 @@ interface Props {
   dispatch: (action: CalculatorAction) => void
   angleMode: AngleMode
   hasMemory: boolean
+  onFunctionChosen?: () => void
 }
 
-export function AdvancedKeypad({ dispatch, angleMode, hasMemory }: Props) {
-  const append = (value?: string) => value && dispatch({ type: 'append', value })
+export function AdvancedKeypad({ dispatch, angleMode, hasMemory, onFunctionChosen }: Props) {
+  const append = (value?: string) => {
+    if (!value) return
+    dispatch({ type: 'append', value })
+    onFunctionChosen?.()
+  }
   return (
     <section className="advanced-controls" aria-label="Avancerade funktioner">
       <div className="setting-row">
