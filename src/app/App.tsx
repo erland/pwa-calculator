@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useReducer, useState } from 'react'
+import { GraphCanvas } from '../calculator/graph/GraphCanvas'
+import { sampleGraph } from '../calculator/graph/sampleGraph'
 import { calculatorReducer, createCalculatorState, type CalculatorAction } from '../calculator/state/calculatorState'
 import { AdvancedKeypad } from '../components/AdvancedKeypad'
 import { BasicKeypad } from '../components/BasicKeypad'
@@ -6,10 +8,21 @@ import { HistoryPanel } from '../components/HistoryPanel'
 import { UpdatePrompt } from '../components/UpdatePrompt'
 import { loadPersistedState, savePersistedState, type PersistedState, type Theme } from '../persistence/storage'
 
+const DEFAULT_GRAPH_VIEWPORT = { xMin: -10, xMax: 10, yMin: -10, yMax: 10 }
+
 export function App() {
   const [state, dispatch] = useReducer(calculatorReducer, undefined, () => createCalculatorState(loadPersistedState()))
   const [functionsOpen, setFunctionsOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const graphActive = containsVariableX(state.expression)
+  const graphSample = useMemo(() => {
+    if (!graphActive) return null
+    try {
+      return sampleGraph(state.expression, { ...DEFAULT_GRAPH_VIEWPORT, width: 720 }, state.angleMode)
+    } catch {
+      return { segments: [], sampleCount: 0 }
+    }
+  }, [graphActive, state.angleMode, state.expression])
   const persisted = useMemo<PersistedState>(() => ({
     angleMode: state.angleMode,
     theme: state.theme,
@@ -24,7 +37,7 @@ export function App() {
   return (
     <>
       <a className="skip-link" href="#calculator">Hoppa till miniräknaren</a>
-      <main className="app-layout mode-advanced">
+      <main className={`app-layout mode-advanced${graphActive ? ' graph-active' : ''}${functionsOpen ? ' functions-open' : ''}`}>
         <header className="app-header">
           <h1>Miniräknaren</h1>
           <label className="theme-picker">
@@ -72,6 +85,18 @@ export function App() {
               />
             </div>
             <BasicKeypad dispatch={dispatch} />
+            {graphActive && (
+              <p className="graph-portrait-hint" role="status">Grafen visas i landskap.</p>
+            )}
+            <div className="graph-workspace" aria-hidden={!graphActive}>
+              {graphActive && (
+                <GraphCanvas
+                  expression={state.expression}
+                  viewport={DEFAULT_GRAPH_VIEWPORT}
+                  segments={graphSample?.segments ?? []}
+                />
+              )}
+            </div>
           </section>
         </div>
       </main>
@@ -84,6 +109,10 @@ export function App() {
       <UpdatePrompt />
     </>
   )
+}
+
+function containsVariableX(expression: string): boolean {
+  return /(^|[^A-Za-z])x([^A-Za-z]|$)/.test(expression)
 }
 
 function displayExpression(expression: string): string {
@@ -100,7 +129,7 @@ function bindKeyboard(dispatch: (action: CalculatorAction) => void): () => void 
   const listener = (event: KeyboardEvent) => {
     if (event.ctrlKey || event.metaKey || event.altKey) return
     let action: CalculatorAction | null = null
-    if (/^[0-9+\-*/^%().,]$/.test(event.key)) action = { type: 'append', value: event.key }
+    if (/^[0-9+\-*/^%().,x]$/i.test(event.key)) action = { type: 'append', value: event.key.toLowerCase() }
     else if (event.key === 'Enter' || event.key === '=') action = { type: 'evaluate' }
     else if (event.key === 'Backspace') action = { type: 'backspace' }
     else if (event.key === 'Escape' || event.key === 'Delete') action = { type: 'clear' }
