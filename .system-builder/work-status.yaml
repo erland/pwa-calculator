@@ -31,10 +31,11 @@ progress:
     - DEV-018
     - CHG-GRAPHING-SUPPORT
     - DEV-019
+    - DEV-020
   in_progress: null
   next:
-    recommended: DEV-020
-    reason: "Header och användarstyrt tema är borttagna, systemtema och legacy storage-migrering är verifierade. Nästa steg är att vända landskapslayouten så sekundärytan ligger till vänster, kalkylatorn till höger och scientific-kontrollerna bottenjusteras."
+    recommended: DEV-021
+    reason: "Landskapslayouten är nu vänd: sekundär graf/scientific-yta ligger till vänster, kalkylatorn till höger och scientific-knappsatsen bottenjusteras mot sifferknappsatsen. Nästa steg är att optimera porträtt så expanderade Funktioner och hela sifferknappsatsen ryms på 375x812 utan vertikal scroll."
 blockers: []
 verification:
   last_status: passed
@@ -43,10 +44,10 @@ verification:
     - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
     - "Graphing PR final CI #73 passed before merge"
     - "Deploy GitHub Pages run on baseline commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f: passed"
-    - "DEV-019 GitHub Actions CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93: npm run verify passed"
-    - "DEV-019 GitHub Actions CI #83: npm run build:pages passed"
-    - "DEV-019 GitHub Actions CI #83: npm run test:e2e passed"
-  notes: "DEV-019 removes the application header/title and theme selector, removes theme from calculator runtime state and new persisted state, accepts and ignores valid legacy v1 theme/mode fields while preserving angleMode/memory/history, and drives light/dark presentation directly from prefers-color-scheme. Browser coverage verifies system color-scheme switching and that theme is no longer persisted."
+    - "DEV-019 GitHub Actions CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93: verify/build:pages/e2e passed"
+    - "DEV-020 initial CI #87: verify/build:pages passed; e2e found scientific keypad lower edge 6.6px/8.2px above numeric keypad"
+    - "DEV-020 repaired CI #89 on commit 30ff4f899825ae21b761b561062b79f6f161b24c: verify/build:pages/e2e passed"
+  notes: "DEV-020 reverses landscape composition for phone and tablet/desktop: graph/scientific secondary workspace is left, stable calculator/display/toolbar/numeric keypad is right. Scientific controls are flex-bottom-aligned and landscape-specific bottom padding is removed so the scientific keypad lower edge aligns with the numeric keypad. Playwright asserts left/right ordering, keypad coordinate stability, graph replacement, bottom alignment, and no page overflow."
 source_state:
   drift: none
-  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019 verified by CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93."
+  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019 and DEV-020 complete. DEV-020 verified by CI #89 on commit 30ff4f899825ae21b761b561062b79f6f161b24c."
