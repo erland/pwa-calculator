@@ -33,6 +33,7 @@ export function AdvancedKeypad({ dispatch, angleMode, hasMemory, onFunctionChose
         <span className="memory-status" aria-live="polite">{hasMemory ? 'M' : ''}</span>
       </div>
       <div className="advanced-keypad">
+        <CalculatorButton variant="function" label="Variabel x" value="x" onPress={append}>x</CalculatorButton>
         <CalculatorButton variant="function" value="(" onPress={append}>(</CalculatorButton>
         <CalculatorButton variant="function" value=")" onPress={append}>)</CalculatorButton>
         <CalculatorButton variant="function" label="Procent" value="%" onPress={append}>%</CalculatorButton>

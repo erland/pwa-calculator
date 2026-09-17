@@ -2,7 +2,7 @@ schema_version: 1
 active_work:
   mode: CHANGE
   plan: docs/development-plan.md
-  change_request: .system-builder/changes/unified-calculator-mode.md
+  change_request: .system-builder/changes/graphing-support.md
   selected_step: null
 progress:
   completed:
@@ -23,23 +23,32 @@ progress:
     - DEV-011
     - DEV-012
     - CHG-UNIFIED-CALCULATOR
+    - DEV-013
+    - DEV-014
+    - DEV-015
+    - DEV-016
+    - DEV-017
+    - DEV-018
+    - CHG-GRAPHING-SUPPORT
   in_progress: null
   next:
     recommended: null
-    reason: "Ändringen till ett enhetligt responsivt kalkylatorgränssnitt är implementerad, dokumenterad och verifierad. PR #4 är redo för merge när senaste CI-körningen är grön."
+    reason: "Graphing change-serien DEV-013–DEV-018 är implementerad, verifierad och dokumenterad. PR #5 är redo för merge; manuell real-device touch/safe-area-kontroll är rekommenderad men inte ett känt blockerande fel."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
-    - "npm run lint (passed in GitHub Actions PR #4)"
-    - "npm run typecheck (passed in GitHub Actions PR #4)"
-    - "npm run test (passed: 40 tests in 5 files in GitHub Actions PR #4)"
-    - "npm run build (passed; manifest and service worker generated in GitHub Actions PR #4)"
-    - "npm run build:pages (passed in GitHub Actions PR #4)"
-    - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles after responsive desktop/tablet fix)"
-    - "GitHub Actions run 35250393495 / CI #24 (passed on commit 81df538b3c3a659dc37c12a3c17ac70b7dc456aa before documentation-only cleanup)"
-  notes: "PR #4 tar bort användarvalet Enkel/Avancerad och mode-state, gör vetenskapliga funktioner responsivt tillgängliga, visar historik on demand och behåller kompatibilitet med äldre localStorage-data som innehåller mode. Dokumentationssynken efter CI #24 ändrar endast README, funktionell specifikation, arkitektur och denna statusfil; en sista CI-körning ska verifiera PR-head före merge."
+    - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
+    - "DEV-013 GitHub Actions CI #30/#31: passed"
+    - "DEV-014 GitHub Actions CI #34/#37: passed"
+    - "DEV-015 GitHub Actions CI #41/#44: passed"
+    - "DEV-016 GitHub Actions CI #50: passed"
+    - "DEV-017 initial CI #62: verify failed on react-hooks/set-state-in-effect; repaired in same step"
+    - "DEV-017 GitHub Actions CI #63: verify/build:pages/e2e passed"
+    - "Post-DEV-017 PR-head CI #65: verify/build:pages/e2e passed"
+    - "DEV-018 final acceptance CI #71 on commit 5132ed8bfd81cd74e0cab72e01350c7e5492cb32: verify/build:pages/e2e passed"
+  notes: "Graphing support is complete for the initial scope: explicit x evaluation, bounded/discontinuity-aware sampling, DPI/theme-aware Canvas rendering, automatic landscape graph workspace with stable numeric keypad, Functions overlay behavior, pointer pan, pointer-centered wheel zoom, deterministic reset, full calculator/PWA regression coverage, canonical documentation sync, known limitations and a manual physical-device checklist."
 source_state:
   drift: none
-  reference: "GitHub PR #4 feature/unified-calculator-mode; funktionell kod verifierad i CI #24 på 81df538b3c3a659dc37c12a3c17ac70b7dc456aa. Dokumentationscleanup pågår på samma PR-head."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-013–DEV-018 complete. Final acceptance CI #71 passed before completion-status commit."

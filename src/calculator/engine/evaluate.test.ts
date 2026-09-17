@@ -30,6 +30,32 @@ describe('evaluateExpression', () => {
   })
 
   it.each([
+    ['x', 3, 3],
+    ['x + 2', 5, 7],
+    ['x^2 - 4', 3, 5],
+    ['sqr(x) + 1', -2, 5],
+    ['sqrt(x)', 9, 3],
+  ])('evaluates %s with x=%s', (expression, x, expected) => {
+    expect(evaluateExpression(expression, 'DEG', { x })).toBeCloseTo(expected, 12)
+  })
+
+  it('applies the selected angle mode to functions of x', () => {
+    expect(evaluateExpression('sin(x)', 'DEG', { x: 30 })).toBeCloseTo(0.5, 12)
+    expect(evaluateExpression('sin(x)', 'RAD', { x: Math.PI / 2 })).toBeCloseTo(1, 12)
+  })
+
+  it('returns a controlled variable error when x has no usable value', () => {
+    for (const variables of [{}, { x: Number.NaN }, { x: Number.POSITIVE_INFINITY }]) {
+      expect(() => evaluateExpression('x + 2', 'DEG', variables)).toThrowError(CalculatorError)
+      try {
+        evaluateExpression('x + 2', 'DEG', variables)
+      } catch (error) {
+        expect((error as CalculatorError).code).toBe('VARIABLE')
+      }
+    }
+  })
+
+  it.each([
     ['1 / 0', 'DIVISION_BY_ZERO'],
     ['sqrt(-1)', 'DOMAIN'],
     ['log(0)', 'DOMAIN'],

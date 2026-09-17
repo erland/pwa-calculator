@@ -2,6 +2,32 @@
 
 Alla betydande förändringar dokumenteras här.
 
+## Ej släppt – grafstöd
+
+### Tillagt
+
+- Variabeln `x` i expression engine med explicit evalueringskontext.
+- Numerisk grafprovtagning med segmentering vid domänfel och uppenbara diskontinuiteter.
+- Canvas-baserad graf med grid, axlar, tema- och Retina/DPI-stöd.
+- Automatisk grafpresentation i landskap när uttrycket använder `x`.
+- Stabil landskapslayout där sifferknappsatsen ligger kvar när sekundärytan växlar mellan vetenskapliga funktioner och graf.
+- Diskret porträttindikering för `x`-uttryck utan permanent grafyta.
+- Panorering genom drag, zoom runt pekarposition och återställning till standardviewport `-10..10`.
+- Enhets-, komponent- och Playwright-täckning för expression engine, sampling, graf-rendering, responsiv layout och viewportinteraktion.
+
+### Ändrat
+
+- Landskapsytan använder display, åtgärder och sifferknappsats i en stabil kalkylatorkolumn i stället för att låta uttryck/resultat ta hela bredden.
+- Vetenskapliga funktioner används som sekundäryta när ingen graf är aktiv och kan öppnas tillfälligt över grafytan när grafen visas.
+
+### Kända begränsningar
+
+- En realvärd funktion av `x` visas åt gången.
+- Grafen använder numerisk sampling och garanterar inte symbolisk identifiering av alla asymptoter.
+- Full grafyta visas i initial scope i landskap, inte permanent i telefonporträtt.
+- Grafviewporten persisteras inte mellan sessioner.
+- Flera kurvor, funktionsvärdestabeller och analytiska funktioner som nollställen/skärningspunkter/derivator ingår inte.
+
 ## 1.0.0-rc.1 – 2026-09-12
 
 ### Tillagt

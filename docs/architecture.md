@@ -1,36 +1,35 @@
-# Arkitektur – Calculator PWA v1
+# Arkitektur – Calculator PWA
 
 ## 1. Arkitekturmål
 
-Arkitekturen ska stödja följande mål i prioriterad ordning:
+Arkitekturen ska prioritera:
 
-1. **Korrekt och testbar beräkningslogik** – matematiska regler ska vara isolerade från presentationen och kunna verifieras med omfattande enhetstester.
-2. **Enkelt grundflöde utan separata användarlägen** – grundläggande räkning ska vara direkt tillgänglig, medan vetenskapliga funktioner exponeras responsivt eller på begäran.
-3. **Full lokal funktion** – all kärnfunktionalitet ska fungera utan backend och, efter första lyckade laddningen, utan nätverk.
-4. **Responsivt och tillgängligt gränssnitt** – samma kodbas ska fungera på mobil, surfplatta och desktop med både pekskärm och tangentbord.
-5. **Liten drift- och beroendeyta** – inga serverkomponenter, databaser eller externa API:er ska krävas för v1.
-6. **Förutsägbar uppdatering** – en ny PWA-version ska inte bytas mitt under en pågående beräkning.
+1. korrekt och testbar matematik,
+2. ett enkelt grundflöde utan separata calculator modes,
+3. stabil responsiv layout där grundknappsatsen inte flyttar sig när sekundär funktionalitet ändras,
+4. helt lokal/offlinekapabel funktion utan backend,
+5. liten dependency- och drift-yta,
+6. tydliga domängränser mellan beräkning, grafprovtagning, viewportinteraktion och rendering.
 
 ## 2. Systemkontext
 
-Calculator PWA är en helt klientbaserad webbapplikation. Den enda primära aktören är användaren.
+Calculator PWA är en klientbaserad React/TypeScript-applikation som levereras statiskt och kör all matematik, grafprovtagning, rendering, viewportinteraktion och persistens lokalt i webbläsaren.
 
 ```mermaid
 flowchart LR
-    User[Användare] --> App[Calculator PWA]
-    App --> BrowserStorage[(Lokal webbläsarlagring)]
-    App --> ServiceWorker[Service Worker / app-cache]
+    User[Användare] --> UI[React UI]
+    UI --> State[Calculator State]
+    State --> Engine[Expression Engine]
+    UI --> Graph[Graph Workspace]
+    Graph --> Viewport[Graph Viewport]
+    Graph --> Sampler[Graph Sampler]
+    Sampler --> Engine
+    Graph --> Canvas[Graph Canvas]
+    UI --> Storage[(localStorage)]
+    Browser[Service Worker / PWA] --> UI
 ```
 
-Det finns i v1:
-
-- ingen backend,
-- ingen autentisering,
-- ingen serverdatabas,
-- inga externa API-anrop i kärnflödet,
-- ingen synkronisering mellan enheter.
-
-Webbserver/CDN används endast för att leverera den statiska applikationen och nya versioner.
+Det finns ingen backend, autentisering, serverdatabas eller extern graph service.
 
 ## 3. Huvudkomponenter
 
@@ -38,420 +37,300 @@ Webbserver/CDN används endast för att leverera den statiska applikationen och 
 
 Ansvarar för:
 
-- huvudlayout,
-- display för uttryck/resultat/fel,
-- grundläggande och vetenskapliga knappsatser,
-- responsiv funktionspanel,
-- historik som on-demand-panel/drawer,
-- minnesindikering,
-- tema och DEG/RAD-kontroll,
-- responsiv layout inklusive safe-area-hantering i landskap,
-- tillgänglig semantik och fokusbeteende.
+- expression/result display,
+- grundknappsats,
+- `Funktioner` och `Historik`,
+- DEG/RAD, minne och tema,
+- responsiv presentation,
+- safe-area-hantering,
+- orienterings-/viewportberoende graph workspace,
+- tillgänglig semantik och input/fokus.
 
-UI:t ska inte implementera matematiska regler. Det skickar användarens avsikt till calculator state/domain-lagret och renderar resultatet.
+UI:t implementerar inte matematiska regler eller grafprovtagning.
 
-Presentationen styrs av tillgängligt skärmutrymme, inte av ett användarvalt Enkel/Avancerad-läge. På små porträttskärmar kan vetenskapliga funktioner vara hopfällda. I landskap och på större skärmar kan de visas permanent tillsammans med den vanliga knappsatsen.
+### 3.2 Calculator State
 
-### 3.2 Calculator State / Application Logic
-
-Ansvarar för det interaktiva miniräknartillståndet:
+Ansvarar för:
 
 - aktuellt uttryck,
-- inmatningsläge,
-- resultat/feltillstånd,
-- efterföljande beräkning efter `=`,
-- radering/nollställning,
+- numeriskt resultat/fel,
+- redigering, clear/backspace och `=`,
 - DEG/RAD,
-- koordinering av historik och minne.
+- minne,
+- historik,
+- tema/persistenskoordination.
 
-Calculator state innehåller inte längre något användarläge för Enkel/Avancerad. Visningen av vetenskapliga funktioner är ett presentationsansvar och får inte ändra den matematiska domänmodellen.
-
-Lagret ska vara oberoende av React-komponenternas visuella struktur så långt det är praktiskt.
+Graph presentation härleds från aktuellt uttryck och viewport och lagras inte som ett separat calculator mode. `x` behandlas som början på ett nytt uttryck efter en slutförd numerisk beräkning.
 
 ### 3.3 Expression Engine
 
-Ansvarar exklusivt för matematiskt innehåll:
+Ansvarar för säker parser/evaluator för:
 
-- tokenisering av tillåten syntax,
-- parsing med korrekt operatorprioritet,
-- parenteser,
-- unära operatorer,
-- procent,
-- potenser,
-- `sin`, `cos`, `tan`, `log`, `ln`, `sqrt`, invers,
-- konstanterna `π` och `e`,
-- DEG/RAD-konvertering,
-- domänfel och division med noll.
+- tal och operatorer,
+- parenteser och unära operatorer,
+- procent/potenser,
+- `sin`, `cos`, `tan`, `log`, `ln`, `sqrt`, invers och kvadrat,
+- `π` och `e`,
+- DEG/RAD,
+- variabeln `x` via explicit evaluation context,
+- kontrollerade syntax-, domän-, divisions- och resultatfel.
 
-Motorn ska använda explicit parser/evaluator och får inte använda `eval`, `Function` eller annan generell JavaScript-exekvering.
+Motorn får inte använda `eval`, `Function` eller dynamisk kodexekvering.
 
-För v1 implementeras den begränsade syntaxen internt i projektet i stället för att införa ett generellt matematikbibliotek. Detta minskar bundle-storlek och dependency-/supply-chain-yta och gör procentsemantiken helt kontrollerbar.
+Domän-API:
+
+```text
+evaluateExpression(expression, angleMode, variables?) -> number
+variables = { x?: number }
+```
+
+Uttryck utan variabler behåller befintlig semantik. Om `x` refereras utan explicit värde ger direct evaluation ett kontrollerat fel.
 
 ### 3.4 Numeric Formatter
 
-Ansvarar för att separera intern beräkning från presentation:
+Ansvarar för presentation av numeriska resultat, avrundning, `-0`, mycket stora/små tal och vetenskaplig notation. Grafdomänen använder råa `number`-värden och ska inte formatera varje sample via UI-formattering.
 
-- normalisering av mycket små flyttalsartefakter,
-- rimlig avrundning för visning,
-- vetenskaplig notation vid mycket stora/små värden,
-- konsekvent presentation av `-0`, `NaN` och infinita/ogiltiga resultat som definierade UI-tillstånd.
+### 3.5 Graph Sampler
 
-V1 använder JavaScript `Number` och lovar inte godtycklig precision.
+Graph Sampler är ett rent domänlager mellan expression engine och rendering.
 
-### 3.5 Persistence Adapter
+Ansvar:
 
-Ett litet adapterlager kapslar webbläsarlagring och ansvarar för:
+- ta emot uttryck, angle mode och matematisk viewport,
+- generera representativa x-samples med begränsad densitet,
+- utvärdera uttrycket genom Expression Engine med `{ x }`,
+- behandla domän-/resultatfel som avbrott i kurvan,
+- dela output i drawable segments,
+- undvika uppenbara falska förbindelser över asymptoter/diskontinuiteter,
+- vara oberoende av React, DOM och Canvas.
+
+Exempel på output:
+
+```text
+GraphSampleResult
+  segments[]
+    points[] { x, y }
+```
+
+Sampler-strategin kan bytas utan att UI/Canvas behöver känna till parserdetaljer.
+
+### 3.6 Graph Viewport
+
+Viewportlagret är ren matematik och ansvarar för:
+
+- standardviewport `x/y = -10..10`,
+- översättning av drag i pixlar till matematisk panorering,
+- zoom runt en normaliserad pekarposition,
+- min/max-gränser för viewportens spann,
+- kontroll av om viewporten är i standardläge.
+
+Viewporten är temporär och persisteras inte i initial scope.
+
+### 3.7 Graph Canvas
+
+Graph Canvas ansvarar för visning och browserinteraktion:
+
+- matematisk koordinat → pixelkoordinat,
+- axlar och grid,
+- rendering av segment,
+- device pixel ratio,
+- tema,
+- pointer-drag för panorering,
+- hjulzoom runt pekarens position,
+- reset-kontroll,
+- confinement av touchgest till graph surface via `touch-action`.
+
+Canvas evaluerar inte uttryck och avgör inte matematiska diskontinuiteter. Interaktionen skickar viewportförändringar till applikationslagret, vilket provar om grafen och renderar om den.
+
+### 3.8 Persistence Adapter
+
+`localStorage` kapslas bakom befintlig adapter och lagrar:
 
 - tema,
 - DEG/RAD,
-- minnesvärde,
-- historik.
+- minne,
+- max 100 historikposter.
 
-`localStorage` är förstahandsval eftersom datamängden är liten och strukturen enkel. Åtkomst ska kapslas och felhanteras så att miniräknaren fortfarande fungerar om lagring är blockerad, full eller rensad.
+Grafstödet kräver ingen schemaändring. Aktuellt uttryck, graph samples och viewport är session-/UI-state och persisteras inte.
 
-Historiken begränsas i v1 till de **100 senaste** slutförda beräkningarna. När gränsen överskrids tas äldsta posten bort.
+Legacy-data som innehåller äldre mode-fält ska fortsatt kunna läsas defensivt och ignoreras.
 
-Äldre lagringsformat kan innehålla `mode: simple` eller `mode: advanced`. Adaptern ska acceptera sådana data defensivt och ignorera det föråldrade fältet så att uppgraderingen inte bryter befintlig lokal data.
+### 3.9 PWA / Service Worker
 
-### 3.6 PWA / Service Worker
+`vite-plugin-pwa`/Workbox levererar app shell och resurser offline. Grafstöd kräver inga nya nätverksanrop och ingår därför i samma statiska/offlinekapabla bundle.
 
-PWA-lagret ansvarar för:
+## 4. Responsiv workspace-arkitektur
 
-- web app manifest,
-- installerbarhet där plattformen stödjer det,
-- precache av applikationsskal och statiska resurser,
-- offline-start efter första lyckade laddningen,
-- upptäckt av ny applikationsversion.
+### Porträtt
 
-Service worker genereras via `vite-plugin-pwa`/Workbox i stället för handskriven cachelogik.
+- Grundknappsats är primär.
+- Vetenskapliga funktioner visas via `Funktioner` på små skärmar.
+- `x` kan matas in via funktionsytan eller tangentbordet.
+- Ingen permanent graph surface i initial scope.
+- Ett grafbart uttryck visar diskret att grafen finns i landskap.
 
-Uppdateringsstrategin ska vara **prompt/reload**, inte tvingad automatisk omladdning. En ny service worker får installeras i bakgrunden, men användaren ska byta till den nya versionen genom en kontrollerad reload så att en pågående beräkning inte avbryts oväntat.
+### Landskap
 
-## 4. Ansvar och beroendegränser
-
-Den huvudsakliga beroenderiktningen är:
+Layouten består av två stabila områden:
 
 ```text
-React UI
-  -> Calculator State
-      -> Expression Engine
-      -> Numeric Formatter
-      -> Persistence Adapter
-
-PWA runtime är ortogonalt till domänlagret och ska inte behövas för beräkning.
+┌────────────────────┬────────────────────────┐
+│ Calculator column  │ Secondary workspace    │
+│ display/result     │ functions OR graph     │
+│ actions            │                        │
+│ numeric keypad     │                        │
+└────────────────────┴────────────────────────┘
 ```
 
-Regler:
+Calculator column behåller samma geometri när secondary workspace växlar innehåll.
 
-- Expression Engine får inte importera React, DOM-API:er eller storage.
-- Numeric Formatter ska vara ren och testbar utan browser.
-- Persistence Adapter får inte innehålla matematik- eller UI-regler.
-- React-komponenter får inte duplicera operatorprioritet eller annan uttryckssemantik.
-- Responsiva media queries och paneltillstånd får inte ändra beräkningssemantik.
-- Service worker får inte vara en förutsättning för att appen fungerar online i vanlig webbläsare.
+Utan `x` visar secondary workspace vetenskapliga funktioner permanent.
 
-## 5. Viktiga dataflöden
+Med `x` visas grafen som standard. `Funktioner` ersätter då grafen tillfälligt i secondary workspace utan att flytta numeric keypad. Historik förblir on demand som overlay/drawer.
 
-### 5.1 Grundläggande beräkning
+Denna geometri verifieras i Playwright genom att sifferknappsatsens position jämförs före och efter grafaktivering samt när funktionspanelen öppnas ovanpå grafytan.
+
+## 5. Dataflöden
+
+### 5.1 Numerisk beräkning
 
 ```text
-Användare
--> knapp/tangentbord
--> UI event
--> Calculator State
--> Expression Engine vid utvärdering
--> Numeric Formatter
--> Calculator State
--> UI-display
+Input
+→ Calculator State
+→ Expression Engine
+→ Numeric Formatter
+→ State/history
+→ UI
 ```
 
-### 5.2 Vetenskaplig beräkning
+### 5.2 Graf
 
 ```text
-Användare
--> öppnar vid behov funktionspanel
--> väljer vetenskaplig funktion
--> Calculator State
--> Expression Engine
--> Numeric Formatter
--> resultat + historikpost
+Expression containing x
+→ graphable-expression detection
+→ Graph Sampler(viewport, expression, angleMode)
+→ Expression Engine(expression, angleMode, {x}) repeated
+→ curve segments
+→ Graph Canvas
 ```
 
-På små porträttskärmar kan funktionspanelen fällas ihop efter vald vetenskaplig funktion. Det är endast presentationsstate och påverkar inte uttrycket eller beräkningsresultatet.
+Enskilda evaluation errors under sampling blir segmentavbrott och inte ett globalt calculator error.
 
-### 5.3 Historik
+### 5.3 Viewportinteraktion
 
 ```text
-Slutförd beräkning
--> Calculator State
--> historikpost
--> Persistence Adapter
--> localStorage
-
-Användare
--> öppnar Historik
--> on-demand drawer/panel
--> väljer eller rensar historik
+pointer drag / wheel
+→ Graph Canvas interaction
+→ pure viewport transform
+→ application viewport state
+→ Graph Sampler
+→ Graph Canvas repaint
 ```
 
-Historikskrivning är sekundär. Ett storage-fel får inte göra en lyckad matematisk beräkning till ett fel.
-
-### 5.4 Offline-start
-
-```text
-Browser navigation
--> Service Worker
--> precached app shell/assets
--> React application
--> Persistence Adapter
--> lokal state/historik
-```
-
-Ingen nätverksresurs ska behövas för kärnberäkningar efter att appversionen har cachelagrats.
+Graph gestures är begränsade till graph surface och förändrar inte calculator controls. Reset återgår deterministiskt till standardviewporten.
 
 ## 6. Data och ägarskap
 
-All användardata ägs lokalt av applikationen i användarens webbläsarprofil.
+Persistenta objekt:
 
-### Persistenta informationsobjekt
+- settings: `angleMode`, `theme`,
+- memory,
+- history.
 
-- `settings`
-  - angleMode: DEG/RAD
-  - theme: system/light/dark
-- `memory`
-  - numeriskt värde eller tomt minne
-- `history`
-  - uttryck
-  - formatterat resultat
-  - tidsstämpel/ordning
+Temporära graph-objekt:
 
-Aktuellt, ännu inte slutfört uttryck behöver inte persisteras i v1. Presentationstillstånd såsom öppen/stängd funktionspanel eller historikpanel persisteras inte.
+- current graphable expression,
+- mathematical viewport,
+- sampled segments.
 
-Persistensformatet ska versionsmärkas eller kunna migreras defensivt om strukturen senare ändras. Ogiltig lokal data ska ignoreras/återställas utan att appen kraschar.
+Expression engine äger matematiksemantik. Graph Sampler äger sampling/discontinuity-policy. Viewportlagret äger koordinattransformation för pan/zoom. Canvas äger pixelrendering och browsergesttolkning. UI äger layout/presentation.
 
-## 7. Integrationer
+## 7. Felmodell
 
-V1 har inga externa affärsintegrationer.
+Direkt kalkylatorutvärdering visar kontrollerade fel för syntax, division med noll, domän, saknad variabel och icke-visningsbart resultat.
 
-Den enda plattformsintegrationen är webbläsarens standard-API:er för:
+Graph Sampler behandlar motsvarande fel för enskilda `x`-värden som lokala sampling gaps när det är matematiskt rimligt.
 
-- DOM/input,
-- localStorage,
-- Service Worker,
-- Web App Manifest,
-- media queries för skärmstorlek/orientering och systemtema,
-- CSS `env(safe-area-inset-*)` för skärmutskärningar i landskap.
-
-PWA-installations-UI betraktas som progressive enhancement och varierar mellan plattformar. Applikationen visar inte en permanent installationssektion i kalkylatorgränssnittet.
+Ett programmerings-/systemfel får inte döljas som en matematisk diskontinuitet.
 
 ## 8. Säkerhetsarkitektur
 
-Säkerhetsytan är liten men följande principer är bindande:
+- inga externa graph-/math-API:er,
+- ingen dynamisk kodexekvering,
+- inputgräns kvarstår,
+- inga secrets,
+- lokal beräkningsdata,
+- dependencies låses i lockfil,
+- Canvas renderar endast intern numerisk data och text som redan är UI-kontrollerad.
 
-- användarens uttryck tolkas enbart som tillåten matematisk syntax,
-- ingen `eval`, `Function` eller dynamisk kodgenerering,
-- ingen användardata skickas externt,
-- inga secrets/API-nycklar finns i klienten,
-- tredjepartsdependencies hålls få och låses i lockfil,
-- inputgränser införs för orimligt långa uttryck för att undvika onödig CPU-/minnesbelastning,
-- lagringsdata valideras innan den används.
+## 9. Prestanda
 
-En rimlig initial gräns är **1 000 tecken per uttryck**, vilket vida överstiger normal interaktiv användning men ger ett tydligt skydd mot oavsiktligt extrema uttryck.
+Graphing introducerar upprepad expression evaluation. Därför gäller:
 
-## 9. Deploymentmodell
+- sampling density är begränsad/proportionerlig till viewport,
+- viewportens spann är begränsat för att undvika patologiska zoomlägen,
+- DOM-element per graph sample undviks; Canvas används,
+- omprovtagning sker efter viewportförändring,
+- Web Worker införs inte initialt men kan övervägas om mätning på verklig mobil hårdvara visar UI-blockering.
 
-Applikationen byggs till statiska filer och distribueras på GitHub Pages eller annan HTTPS-kapabel statisk webbhosting/CDN.
+## 10. Deployment och drift
+
+Deploymentmodellen förändras inte:
 
 ```text
-Source
--> Vite build
--> static dist/
--> HTTPS static host/CDN
--> browser + service worker cache
+Source → Vite build → statiska filer → GitHub Pages/HTTPS → PWA cache
 ```
 
-Ingen container krävs för runtime i v1.
-
-Krav på driftmiljön:
-
-- HTTPS i produktion (för PWA/service worker),
-- korrekta MIME-typer,
-- möjlighet att leverera manifest, ikoner och service worker-filer.
-
-V1 behöver ingen server-side health endpoint. Tillgänglighet övervakas på hosting-/HTTP-nivå.
-
-## 10. Observability och operability
-
-För v1 behövs ingen central telemetry eller användarspårning.
-
-Operativa principer:
-
-- build/test ska vara deterministiska,
-- produktionsbygget ska kunna verifieras lokalt via preview-server,
-- PWA-manifest och service worker ska verifieras i test/acceptans,
-- responsiva huvudlägen ska verifieras med automatiserade viewporttester,
-- runtime-fel får loggas till browser console i utvecklingsläge men ingen extern felinsamling är krav i v1,
-- en uppdateringsindikering ska ge användaren möjlighet att ladda om när ny version är klar.
+Graphing kräver ingen serverkonfiguration, migration eller ny extern tjänst.
 
 ## 11. Teknikval
 
-### 11.1 Språk
+- TypeScript
+- React
+- Vite
+- egen explicit expression parser/evaluator
+- HTML Canvas 2D för graph rendering
+- localStorage bakom adapter
+- vite-plugin-pwa/Workbox
+- Vitest + React Testing Library + Playwright
 
-**TypeScript** för all applikationskod.
+Ett externt plottingbibliotek ska endast införas om den interna Canvas-lösningen inte ger tillräcklig korrekthet eller underhållbarhet. Ett sådant byte kräver ny dependency-/bundle-/security-bedömning.
 
-### 11.2 UI
-
-**React**.
-
-Motiv:
-
-- komponentbaserad struktur passar responsiva paneler och knappsatser,
-- state/rendering kan hållas separerad från den rena matematikdomänen,
-- mogen test- och tillgänglighetsekosystem.
-
-Ingen separat global state-management-dependency behövs. React state/reducer och små rena domänmoduler är tillräckligt för v1.
-
-### 11.3 Build/dev server
-
-**Vite**.
-
-### 11.4 PWA
-
-**vite-plugin-pwa** med Workbox-genererad service worker och manifest.
-
-Vald strategi:
-
-- precache av byggda resurser,
-- offline app-shell,
-- promptbaserad versionsuppdatering,
-- inga runtime-cachade externa API:er eftersom sådana saknas.
-
-### 11.5 Matematikmotor
-
-**Egen begränsad parser/evaluator i TypeScript**.
-
-Motiv:
-
-- v1-syntaxen är avgränsad,
-- inga behov av symbolisk algebra, matriser eller CAS,
-- full kontroll över procent, DEG/RAD och felmodell,
-- färre runtime-dependencies.
-
-### 11.6 Persistens
-
-**localStorage bakom adapter**.
-
-IndexedDB bedöms vara onödigt för den lilla datamängden i v1.
-
-### 11.7 Test
-
-**Vitest** för:
-
-- expression engine,
-- numeric formatter,
-- calculator state,
-- storage adapter,
-- komponent-/interaktionstester där lämpligt.
-
-**React Testing Library** används för beteendeorienterade UI-tester.
-
-**Playwright** används för end-to-end-flöden:
-
-- grundläggande och vetenskaplig beräkning i samma UI,
-- tangentbord,
-- smalt porträtt med hopfälld funktionspanel,
-- telefonlandskap med tvåkolumnslayout och safe area,
-- surfplattelandskap,
-- historik/persistens,
-- tema,
-- felåterhämtning,
-- PWA/offline-verifiering.
-
-Service-worker-specifika assertions koncentreras till Chromium där testverktygets service-worker-inspektion har bäst direktstöd; kärn-UI och matematik ska även testas utan beroende av service worker.
-
-### 11.8 Kodkvalitet
-
-- ESLint för statisk kodkontroll.
-- TypeScript strict mode.
-
-## 12. Källkodsstruktur
-
-```text
-src/
-  app/
-    App.tsx
-  calculator/
-    engine/
-    state/
-    formatting/
-  components/
-  persistence/
-  pwa/
-  styles/
-```
-
-Principen är viktigare än mapparna: ren matematikdomän ska inte blandas med React eller browserpersistens.
-
-## 13. Trade-offs och constraints
-
-### Ett adaptivt UI kontra separata lägen
-
-Ett adaptivt UI minskar användarens val och förenklar runtime-state, men kräver mer omsorg i responsiv CSS och viewporttester. För v1 är detta att föredra eftersom samma funktioner kan göras tillgängliga utan att nybörjaren först måste förstå ett lägesval.
-
-### Egen parser kontra matematikbibliotek
-
-Egen parser innebär mer kod som måste verifieras noggrant, men scope är tillräckligt begränsad för att vinsten i kontroll och liten dependency-yta väger tyngre i v1.
-
-### `Number` kontra godtycklig precision
-
-JavaScript `Number` ger små flyttalsartefakter men är tillräckligt för målgruppen. Arkitekturen kompenserar med central formattering i stället för att introducera ett arbitrary-precision-bibliotek.
-
-### localStorage kontra IndexedDB
-
-localStorage är synkront men datamängden är mycket liten. Adaptern håller bytet möjligt om framtida scope kräver större eller mer strukturerad lagring.
-
-### Klient-only kontra backend
-
-Avsaknaden av backend gör synkronisering mellan enheter omöjlig i v1 men ger maximal offlineförmåga, integritet och enkel drift. Det matchar aktuell scope.
-
-## 14. Arkitekturbeslut
-
-Följande beslut betraktas som låsta för v1 tills ett konkret problem motiverar ändring:
+## 12. Arkitekturbeslut
 
 - ARCH-001: klientbaserad statisk PWA utan backend.
 - ARCH-002: React + TypeScript + Vite.
-- ARCH-003: egen explicit expression parser/evaluator; ingen dynamisk kodexekvering.
-- ARCH-004: JavaScript `Number` + central resultatformatterare.
-- ARCH-005: localStorage bakom adapter, historik max 100 poster och defensiv läsning av äldre lagringsformat.
-- ARCH-006: `vite-plugin-pwa`/Workbox med promptbaserad uppdatering.
-- ARCH-007: Vitest + React Testing Library + Playwright som testbas.
-- ARCH-008: ett enhetligt responsivt kalkylatorgränssnitt; presentationen styrs av viewport och tillgängligt utrymme, inte användarvalt Simple/Advanced-mode.
-- ARCH-009: historik visas on demand och tar inte permanent layoututrymme.
-- ARCH-010: landskapslayout respekterar CSS safe-area-insets.
+- ARCH-003: egen explicit parser/evaluator utan dynamisk kodexekvering.
+- ARCH-004: JavaScript `Number` + central formattering.
+- ARCH-005: localStorage bakom adapter, historik max 100 poster.
+- ARCH-006: vite-plugin-pwa/Workbox.
+- ARCH-007: Vitest + RTL + Playwright.
+- ARCH-008: graphing använder samma Expression Engine med explicit variable context.
+- ARCH-009: Graph Sampler är ett separat rent domänlager mellan evaluator och renderer.
+- ARCH-010: Canvas 2D är renderer för initial graphing-scope.
+- ARCH-011: graph presentation är expression-/viewport-driven och inte ett separat calculator mode.
+- ARCH-012: landscape calculator column är spatialt stabil; secondary workspace byter mellan functions och graph.
+- ARCH-013: graph viewport-transformationer är rena domänfunktioner; pointer/wheel events stannar i Canvas/UI-lagret.
+- ARCH-014: graph viewport är temporär och återställs deterministiskt, inte persisterad.
 
-Separata ADR-filer behövs inte ännu eftersom projektet är litet och besluten är dokumenterade här. Om ett av besluten senare ändras eller blir omtvistat ska separat ADR skapas.
+## 13. Viktiga trade-offs
 
-## 15. Öppna arkitekturfrågor
+### Graph endast i initial landskapsyta
 
-Inga blockerande arkitekturfrågor återstår för v1.
+Det håller phone portrait enkelt och ger grafen meningsfull yta. Nackdelen är att användaren behöver rotera en smal telefon för att se grafen. Uttrycket och `x`-input fungerar dock fortfarande i porträtt så rotationen förlorar inte arbetet.
 
-Framtida förbättringar kan bland annat omfatta:
+### Canvas kontra SVG/plotting library
 
-- ytterligare vetenskapliga funktioner,
-- fler verifierade viewportprofiler,
-- eventuell förenkling/omdöpning av äldre interna CSS-klassnamn när det kan göras utan regressionsrisk,
-- ytterligare tillgänglighetsanpassningar.
+Canvas ger liten dependency-yta och lämpar sig för många sampled points. Det ger mindre native DOM-semantik, vilket kompenseras med tillgängliga kontroller/labels utanför canvas.
 
-## 16. Aktuell verifieringsstrategi
+### Sampling kontra symbolisk analys
 
-För den enhetliga responsiva modellen ska CI minst verifiera:
+Initial version provar funktionen numeriskt i stället för att analysera den symboliskt. Det håller scope rimligt men kräver försiktig discontinuity-policy och betyder att perfekt identifiering av alla asymptoter inte garanteras.
 
-1. lint, typecheck, enhets-/komponenttester och produktionsbygge,
-2. grundläggande beräkning utan lägesväljare,
-3. vetenskapliga funktioner, minne och historik i samma kalkylator,
-4. smal porträttvy med hopfälld funktionspanel,
-5. telefonlandskap utan sidscrollning,
-6. surfplattelandskap utan sidscrollning,
-7. tema och persistens,
-8. matematisk felåterhämtning,
-9. offlinefunktion via service worker.
+### Temporär viewport kontra persistens
+
+Viewporten återställs när grafsessionen lämnas och sparas inte mellan sessioner. Det minskar state-/migrationsytan och ger ett förutsägbart startläge, på bekostnad av att användaren inte kan återuppta en tidigare pan/zoom-position.
+
+## 14. Öppna arkitekturfrågor
+
+Inga blockerande arkitekturfrågor återstår för den initiala graphing-serien. Verklig touchkänsla och prestanda på olika mobila enheter ska fortsatt följas upp som manuell acceptans och kan motivera framtida optimering utan att ändra nuvarande domängränser.

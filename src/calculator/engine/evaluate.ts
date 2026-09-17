@@ -1,5 +1,5 @@
 import { tokenize } from './tokenizer'
-import { CalculatorError, type AngleMode, type Token } from './types'
+import { CalculatorError, type AngleMode, type EvaluationVariables, type Token } from './types'
 
 const FUNCTIONS = new Set(['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', 'inv', 'sqr'])
 
@@ -9,6 +9,7 @@ class Parser {
   constructor(
     private readonly tokens: Token[],
     private readonly angleMode: AngleMode,
+    private readonly variables: EvaluationVariables,
   ) {}
 
   parse(): number {
@@ -84,6 +85,7 @@ class Parser {
     if (token.type === 'identifier') {
       if (token.value === 'pi') return Math.PI
       if (token.value === 'e') return Math.E
+      if (token.value === 'x') return this.readVariableX()
       if (!FUNCTIONS.has(token.value)) throw new CalculatorError('SYNTAX', `Funktionen ”${token.value}” stöds inte.`)
       if (this.consume().type !== 'leftParen') throw new CalculatorError('SYNTAX', 'Funktionens argument måste stå inom parentes.')
       const argument = this.parseAddition()
@@ -91,6 +93,14 @@ class Parser {
       return this.applyFunction(token.value, argument)
     }
     throw new CalculatorError('SYNTAX', 'Uttrycket är inte fullständigt.')
+  }
+
+  private readVariableX(): number {
+    const value = this.variables.x
+    if (value === undefined || !Number.isFinite(value)) {
+      throw new CalculatorError('VARIABLE', 'Variabeln x kräver ett ändligt numeriskt värde.')
+    }
+    return value
   }
 
   private applyFunction(name: string, value: number): number {
@@ -148,7 +158,11 @@ class Parser {
   }
 }
 
-export function evaluateExpression(expression: string, angleMode: AngleMode = 'DEG'): number {
+export function evaluateExpression(
+  expression: string,
+  angleMode: AngleMode = 'DEG',
+  variables: EvaluationVariables = {},
+): number {
   if (!expression.trim()) throw new CalculatorError('SYNTAX', 'Skriv ett uttryck först.')
-  return new Parser(tokenize(expression), angleMode).parse()
+  return new Parser(tokenize(expression), angleMode, variables).parse()
 }
