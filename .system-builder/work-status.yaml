@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/graphing-support.md
-  selected_step: DEV-014
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -24,21 +24,22 @@ progress:
     - DEV-012
     - CHG-UNIFIED-CALCULATOR
     - DEV-013
-  in_progress: DEV-014
+    - DEV-014
+  in_progress: null
   next:
-    recommended: DEV-014
-    reason: "Implementera en ren graph sampler som omvandlar uttryck och viewport till ritbara segment med kontrollerad hantering av domänfel och diskontinuiteter."
+    recommended: DEV-015
+    reason: "Graph sampler är verifierad och UI-oberoende. Nästa steg är en återanvändbar Canvas-komponent som ritar axlar, grid och sampler-segment utan att ännu integrera landskapslayouten."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
     - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
-    - "DEV-013 npm run verify in GitHub Actions CI #30: passed"
-    - "DEV-013 npm run build:pages in GitHub Actions CI #30: passed"
-    - "DEV-013 npm run test:e2e in GitHub Actions CI #30: passed"
-    - "DEV-013 status commit GitHub Actions CI #31: passed"
-  notes: "DEV-014 pågår. Samplern ska vara UI-oberoende, använda expression engine för varje x-värde, fortsätta över punktvisa matematiska domänfel och dela segment vid uppenbara diskontinuiteter."
+    - "DEV-013 GitHub Actions CI #30/#31: passed"
+    - "DEV-014 npm run verify in GitHub Actions CI #34: passed"
+    - "DEV-014 npm run build:pages in GitHub Actions CI #34: passed"
+    - "DEV-014 npm run test:e2e in GitHub Actions CI #34: passed"
+  notes: "DEV-014 adds a pure graph sampler with viewport-derived bounded sampling density, expression-engine evaluation for each x value, segment breaks for pointwise DOMAIN/DIVISION_BY_ZERO/RESULT errors, and a large-jump heuristic to avoid obvious false connections across asymptotes. Tests cover linear, quadratic, sine, sqrt domain handling, 1/x, tan, density bounds, invalid viewports and propagation of non-pointwise expression errors."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-014 selected after green DEV-013 CI #30/#31."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-014 verified by CI #34 on commit 1474b0416d8b42b6d97cc090bf47b25389825dcf."
