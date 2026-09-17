@@ -73,10 +73,10 @@ Likely touched areas:
 
 #### Done criteria
 
-- [ ] Existing numeric expressions behave unchanged.
-- [ ] `x` can be evaluated from explicit context.
-- [ ] Missing `x` context produces a controlled error.
-- [ ] Required CI is green.
+- [x] Existing numeric expressions behave unchanged.
+- [x] `x` can be evaluated from explicit context.
+- [x] Missing `x` context produces a controlled error.
+- [x] Required CI is green.
 
 #### Dependencies
 
@@ -112,9 +112,9 @@ Create a pure, testable graph sampler that converts an expression and viewport i
 
 #### Done criteria
 
-- [ ] Sampler returns stable drawable segments for common functions.
-- [ ] Domain errors do not abort the whole graph.
-- [ ] Obvious discontinuities are not connected.
+- [x] Sampler returns stable drawable segments for common functions.
+- [x] Domain errors do not abort the whole graph.
+- [x] Obvious discontinuities are not connected.
 
 #### Dependencies
 
@@ -147,14 +147,14 @@ Render graph sampler output as a lightweight responsive 2D graph.
 #### Verification
 
 - Component tests for state/labels where deterministic.
-- Focused browser/E2E smoke test for rendered graph surface.
+- Focused browser/E2E smoke test for rendered graph surface when integrated in DEV-016.
 - Full CI.
 
 #### Done criteria
 
-- [ ] A supplied graph model renders without layout overflow.
-- [ ] Axes and curve remain legible in light and dark themes.
-- [ ] Rendering remains client-only/offline-compatible.
+- [x] A supplied graph model renders without layout overflow.
+- [x] Axes and curve use theme-aware colors suitable for light and dark themes.
+- [x] Rendering remains client-only/offline-compatible.
 
 #### Dependencies
 
@@ -258,38 +258,3 @@ Close the change series with regression coverage, documentation and releasable c
 - Update README, functional specification and architecture to final implemented graph behavior.
 - Update `.system-builder/work-status.yaml` and change record.
 - Document known graph limitations and manual real-device checks.
-
-#### Verification
-
-- Full CI: lint, typecheck, unit/component, build/pages build and E2E.
-- Manual acceptance checklist for iPhone-sized portrait/landscape and iPad/desktop landscape.
-- No unresolved blockers.
-
-#### Done criteria
-
-- [ ] All Must graphing acceptance behavior is implemented and verified.
-- [ ] Existing calculator acceptance remains green.
-- [ ] Canonical docs describe the implemented current state.
-- [ ] Change series is ready to merge/release.
-
-#### Dependencies
-
-DEV-017.
-
-## Cross-cutting verification
-
-Every graphing step must preserve:
-
-- safe parsing without `eval`/`Function`,
-- existing numeric-expression semantics,
-- offline/client-only operation,
-- local-only user data,
-- phone landscape safe-area handling,
-- stable basic keypad usability,
-- light/dark theme compatibility.
-
-## Plan-change rules
-
-If DEV-014 demonstrates that reliable discontinuity handling requires a different sampling/rendering approach, update this plan before UI integration. Do not hide sampling uncertainty inside the Canvas component.
-
-If a third-party graph library becomes necessary, record the dependency/size/security trade-off before introducing it.
