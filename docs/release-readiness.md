@@ -4,7 +4,7 @@
 
 **READY_WITH_DEVICE_CHECK**
 
-Compact-responsive change-serien är automatiskt verifierad genom DEV-019–DEV-021 och avslutas i DEV-022 med full PR-head-verifiering. Kvarvarande kontroll är en rekommenderad manuell real-device-genomgång på representativ iPhone/iPad för faktisk safe-area/touchkänsla. Den är inte ett känt kodblockerande fel.
+Compact-responsive change-serien DEV-019–DEV-022 är implementerad, dokumenterad och automatiskt verifierad. Final synchronized implementation/docs head passerade CI #110 med `npm run verify`, Pages-build och Playwright E2E. Kvarvarande kontroll är en rekommenderad manuell real-device-genomgång på representativ iPhone/iPad för faktisk safe-area/touchkänsla. Den är inte ett känt kodblockerande fel.
 
 ## Gates
 
@@ -20,7 +20,8 @@ Compact-responsive change-serien är automatiskt verifierad genom DEV-019–DEV-
 | Graph regression | PASS | graph activation, pan/zoom/reset och portrait hint ingår i E2E |
 | Calculator regression | PASS | arithmetic, science, DEG/RAD, history, memory och error recovery |
 | PWA/offline | PASS | Pages-build + service-worker/offline E2E |
-| Dokumentationsdrift | PASS | README, spec, architecture, changelog, readiness, change record och status synkas i DEV-022 |
+| Dokumentationsdrift | PASS | README, spec, architecture, changelog, readiness, change record, plan och status synkade i DEV-022 |
+| Final synchronized CI | PASS | CI #110: verify + Pages-build + Playwright E2E |
 | Manuell touch/device-kontroll | RECOMMENDED | Checklista nedan; inte markerad utförd utan verklig enhetskontroll |
 
 ## Compact responsive acceptance
@@ -77,4 +78,4 @@ Före eller strax efter merge rekommenderas följande på faktisk hårdvara:
 
 ## Merge/release
 
-DEV-022 kräver ingen backend, migration eller deploymentskonfiguration. När sista PR-headen har full grön CI och System Builder-statusen markerar DEV-022 samt `CHG-COMPACT-RESPONSIVE-LAYOUT` completed är PR #6 merge-ready. En separat versions-/releaseändring kan göras efter merge enligt projektets normala releaseflöde.
+DEV-022 och `CHG-COMPACT-RESPONSIVE-LAYOUT` är completed. PR #6 är merge-ready när även den avslutande status-/readiness-headen har grön CI. Ingen backend, migration eller deploymentskonfiguration krävs. En separat versions-/releaseändring kan göras efter merge enligt projektets normala releaseflöde.
