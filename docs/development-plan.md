@@ -96,6 +96,7 @@ Make landscape feel more natural by placing the active calculator on the right a
 - Graph activation + Functions switching keeps numeric keypad fixed.
 - No horizontal/vertical page overflow.
 - Full CI.
+- Initial CI #87 exposed a 6.6–8.2 px lower-edge offset caused by scientific-panel bottom padding; repaired in-step and reverified by CI #89.
 
 #### Done criteria
 
