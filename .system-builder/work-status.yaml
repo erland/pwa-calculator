@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/graphing-support.md
-  selected_step: null
+  selected_step: DEV-014
 progress:
   completed:
     - CRT-001
@@ -24,10 +24,10 @@ progress:
     - DEV-012
     - CHG-UNIFIED-CALCULATOR
     - DEV-013
-  in_progress: null
+  in_progress: DEV-014
   next:
     recommended: DEV-014
-    reason: "Variabeln x är verifierat stödd i expression engine. Nästa riskreducerande steg är en ren graph sampler som hanterar domänfel och diskontinuiteter innan Canvas/UI integreras."
+    reason: "Implementera en ren graph sampler som omvandlar uttryck och viewport till ritbara segment med kontrollerad hantering av domänfel och diskontinuiteter."
 blockers: []
 verification:
   last_status: passed
@@ -37,7 +37,8 @@ verification:
     - "DEV-013 npm run verify in GitHub Actions CI #30: passed"
     - "DEV-013 npm run build:pages in GitHub Actions CI #30: passed"
     - "DEV-013 npm run test:e2e in GitHub Actions CI #30: passed"
-  notes: "DEV-013 introduces EvaluationVariables with optional x, resolves x through explicit evaluation context, preserves existing numeric-expression callers through a default empty context, and returns controlled VARIABLE errors for missing/non-finite x values. No graph UI is exposed yet."
+    - "DEV-013 status commit GitHub Actions CI #31: passed"
+  notes: "DEV-014 pågår. Samplern ska vara UI-oberoende, använda expression engine för varje x-värde, fortsätta över punktvisa matematiska domänfel och dela segment vid uppenbara diskontinuiteter."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-013 verified by CI #30 on commit cd00ee311c856e10b6536e25615c1174188e64b8."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-014 selected after green DEV-013 CI #30/#31."
