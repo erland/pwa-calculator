@@ -59,11 +59,11 @@ Remove non-essential header chrome and simplify theming to system preference onl
 
 #### Done criteria
 
-- [ ] No user-selectable theme control remains.
-- [ ] UI follows system light/dark preference.
-- [ ] New persisted state does not require/write `theme`.
-- [ ] Existing persisted data with a theme field loads without data loss.
-- [ ] Header/title no longer consumes calculator layout space.
+- [x] No user-selectable theme control remains.
+- [x] UI follows system light/dark preference.
+- [x] New persisted state does not require/write `theme`.
+- [x] Existing persisted data with a theme field loads without data loss.
+- [x] Header/title no longer consumes calculator layout space.
 
 #### Dependencies
 
