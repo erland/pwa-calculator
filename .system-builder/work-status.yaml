@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/compact-responsive-layout.md
-  selected_step: null
+  selected_step: DEV-022
 progress:
   completed:
     - CRT-001
@@ -33,10 +33,10 @@ progress:
     - DEV-019
     - DEV-020
     - DEV-021
-  in_progress: null
+  in_progress: DEV-022
   next:
     recommended: DEV-022
-    reason: "Kompakt porträtt är verifierat på 375x812 med hela Funktioner-panelen och sifferknappsatsen expanderade utan sidscroll. Nästa steg är slutlig regression, dokumentationssynk och merge readiness för hela CHANGE-serien."
+    reason: "DEV-019–DEV-021 är verifierade. DEV-022 synkar kanoniska dokument, kör slutlig regression och stänger CHANGE-serien först efter full grön PR-head."
 blockers: []
 verification:
   last_status: passed
@@ -49,7 +49,8 @@ verification:
     - "DEV-020 initial CI #87: verify/build:pages passed; e2e found scientific keypad lower edge 6.6px/8.2px above numeric keypad"
     - "DEV-020 repaired CI #89 on commit 30ff4f899825ae21b761b561062b79f6f161b24c: verify/build:pages/e2e passed"
     - "DEV-021 GitHub Actions CI #101 on commit 0d5b4031e2a73b95d82debf0350e9bea5383ee34: verify/build:pages/e2e passed"
-  notes: "DEV-021 adds a portrait-only compact override loaded after existing responsive styles. At 375x812 the scientific keypad uses five columns, vertical padding/gaps are reduced without device detection, numeric keys remain about 48px high and scientific keys about 42px high, and dedicated Playwright coverage verifies the fully expanded scientific panel plus complete numeric keypad fit without page scroll. Existing auto-collapse after choosing x and the landscape graph hint remain intact."
+    - "DEV-021 closing status head CI #103: verify/build:pages/e2e passed"
+  notes: "DEV-022 in progress: canonical documentation and final acceptance are being synchronized against the verified compact responsive implementation."
 source_state:
   drift: none
-  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019–DEV-021 complete. DEV-021 verified by CI #101 on commit 0d5b4031e2a73b95d82debf0350e9bea5383ee34."
+  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-022 locked for final acceptance."
