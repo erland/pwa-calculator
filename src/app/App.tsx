@@ -32,9 +32,6 @@ export function App() {
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
   useEffect(() => applyTheme(state.theme), [state.theme])
-  useEffect(() => {
-    if (!graphActive) setGraphViewport(DEFAULT_GRAPH_VIEWPORT)
-  }, [graphActive])
   useLayoutEffect(() => bindKeyboard(dispatch), [])
 
   return (
