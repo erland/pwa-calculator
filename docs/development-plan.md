@@ -236,9 +236,9 @@ Make the graph practically explorable while preserving the stable calculator lay
 
 #### Done criteria
 
-- [ ] User can inspect different graph regions without affecting calculator input controls.
-- [ ] Reset returns to deterministic default viewport.
-- [ ] No page-scroll/safe-area regression in landscape.
+- [x] User can inspect different graph regions without affecting calculator input controls.
+- [x] Reset returns to deterministic default viewport.
+- [x] No page-scroll/safe-area regression in landscape.
 
 #### Dependencies
 
