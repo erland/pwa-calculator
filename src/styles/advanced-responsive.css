@@ -193,37 +193,43 @@
   }
 }
 
-/* Landscape uses a stable calculator column on the left and a secondary
- * workspace on the right. The secondary workspace holds scientific controls
- * normally and the graph when x is present. */
+/* Landscape keeps the secondary graph/scientific workspace on the left and
+ * the stable calculator controls on the right. Scientific controls align to
+ * the bottom of their workspace so their keypad shares the numeric keypad's
+ * lower visual baseline. */
 @media (orientation: landscape) {
   .mode-advanced .calculator-card {
     display: grid;
-    grid-template-columns: minmax(18rem, .8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, .8fr);
     grid-template-rows: auto auto minmax(0, 1fr);
   }
 
   .mode-advanced .display {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
   }
 
   .mode-advanced .advanced-toolbar {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 2;
   }
 
   .mode-advanced .basic-keypad {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 3;
   }
 
   .mode-advanced .advanced-panel,
   .mode-advanced .graph-workspace {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1 / 4;
     min-width: 0;
     min-height: 0;
+  }
+
+  .mode-advanced .advanced-panel {
+    display: flex;
+    align-items: flex-end;
   }
 
   .mode-advanced.graph-active:not(.functions-open) .advanced-panel {
@@ -258,7 +264,8 @@
   }
 
   .mode-advanced .advanced-controls {
-    height: 100%;
+    width: 100%;
+    height: auto;
     margin-bottom: 0;
   }
 }
@@ -285,7 +292,7 @@
   }
 
   .mode-advanced .calculator-card {
-    grid-template-columns: minmax(17rem, .85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(17rem, .85fr);
     grid-template-rows: auto auto 1fr;
     gap: .4rem;
     padding: .45rem;
@@ -389,7 +396,7 @@
   }
 
   .mode-advanced .calculator-card {
-    grid-template-columns: minmax(20rem, .72fr) minmax(0, 1.28fr);
+    grid-template-columns: minmax(0, 1.28fr) minmax(20rem, .72fr);
     gap: .65rem;
   }
 
