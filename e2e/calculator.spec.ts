@@ -34,58 +34,86 @@ test('calculator handles science, history, memory and persistence', async ({ pag
   await expect(page.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeVisible()
 })
 
-test('small portrait phone keeps numeric keypad available and collapses functions after a choice', async ({ page }) => {
+test('small portrait phone keeps graphing compact and collapses functions after choosing x', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 })
   await page.goto('/')
 
   const functions = page.getByRole('button', { name: /Funktioner/ })
   await expect(functions).toHaveAttribute('aria-expanded', 'false')
-  await expect(page.getByRole('button', { name: 'sin' })).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Variabel x' })).toBeHidden()
   await expect(page.getByRole('button', { name: '7' })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 
   await functions.click()
-  await expect(functions).toHaveAttribute('aria-expanded', 'true')
-  await page.getByRole('button', { name: 'sin' }).click()
+  await page.getByRole('button', { name: 'Variabel x' }).click()
   await expect(functions).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.getByText('Grafen visas i landskap.')).toBeVisible()
+  await expect(page.getByRole('img', { name: /Graf för uttrycket x/ })).toBeHidden()
   await expect(page.getByRole('button', { name: '7' })).toBeVisible()
 })
 
-test('phone landscape shows scientific and numeric keypads side by side without scrolling', async ({ page }) => {
+test('phone landscape keeps numeric keypad fixed when x activates the graph', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/')
 
-  const calculator = page.locator('.calculator-card')
   const advanced = page.locator('.advanced-controls')
   const basic = page.locator('.basic-keypad')
-  const [calculatorBox, advancedBox, basicBox] = await Promise.all([
-    calculator.boundingBox(),
-    advanced.boundingBox(),
-    basic.boundingBox(),
-  ])
-
-  expect(calculatorBox).not.toBeNull()
+  const beforeBasic = await basic.boundingBox()
+  const advancedBox = await advanced.boundingBox()
+  expect(beforeBasic).not.toBeNull()
   expect(advancedBox).not.toBeNull()
-  expect(basicBox).not.toBeNull()
-  expect(advancedBox!.y).toBeCloseTo(basicBox!.y, 0)
-  expect(advancedBox!.x).toBeLessThan(basicBox!.x)
+  expect(advancedBox!.x).toBeGreaterThan(beforeBasic!.x)
+
+  await page.getByRole('button', { name: 'Variabel x' }).click()
+  const graph = page.getByRole('img', { name: /Graf för uttrycket x/ })
+  await expect(graph).toBeVisible()
+  await expect(advanced).toBeHidden()
+
+  const afterBasic = await basic.boundingBox()
+  expect(afterBasic).not.toBeNull()
+  expect(afterBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
+  expect(afterBasic!.y).toBeCloseTo(beforeBasic!.y, 0)
+
+  const functions = page.getByRole('button', { name: /Funktioner/ })
+  await expect(functions).toBeVisible()
+  await functions.click()
+  await expect(advanced).toBeVisible()
+  await expect(graph).toBeHidden()
+  const functionsBasic = await basic.boundingBox()
+  expect(functionsBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
+  expect(functionsBasic!.y).toBeCloseTo(beforeBasic!.y, 0)
+
   await expect(page.locator('.app-header')).toBeHidden()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })
 
-test('iPad-sized landscape viewport shows both keypads without page scrolling', async ({ page }) => {
+test('iPad-sized landscape viewport renders graph in the secondary workspace without moving keypad', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 768 })
   await page.goto('/')
 
+  const basic = page.locator('.basic-keypad')
+  const beforeBasic = await basic.boundingBox()
   const advancedBox = await page.locator('.advanced-controls').boundingBox()
-  const basicBox = await page.locator('.basic-keypad').boundingBox()
+  expect(beforeBasic).not.toBeNull()
   expect(advancedBox).not.toBeNull()
-  expect(basicBox).not.toBeNull()
-  expect(advancedBox!.y).toBeCloseTo(basicBox!.y, 0)
-  expect(advancedBox!.x).toBeLessThan(basicBox!.x)
+  expect(advancedBox!.x).toBeGreaterThan(beforeBasic!.x)
+
+  await page.getByRole('button', { name: 'Variabel x' }).click()
+  await expect(page.getByRole('img', { name: /Graf för uttrycket x/ })).toBeVisible()
+  const afterBasic = await basic.boundingBox()
+  expect(afterBasic).not.toBeNull()
+  expect(afterBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
+  expect(afterBasic!.y).toBeCloseTo(beforeBasic!.y, 0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
+})
+
+test('keyboard x input activates graphing in landscape', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
+  await page.goto('/')
+  await page.keyboard.type('x^2-4')
+  await expect(page.getByRole('img', { name: /Graf för uttrycket x\^2-4/ })).toBeVisible()
 })
 
 test('theme persists after reload', async ({ page }) => {
