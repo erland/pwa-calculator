@@ -5,6 +5,7 @@ import { setupPwa } from './pwa/setupPwa'
 import './styles/app.css'
 import './styles/advanced-responsive.css'
 import './styles/advanced-tablet-compact.css'
+import './styles/landscape-safe-area.css'
 
 setupPwa()
 
