@@ -116,6 +116,45 @@ test('keyboard x input activates graphing in landscape', async ({ page }) => {
   await expect(page.getByRole('img', { name: /Graf för uttrycket x\^2-4/ })).toBeVisible()
 })
 
+test('graph viewport can zoom, pan and reset without moving the keypad', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 768 })
+  await page.goto('/')
+  await page.keyboard.type('x^2')
+
+  const graph = page.getByRole('img', { name: /Graf för uttrycket x\^2/ })
+  const reset = page.getByRole('button', { name: 'Återställ graf' })
+  const keypad = page.locator('.basic-keypad')
+  await expect(graph).toBeVisible()
+  await expect(reset).toBeDisabled()
+  const keypadBefore = await keypad.boundingBox()
+  const graphBox = await graph.boundingBox()
+  expect(keypadBefore).not.toBeNull()
+  expect(graphBox).not.toBeNull()
+
+  await graph.hover({ position: { x: graphBox!.width / 2, y: graphBox!.height / 2 } })
+  await page.mouse.wheel(0, -300)
+  await expect(reset).toBeEnabled()
+
+  const centerX = graphBox!.x + graphBox!.width / 2
+  const centerY = graphBox!.y + graphBox!.height / 2
+  await page.mouse.move(centerX, centerY)
+  await page.mouse.down()
+  await page.mouse.move(centerX + 60, centerY + 30, { steps: 4 })
+  await page.mouse.up()
+
+  const keypadAfterInteraction = await keypad.boundingBox()
+  expect(keypadAfterInteraction!.x).toBeCloseTo(keypadBefore!.x, 0)
+  expect(keypadAfterInteraction!.y).toBeCloseTo(keypadBefore!.y, 0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
+
+  await reset.click()
+  await expect(reset).toBeDisabled()
+  const keypadAfterReset = await keypad.boundingBox()
+  expect(keypadAfterReset!.x).toBeCloseTo(keypadBefore!.x, 0)
+  expect(keypadAfterReset!.y).toBeCloseTo(keypadBefore!.y, 0)
+})
+
 test('theme persists after reload', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('combobox', { name: 'Tema' }).selectOption('dark')
