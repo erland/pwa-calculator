@@ -146,8 +146,8 @@ Render graph sampler output as a lightweight responsive 2D graph.
 
 #### Verification
 
-- Component tests for state/labels where deterministic.
-- Focused browser/E2E smoke test for rendered graph surface when integrated in DEV-016.
+- Component tests for state/labels and deterministic coordinate/render behavior.
+- Focused browser/E2E smoke test for the rendered graph surface when the component is integrated in DEV-016.
 - Full CI.
 
 #### Done criteria
@@ -190,6 +190,7 @@ Integrate graphing into the calculator with the agreed stable landscape interact
 - Component/UI tests for `x` and responsive states.
 - Playwright portrait regression.
 - Playwright phone landscape and iPad/desktop landscape layout checks.
+- Focused browser smoke test that the integrated Canvas graph renders.
 - Assert keypad position is stable before/after graph activation.
 - Full CI.
 
@@ -258,3 +259,38 @@ Close the change series with regression coverage, documentation and releasable c
 - Update README, functional specification and architecture to final implemented graph behavior.
 - Update `.system-builder/work-status.yaml` and change record.
 - Document known graph limitations and manual real-device checks.
+
+#### Verification
+
+- Full CI: lint, typecheck, unit/component, build/pages build and E2E.
+- Manual acceptance checklist for iPhone-sized portrait/landscape and iPad/desktop landscape.
+- No unresolved blockers.
+
+#### Done criteria
+
+- [ ] All Must graphing acceptance behavior is implemented and verified.
+- [ ] Existing calculator acceptance remains green.
+- [ ] Canonical docs describe the implemented current state.
+- [ ] Change series is ready to merge/release.
+
+#### Dependencies
+
+DEV-017.
+
+## Cross-cutting verification
+
+Every graphing step must preserve:
+
+- safe parsing without `eval`/`Function`,
+- existing numeric-expression semantics,
+- offline/client-only operation,
+- local-only user data,
+- phone landscape safe-area handling,
+- stable basic keypad usability,
+- light/dark theme compatibility.
+
+## Plan-change rules
+
+If DEV-014 demonstrates that reliable discontinuity handling requires a different sampling/rendering approach, update this plan before UI integration. Do not hide sampling uncertainty inside the Canvas component.
+
+If a third-party graph library becomes necessary, record the dependency/size/security trade-off before introducing it.
