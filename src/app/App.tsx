@@ -90,11 +90,6 @@ export function App() {
             <BasicKeypad dispatch={dispatch} />
           </section>
         </div>
-
-        <details className="install-help">
-          <summary>Installera eller använd offline</summary>
-          <p>Öppna webbläsarens meny och välj att installera eller lägga till appen på hemskärmen. Efter första fullständiga laddningen fungerar beräkningar och sparade inställningar utan nätverk.</p>
-        </details>
       </main>
       {state.mode === 'advanced' && historyOpen && (
         <div className="history-overlay">
