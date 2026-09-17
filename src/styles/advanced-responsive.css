@@ -34,148 +34,134 @@
   .app-layout.mode-advanced {
     width: min(100% - .75rem, 70rem);
     min-height: 100dvh;
-    padding: .4rem 0;
+    padding: .25rem 0;
   }
 
+  /* In a short landscape viewport the calculator itself is the primary UI.
+   * Theme selection remains available after rotating back to portrait, while
+   * the mode switch stays visible so advanced mode can be left immediately.
+   */
   .mode-advanced .app-header {
-    align-items: center;
-    margin-bottom: .3rem;
-  }
-
-  .mode-advanced .app-header .eyebrow {
     display: none;
-  }
-
-  .mode-advanced .app-header h1 {
-    font-size: 1.25rem;
-  }
-
-  .mode-advanced .theme-picker {
-    grid-template-columns: auto auto;
-    align-items: center;
-    gap: .4rem;
-  }
-
-  .mode-advanced .theme-picker select {
-    min-height: 2.1rem;
-    padding-block: 0;
   }
 
   .mode-advanced .mode-switch {
     width: min(100%, 22rem);
-    margin-bottom: .3rem;
+    margin-bottom: .25rem;
+    padding: .18rem;
   }
 
   .mode-advanced .mode-switch button {
-    min-height: 2.1rem;
+    min-height: 1.85rem;
   }
 
   .mode-advanced .workspace {
     grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem);
     align-items: stretch;
-    gap: .45rem;
+    gap: .4rem;
   }
 
   .mode-advanced .calculator-card {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
     grid-template-rows: auto 1fr;
-    gap: .45rem;
-    padding: .5rem;
+    gap: .4rem;
+    padding: .45rem;
   }
 
   .mode-advanced .display {
     grid-column: 1 / -1;
-    min-height: 4rem;
+    min-height: 3.7rem;
     margin-bottom: 0;
-    padding: .45rem .7rem;
+    padding: .35rem .65rem;
   }
 
   .mode-advanced .expression {
-    font-size: .82rem;
+    font-size: .8rem;
   }
 
   .mode-advanced .result {
-    margin-top: .2rem;
-    font-size: clamp(1.55rem, 5vw, 2.25rem);
+    margin-top: .15rem;
+    font-size: clamp(1.45rem, 5vw, 2.1rem);
   }
 
   .mode-advanced .advanced-controls {
     min-width: 0;
     margin-bottom: 0;
-    padding: .4rem;
+    padding: .35rem;
   }
 
   .mode-advanced .setting-row {
-    gap: .4rem;
-    margin-bottom: .3rem;
-    font-size: .75rem;
-  }
-
-  .mode-advanced .segmented.compact {
-    width: 7rem;
-  }
-
-  .mode-advanced .segmented.compact button {
-    min-height: 1.9rem;
+    gap: .35rem;
+    margin-bottom: .25rem;
     font-size: .72rem;
   }
 
+  .mode-advanced .segmented.compact {
+    width: 6.5rem;
+    padding: .18rem;
+  }
+
+  .mode-advanced .segmented.compact button {
+    min-height: 1.7rem;
+    font-size: .7rem;
+  }
+
   .mode-advanced .memory-row {
-    grid-template-columns: repeat(4, 1fr) 1.1rem;
-    gap: .25rem;
-    margin-bottom: .3rem;
+    grid-template-columns: repeat(4, 1fr) 1rem;
+    gap: .2rem;
+    margin-bottom: .25rem;
   }
 
   .mode-advanced .memory-row button {
-    min-height: 2.05rem;
+    min-height: 1.85rem;
     border-radius: .5rem;
-    font-size: .8rem;
+    font-size: .76rem;
   }
 
   .mode-advanced .advanced-keypad {
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: .25rem;
+    gap: .22rem;
   }
 
   .mode-advanced .basic-keypad {
     align-content: stretch;
-    gap: .3rem;
+    gap: .25rem;
   }
 
   .mode-advanced .calculator-key,
   .mode-advanced .key-function {
-    min-height: 2.35rem;
-    border-radius: .6rem;
+    min-height: 2.15rem;
+    border-radius: .55rem;
   }
 
   .mode-advanced .calculator-key {
-    font-size: 1rem;
+    font-size: .95rem;
   }
 
   .mode-advanced .key-function {
-    font-size: .82rem;
+    font-size: .78rem;
   }
 
   .mode-advanced .history-panel {
     max-height: none;
     min-height: 0;
     overflow: auto;
-    padding: .65rem;
+    padding: .55rem;
   }
 
   .mode-advanced .history-panel h2 {
-    font-size: .95rem;
+    font-size: .9rem;
   }
 
   .mode-advanced .history-list {
-    gap: .3rem;
-    margin-top: .45rem;
+    gap: .25rem;
+    margin-top: .35rem;
   }
 
   .mode-advanced .history-list button {
-    gap: .15rem;
-    padding: .45rem;
+    gap: .12rem;
+    padding: .4rem;
   }
 
   .mode-advanced .install-help {
