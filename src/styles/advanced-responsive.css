@@ -1,0 +1,184 @@
+/* Compact advanced-mode layout for phones and small tablets.
+ * The calculator logic stays unchanged; this file only adapts presentation.
+ */
+
+@media (max-width: 760px) {
+  .mode-advanced .display {
+    min-height: 6.25rem;
+  }
+
+  .mode-advanced .advanced-controls {
+    padding: .65rem;
+  }
+
+  .mode-advanced .advanced-keypad {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .mode-advanced .key-function {
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 410px) and (orientation: portrait) {
+  .mode-advanced .advanced-keypad {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 950px) {
+  body {
+    min-height: 100dvh;
+  }
+
+  .app-layout.mode-advanced {
+    width: min(100% - .75rem, 70rem);
+    min-height: 100dvh;
+    padding: .4rem 0;
+  }
+
+  .mode-advanced .app-header {
+    align-items: center;
+    margin-bottom: .3rem;
+  }
+
+  .mode-advanced .app-header .eyebrow {
+    display: none;
+  }
+
+  .mode-advanced .app-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .mode-advanced .theme-picker {
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: .4rem;
+  }
+
+  .mode-advanced .theme-picker select {
+    min-height: 2.1rem;
+    padding-block: 0;
+  }
+
+  .mode-advanced .mode-switch {
+    width: min(100%, 22rem);
+    margin-bottom: .3rem;
+  }
+
+  .mode-advanced .mode-switch button {
+    min-height: 2.1rem;
+  }
+
+  .mode-advanced .workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem);
+    align-items: stretch;
+    gap: .45rem;
+  }
+
+  .mode-advanced .calculator-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    grid-template-rows: auto 1fr;
+    gap: .45rem;
+    padding: .5rem;
+  }
+
+  .mode-advanced .display {
+    grid-column: 1 / -1;
+    min-height: 4rem;
+    margin-bottom: 0;
+    padding: .45rem .7rem;
+  }
+
+  .mode-advanced .expression {
+    font-size: .82rem;
+  }
+
+  .mode-advanced .result {
+    margin-top: .2rem;
+    font-size: clamp(1.55rem, 5vw, 2.25rem);
+  }
+
+  .mode-advanced .advanced-controls {
+    min-width: 0;
+    margin-bottom: 0;
+    padding: .4rem;
+  }
+
+  .mode-advanced .setting-row {
+    gap: .4rem;
+    margin-bottom: .3rem;
+    font-size: .75rem;
+  }
+
+  .mode-advanced .segmented.compact {
+    width: 7rem;
+  }
+
+  .mode-advanced .segmented.compact button {
+    min-height: 1.9rem;
+    font-size: .72rem;
+  }
+
+  .mode-advanced .memory-row {
+    grid-template-columns: repeat(4, 1fr) 1.1rem;
+    gap: .25rem;
+    margin-bottom: .3rem;
+  }
+
+  .mode-advanced .memory-row button {
+    min-height: 2.05rem;
+    border-radius: .5rem;
+    font-size: .8rem;
+  }
+
+  .mode-advanced .advanced-keypad {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: .25rem;
+  }
+
+  .mode-advanced .basic-keypad {
+    align-content: stretch;
+    gap: .3rem;
+  }
+
+  .mode-advanced .calculator-key,
+  .mode-advanced .key-function {
+    min-height: 2.35rem;
+    border-radius: .6rem;
+  }
+
+  .mode-advanced .calculator-key {
+    font-size: 1rem;
+  }
+
+  .mode-advanced .key-function {
+    font-size: .82rem;
+  }
+
+  .mode-advanced .history-panel {
+    max-height: none;
+    min-height: 0;
+    overflow: auto;
+    padding: .65rem;
+  }
+
+  .mode-advanced .history-panel h2 {
+    font-size: .95rem;
+  }
+
+  .mode-advanced .history-list {
+    gap: .3rem;
+    margin-top: .45rem;
+  }
+
+  .mode-advanced .history-list button {
+    gap: .15rem;
+    padding: .45rem;
+  }
+
+  .mode-advanced .install-help {
+    display: none;
+  }
+}
