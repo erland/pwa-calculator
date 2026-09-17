@@ -26,10 +26,11 @@ progress:
     - DEV-013
     - DEV-014
     - DEV-015
+    - DEV-016
   in_progress: null
   next:
-    recommended: DEV-016
-    reason: "Canvas-komponenten är verifierad och frikopplad från layouten. Nästa steg är att integrera x-inmatning och den stabila landskapsarbetsytan där grafen ersätter den sekundära funktionsytan utan att flytta sifferknappsatsen."
+    recommended: DEV-017
+    reason: "Den responsiva grafarbetsytan är integrerad och verifierad. Nästa steg är viewportinteraktion med pan, zoom och reset utan att påverka kalkylatorns stabila vänsterkolumn."
 blockers: []
 verification:
   last_status: passed
@@ -38,10 +39,11 @@ verification:
     - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
     - "DEV-013 GitHub Actions CI #30/#31: passed"
     - "DEV-014 GitHub Actions CI #34/#37: passed"
-    - "DEV-015 npm run verify in GitHub Actions CI #41: passed"
-    - "DEV-015 npm run build:pages in GitHub Actions CI #41: passed"
-    - "DEV-015 npm run test:e2e in GitHub Actions CI #41: passed"
-  notes: "DEV-015 adds a reusable GraphCanvas that consumes already sampled graph segments, maps mathematical coordinates to CSS pixels with inverted y-axis, draws bounded nice-step grid lines, axes and curves, scales the backing store for devicePixelRatio, redraws on resize/theme changes, exposes an accessible graph description and provides a compact empty/help state. The final calculator landscape integration remains intentionally deferred to DEV-016."
+    - "DEV-015 GitHub Actions CI #41/#44: passed"
+    - "DEV-016 npm run verify in GitHub Actions CI #50: passed"
+    - "DEV-016 npm run build:pages in GitHub Actions CI #50: passed"
+    - "DEV-016 npm run test:e2e in GitHub Actions CI #50: passed"
+  notes: "DEV-016 adds x to the Functions surface and keyboard input, detects graphable expressions, keeps portrait compact with a landscape hint, and uses a stable landscape calculator column plus a secondary workspace. Without x the secondary area shows scientific controls; with x it shows the sampled Canvas graph. Funktioner temporarily replaces the graph in the secondary area without moving the numeric keypad. Playwright verifies stable keypad coordinates on phone/iPad landscape, integrated Canvas visibility, portrait behavior, no overflow and keyboard x activation."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-015 verified by CI #41 on commit eb276bc55bc632d53c3bb9673e8fc59ffd5d1840."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-016 verified by CI #50 on commit 956e4e83a6197c5f608ede7dd48ddaccc5b15d76."
