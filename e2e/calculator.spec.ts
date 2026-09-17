@@ -11,6 +11,7 @@ test('simple mode calculates with operator precedence and keyboard', async ({ pa
 })
 
 test('advanced mode handles science, history, memory and persistence', async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 900 })
   await page.goto('/')
   await page.getByRole('button', { name: 'Avancerad' }).click()
   await page.getByRole('button', { name: 'sin' }).click()
