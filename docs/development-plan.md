@@ -196,10 +196,10 @@ Integrate graphing into the calculator with the agreed stable landscape interact
 
 #### Done criteria
 
-- [ ] Basic calculator UX is unchanged in portrait until graph functionality is intentionally used.
-- [ ] `x` activates graph presentation automatically in landscape.
-- [ ] Numeric keypad does not move when graph presentation changes.
-- [ ] Existing Function/History behavior remains available.
+- [x] Basic calculator UX is unchanged in portrait until graph functionality is intentionally used.
+- [x] `x` activates graph presentation automatically in landscape.
+- [x] Numeric keypad does not move when graph presentation changes.
+- [x] Existing Function/History behavior remains available.
 
 #### Dependencies
 
