@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/compact-responsive-layout.md
-  selected_step: DEV-022
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -33,24 +33,27 @@ progress:
     - DEV-019
     - DEV-020
     - DEV-021
-  in_progress: DEV-022
+    - DEV-022
+    - CHG-COMPACT-RESPONSIVE-LAYOUT
+  in_progress: null
   next:
-    recommended: DEV-022
-    reason: "DEV-019–DEV-021 är verifierade. DEV-022 synkar kanoniska dokument, kör slutlig regression och stänger CHANGE-serien först efter full grön PR-head."
+    recommended: null
+    reason: "Compact-responsive CHANGE-serien DEV-019–DEV-022 är implementerad, dokumenterad och verifierad. Ingen ytterligare planerad utveckling återstår före merge."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
     - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
-    - "Graphing PR final CI #73 passed before merge"
-    - "Deploy GitHub Pages run on baseline commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f: passed"
-    - "DEV-019 GitHub Actions CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93: verify/build:pages/e2e passed"
-    - "DEV-020 initial CI #87: verify/build:pages passed; e2e found scientific keypad lower edge 6.6px/8.2px above numeric keypad"
-    - "DEV-020 repaired CI #89 on commit 30ff4f899825ae21b761b561062b79f6f161b24c: verify/build:pages/e2e passed"
-    - "DEV-021 GitHub Actions CI #101 on commit 0d5b4031e2a73b95d82debf0350e9bea5383ee34: verify/build:pages/e2e passed"
+    - "DEV-019 GitHub Actions CI #83: verify/build:pages/e2e passed"
+    - "DEV-020 initial CI #87 found scientific keypad lower-edge offset; repaired in-step"
+    - "DEV-020 repaired CI #89: verify/build:pages/e2e passed"
+    - "DEV-021 GitHub Actions CI #101: verify/build:pages/e2e passed"
     - "DEV-021 closing status head CI #103: verify/build:pages/e2e passed"
-  notes: "DEV-022 in progress: canonical documentation and final acceptance are being synchronized against the verified compact responsive implementation."
+    - "DEV-022 final synchronized implementation/docs head CI #110: npm run verify passed"
+    - "DEV-022 final synchronized implementation/docs head CI #110: npm run build:pages passed"
+    - "DEV-022 final synchronized implementation/docs head CI #110: npm run test:e2e passed"
+  notes: "Compact-responsive series completed. Header/theme picker removed; system color scheme is the single theme source; legacy theme/mode storage remains readable and ignored; landscape secondary workspace is left with stable calculator right; scientific keypad is bottom-aligned; 375x812 portrait supports fully expanded Functions plus complete numeric keypad without page scroll. Real-device iPhone/iPad checks remain recommended follow-up, not an automated-code blocker."
 source_state:
   drift: none
-  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-022 locked for final acceptance."
+  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019–DEV-022 and CHG-COMPACT-RESPONSIVE-LAYOUT complete. Final synchronized head verified by CI #110."
