@@ -4,7 +4,7 @@ En responsiv och installerbar PWA som kombinerar traditionell vardagsräkning, v
 
 **Publicerad app:** [https://erland.github.io/pwa-calculator/](https://erland.github.io/pwa-calculator/)
 
-Grundläggande siffer- och operatorfunktioner är alltid direkt tillgängliga. Vetenskapliga funktioner, DEG/RAD, minne och historik visas eller fälls fram utifrån tillgängligt skärmutrymme: på små porträttskärmar hålls de sekundära funktionerna undan tills de behövs, medan landskap och större skärmar kan visa mer samtidigt.
+Grundläggande siffer- och operatorfunktioner är alltid direkt tillgängliga. Vetenskapliga funktioner, DEG/RAD, minne och historik visas eller fälls fram utifrån tillgängligt skärmutrymme: på små porträttskärmar hålls de sekundära funktionerna undan tills de behövs, medan landskap och större skärmar kan visa mer samtidigt. Kalkylatorytan har ingen permanent titel/header eller temaväljare; färgschemat följer systemet. På 375×812 ryms hela expanderade Funktioner-panelen tillsammans med hela sifferknappsatsen utan page scroll.
 
 Grafstöd aktiveras av uttrycket i stället för av ett separat grafläge. Variabeln `x` finns under **Funktioner** och kan även matas in från tangentbordet. På telefon i porträtt förblir kalkylatorn kompakt; ett `x`-uttryck visar en diskret indikation om att grafen finns i landskap. I landskap ligger graf/vetenskapliga funktioner i vänster sekundäryta medan kalkylatorn och sifferknappsatsen ligger stabilt till höger. När vetenskapliga funktioner visas bottenjusteras deras knappsats mot sifferknappsatsen.
 
@@ -82,8 +82,9 @@ Vinkelenhet, minne och de 100 senaste slutförda beräkningarna lagras versionsm
 - JavaScript `Number` använder IEEE-754 och ger inte godtycklig precision eller exakt finansiell decimalaritmetik.
 - Grafstödet visar en realvärd funktion av `x` åt gången; flera samtidiga kurvor, symbolisk algebra, komplexa tal och grafanalys som nollställen/skärningspunkter/derivator ingår inte.
 - Grafen bygger på numerisk sampling. Domänfel och uppenbara diskontinuiteter segmenteras, men alla matematiska asymptoter kan inte garanteras bli symboliskt identifierade.
-- Den fulla grafytan visas i initial scope i landskap, inte permanent i telefonporträtt.
+- Den fulla grafytan visas i landskap, inte permanent i telefonporträtt.
 - Grafens viewport sparas inte mellan sessioner.
+- Appens ljust/mörkt-tema följer systeminställningen och kan inte väljas separat i appen.
 - PWA-installationens meny och funktion varierar mellan webbläsare och operativsystem. Webbappen fungerar även utan en särskild installationsknapp.
 - PWA och service worker kräver HTTPS i produktion; `localhost` är undantaget för utveckling.
 
