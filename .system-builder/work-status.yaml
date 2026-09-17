@@ -32,10 +32,11 @@ progress:
     - CHG-GRAPHING-SUPPORT
     - DEV-019
     - DEV-020
+    - DEV-021
   in_progress: null
   next:
-    recommended: DEV-021
-    reason: "Landskapslayouten är nu vänd: sekundär graf/scientific-yta ligger till vänster, kalkylatorn till höger och scientific-knappsatsen bottenjusteras mot sifferknappsatsen. Nästa steg är att optimera porträtt så expanderade Funktioner och hela sifferknappsatsen ryms på 375x812 utan vertikal scroll."
+    recommended: DEV-022
+    reason: "Kompakt porträtt är verifierat på 375x812 med hela Funktioner-panelen och sifferknappsatsen expanderade utan sidscroll. Nästa steg är slutlig regression, dokumentationssynk och merge readiness för hela CHANGE-serien."
 blockers: []
 verification:
   last_status: passed
@@ -47,7 +48,8 @@ verification:
     - "DEV-019 GitHub Actions CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93: verify/build:pages/e2e passed"
     - "DEV-020 initial CI #87: verify/build:pages passed; e2e found scientific keypad lower edge 6.6px/8.2px above numeric keypad"
     - "DEV-020 repaired CI #89 on commit 30ff4f899825ae21b761b561062b79f6f161b24c: verify/build:pages/e2e passed"
-  notes: "DEV-020 reverses landscape composition for phone and tablet/desktop: graph/scientific secondary workspace is left, stable calculator/display/toolbar/numeric keypad is right. Scientific controls are flex-bottom-aligned and landscape-specific bottom padding is removed so the scientific keypad lower edge aligns with the numeric keypad. Playwright asserts left/right ordering, keypad coordinate stability, graph replacement, bottom alignment, and no page overflow."
+    - "DEV-021 GitHub Actions CI #101 on commit 0d5b4031e2a73b95d82debf0350e9bea5383ee34: verify/build:pages/e2e passed"
+  notes: "DEV-021 adds a portrait-only compact override loaded after existing responsive styles. At 375x812 the scientific keypad uses five columns, vertical padding/gaps are reduced without device detection, numeric keys remain about 48px high and scientific keys about 42px high, and dedicated Playwright coverage verifies the fully expanded scientific panel plus complete numeric keypad fit without page scroll. Existing auto-collapse after choosing x and the landscape graph hint remain intact."
 source_state:
   drift: none
-  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019 and DEV-020 complete. DEV-020 verified by CI #89 on commit 30ff4f899825ae21b761b561062b79f6f161b24c."
+  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019–DEV-021 complete. DEV-021 verified by CI #101 on commit 0d5b4031e2a73b95d82debf0350e9bea5383ee34."
