@@ -15,6 +15,34 @@
   min-height: 16rem;
   aspect-ratio: 16 / 9;
   background: var(--surface-soft);
+  cursor: grab;
+  touch-action: none;
+}
+
+.graph-canvas__surface:active {
+  cursor: grabbing;
+}
+
+.graph-canvas__reset {
+  position: absolute;
+  z-index: 2;
+  top: .55rem;
+  right: .55rem;
+  min-height: 2.2rem;
+  padding: 0 .7rem;
+  border: 1px solid var(--border);
+  border-radius: .65rem;
+  color: var(--accent-dark);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  font-size: .78rem;
+  font-weight: 750;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.graph-canvas__reset:disabled {
+  cursor: default;
+  opacity: .45;
 }
 
 .graph-canvas__caption {
