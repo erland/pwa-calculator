@@ -7,6 +7,7 @@ import './styles/system-theme.css'
 import './styles/advanced-responsive.css'
 import './styles/advanced-tablet-compact.css'
 import './styles/landscape-safe-area.css'
+import './styles/compact-portrait.css'
 
 setupPwa()
 
