@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useReducer } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useReducer, useState } from 'react'
 import { calculatorReducer, createCalculatorState, type CalculatorAction } from '../calculator/state/calculatorState'
 import { AdvancedKeypad } from '../components/AdvancedKeypad'
 import { BasicKeypad } from '../components/BasicKeypad'
@@ -8,6 +8,8 @@ import { loadPersistedState, savePersistedState, type PersistedState, type Theme
 
 export function App() {
   const [state, dispatch] = useReducer(calculatorReducer, undefined, () => createCalculatorState(loadPersistedState()))
+  const [functionsOpen, setFunctionsOpen] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
   const persisted = useMemo<PersistedState>(() => ({
     mode: state.mode,
     angleMode: state.angleMode,
@@ -18,6 +20,12 @@ export function App() {
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
   useEffect(() => applyTheme(state.theme), [state.theme])
+  useEffect(() => {
+    if (state.mode !== 'advanced') {
+      setFunctionsOpen(false)
+      setHistoryOpen(false)
+    }
+  }, [state.mode])
   useLayoutEffect(() => bindKeyboard(dispatch), [])
 
   return (
@@ -25,10 +33,7 @@ export function App() {
       <a className="skip-link" href="#calculator">Hoppa till miniräknaren</a>
       <main className={`app-layout mode-${state.mode}`}>
         <header className="app-header">
-          <div>
-            <p className="eyebrow">Offlineklar PWA</p>
-            <h1>Miniräknaren</h1>
-          </div>
+          <h1>Miniräknaren</h1>
           <label className="theme-picker">
             <span>Tema</span>
             <select value={state.theme} onChange={(event) => dispatch({ type: 'set-theme', theme: event.target.value as Theme })}>
@@ -50,10 +55,40 @@ export function App() {
               <span className="expression">{displayExpression(state.expression) || 'Skriv en beräkning'}</span>
               {state.error ? <strong className="error">{state.error}</strong> : <strong className="result">{state.result}</strong>}
             </div>
-            {state.mode === 'advanced' && <AdvancedKeypad dispatch={dispatch} angleMode={state.angleMode} hasMemory={state.memory !== null} />}
+            {state.mode === 'advanced' && (
+              <>
+                <div className="advanced-toolbar">
+                  <button
+                    type="button"
+                    className="panel-toggle functions-toggle"
+                    aria-expanded={functionsOpen}
+                    aria-controls="advanced-functions-panel"
+                    onClick={() => setFunctionsOpen((open) => !open)}
+                  >
+                    Funktioner <span aria-hidden="true">{functionsOpen ? '▴' : '▾'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="panel-toggle history-toggle"
+                    aria-expanded={historyOpen}
+                    aria-controls="history-panel"
+                    onClick={() => setHistoryOpen(true)}
+                  >
+                    Historik
+                  </button>
+                </div>
+                <div id="advanced-functions-panel" className="advanced-panel" data-open={functionsOpen ? 'true' : 'false'}>
+                  <AdvancedKeypad
+                    dispatch={dispatch}
+                    angleMode={state.angleMode}
+                    hasMemory={state.memory !== null}
+                    onFunctionChosen={() => setFunctionsOpen(false)}
+                  />
+                </div>
+              </>
+            )}
             <BasicKeypad dispatch={dispatch} />
           </section>
-          {state.mode === 'advanced' && <HistoryPanel history={state.history} dispatch={dispatch} />}
         </div>
 
         <details className="install-help">
@@ -61,6 +96,12 @@ export function App() {
           <p>Öppna webbläsarens meny och välj att installera eller lägga till appen på hemskärmen. Efter första fullständiga laddningen fungerar beräkningar och sparade inställningar utan nätverk.</p>
         </details>
       </main>
+      {state.mode === 'advanced' && historyOpen && (
+        <div className="history-overlay">
+          <button type="button" className="history-backdrop" aria-label="Stäng historik" onClick={() => setHistoryOpen(false)} />
+          <HistoryPanel history={state.history} dispatch={dispatch} onClose={() => setHistoryOpen(false)} />
+        </div>
+      )}
       <UpdatePrompt />
     </>
   )
