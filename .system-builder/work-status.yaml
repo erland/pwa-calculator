@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/graphing-support.md
-  selected_step: null
+  selected_step: DEV-015
 progress:
   completed:
     - CRT-001
@@ -25,10 +25,10 @@ progress:
     - CHG-UNIFIED-CALCULATOR
     - DEV-013
     - DEV-014
-  in_progress: null
+  in_progress: DEV-015
   next:
     recommended: DEV-015
-    reason: "Graph sampler är verifierad och UI-oberoende. Nästa steg är en återanvändbar Canvas-komponent som ritar axlar, grid och sampler-segment utan att ännu integrera landskapslayouten."
+    reason: "Implementera en återanvändbar Canvas-komponent som ritar axlar, grid och sampler-segment utan att ännu integrera den slutliga landskapslayouten."
 blockers: []
 verification:
   last_status: passed
@@ -39,7 +39,8 @@ verification:
     - "DEV-014 npm run verify in GitHub Actions CI #34: passed"
     - "DEV-014 npm run build:pages in GitHub Actions CI #34: passed"
     - "DEV-014 npm run test:e2e in GitHub Actions CI #34: passed"
-  notes: "DEV-014 adds a pure graph sampler with viewport-derived bounded sampling density, expression-engine evaluation for each x value, segment breaks for pointwise DOMAIN/DIVISION_BY_ZERO/RESULT errors, and a large-jump heuristic to avoid obvious false connections across asymptotes. Tests cover linear, quadratic, sine, sqrt domain handling, 1/x, tan, density bounds, invalid viewports and propagation of non-pointwise expression errors."
+    - "DEV-014 final PR-head GitHub Actions CI #37: passed"
+  notes: "DEV-015 pågår. Canvas-komponenten ska konsumera samplade segment, vara DPI-medveten och responsiv, rita grid/axlar/kurva samt exponera en tillgänglig beskrivning utan att ännu kopplas in i kalkylatorns landskapslayout."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-014 verified by CI #34 on commit 1474b0416d8b42b6d97cc090bf47b25389825dcf."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-015 selected after green DEV-014 CI #34/#37."
