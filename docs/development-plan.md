@@ -1,379 +1,295 @@
-# Development plan – Calculator PWA v1
+# Development plan – Graphing support
 
-## 1. Syfte
+## Goal and delivery scope
 
-Denna plan bryter ned implementationen av Calculator PWA v1 i små, säkra och verifierbara utvecklingssteg. Varje DEV-steg ska kunna genomföras separat med kommandot **”Gör nästa steg”** och lämna projektet i ett fungerande eller tydligt verifierbart tillstånd.
+Add graphing to the existing unified Calculator PWA without introducing a separate calculator mode or making basic calculator use more complex.
 
-Planen utgår från:
+Graphing is driven by the expression: an expression containing variable `x` is graphable. The numeric keypad remains the stable calculator anchor. In landscape, the secondary workspace shows either scientific controls or the graph while the calculator remains in place.
 
-- `docs/functional-specification.md`
-- `docs/risk-feasibility.md`
-- `docs/architecture.md`
+This plan supersedes the completed v1 implementation plan. Historical completed steps remain available in Git history and `.system-builder/work-status.yaml`.
 
-## 2. Genomförandeprinciper
+## Planning assumptions
 
-För varje steg gäller:
+- Baseline is `main` at `7061ba865bad3dc104bddfff7f7d3bb3176a4d24`.
+- Baseline CI #29 is green.
+- Existing arithmetic/scientific behavior must not regress.
+- Graphing remains entirely client-side and offline-capable.
+- No third-party plotting library is required initially; a small Canvas-based renderer is preferred unless implementation evidence shows otherwise.
+- Initial graph scope is one real-valued function of `x` at a time.
+- Phone portrait does not render the graph in the initial scope.
+- Landscape keeps the numeric keypad in the same location whether graphing is active or not.
 
-1. Ändra endast det som behövs för stegets scope.
-2. Lägg till eller uppdatera tester samtidigt som funktionaliteten införs.
-3. Kör relevanta verifieringar innan steget markeras klart.
-4. Uppdatera dokumentation och System Builder-state när steget är klart.
-5. Leverera en komplett projekt-zip efter varje avslutat steg.
-6. Undvik att introducera funktionalitet som hör till senare steg om den inte krävs för att hålla projektet byggbart.
+## Step overview
 
-## 3. Planöversikt
-
-| Steg | Namn | Primärt resultat |
+| Step | Name | Primary result |
 |---|---|---|
-| DEV-001 | Projektbootstrap och kvalitetsbas | Körbar React/TypeScript/Vite-app med test- och lintbas |
-| DEV-002 | Grundläggande expression engine | Säkra grundberäkningar med parser/evaluator och tester |
-| DEV-003 | Avancerad matematik och formattering | Vetenskapliga funktioner, DEG/RAD och robust resultatpresentation |
-| DEV-004 | Calculator state och lokal persistens | Testbar applikationslogik, historik, minne och inställningar |
-| DEV-005 | Enkel-läge UI | Färdig lättanvänd grundminiräknare för mobil och desktop |
-| DEV-006 | Avancerat läge UI | Vetenskapliga funktioner, historik och minne i användargränssnittet |
-| DEV-007 | Responsivitet, tangentbord och tillgänglighet | Polerat gränssnitt med tema, keyboard och a11y |
-| DEV-008 | PWA, installation och offline | Installerbar PWA som fungerar offline efter första laddning |
-| DEV-009 | End-to-end, felhantering och härdning | Verifierade huvudflöden och robust edge-case-hantering |
-| DEV-010 | Release readiness v1 | Slutlig dokumentation, verifiering och release-kandidat |
-| DEV-011 | Release-styrd GitHub Pages-publicering | Automatisk driftsättning vid publicerad GitHub Release |
-| DEV-012 | Pages miljöskydd | Release-trigger som deployar från en tillåten `main`-referens |
+| DEV-013 | Variable-aware expression engine | Expressions can be evaluated for a supplied `x` value |
+| DEV-014 | Graph sampling domain | Safe point/segment sampling with domain/discontinuity handling |
+| DEV-015 | Graph canvas component | Reusable axes/grid/curve renderer with deterministic tests where practical |
+| DEV-016 | Responsive graph workspace | Stable landscape calculator + automatic graph surface for expressions using `x` |
+| DEV-017 | Graph viewport interaction | Pan, zoom and reset without moving the calculator controls |
+| DEV-018 | Graphing acceptance and release readiness | E2E/regression coverage, docs/status sync and release-ready change series |
 
-## 4. Detaljerade utvecklingssteg
+## Development steps
 
-### DEV-001 – Projektbootstrap och kvalitetsbas
+### DEV-013 – Variable-aware expression engine
 
-**Mål:** Skapa den tekniska bas som alla senare steg bygger på.
+#### Objective
 
-**Omfattning:**
+Extend the existing expression engine so graph code can evaluate the same expression repeatedly for different `x` values without changing existing numeric-expression behavior.
 
-- Initiera React + TypeScript + Vite.
-- Sätt upp projektstruktur enligt arkitekturens lagergränser.
-- Installera och konfigurera Vitest och React Testing Library.
-- Sätt upp ESLint och grundläggande formatterings-/typkontroll.
-- Lägg in scripts för `dev`, `build`, `test`, `lint` och typkontroll.
-- Skapa ett minimalt applikationsskal som renderar utan affärslogik.
-- Lägg till första smoke-testet.
-- Skapa grundläggande CI-workflow som kör install, lint, test och build.
+#### Scope
 
-**Ej i detta steg:**
+**Included**
+- Add an explicit evaluation-variable context with optional `x`.
+- Resolve identifier `x` from that context.
+- Keep `pi`, `e` and existing functions unchanged.
+- Return a controlled calculator error when an expression references `x` without a supplied value.
+- Add unit tests for direct `x`, arithmetic with `x`, functions of `x`, DEG/RAD interaction and missing-variable behavior.
 
-- matematisk funktionalitet,
-- färdigt calculator-UI,
-- PWA/service worker.
+**Not included**
+- UI button for `x`.
+- Graph sampling.
+- Canvas rendering.
+- Layout changes.
 
-**Verifiering:**
+#### Prerequisites
 
-- ren installation lyckas,
-- lint passerar,
-- tester passerar,
-- produktion build lyckas.
+- Existing CI baseline is green.
+- Existing expression engine tests pass on `main`.
 
-**Klart när:** Projektet kan checkas ut/packas upp och verifieras reproducerbart med dokumenterade kommandon.
+#### Implementation
 
----
+Likely touched areas:
+- `src/calculator/engine/types.ts`
+- `src/calculator/engine/evaluate.ts`
+- `src/calculator/engine/evaluate.test.ts`
 
-### DEV-002 – Grundläggande expression engine
+#### Verification
 
-**Mål:** Implementera en isolerad och säker kärna för grundläggande matematik.
+- Expression-engine unit tests.
+- Existing full unit suite.
+- Lint, typecheck and build through CI.
 
-**Omfattning:**
+#### Done criteria
 
-- Tokenisering för tal, decimaler, `+`, `-`, `*`, `/` och parenteser.
-- Parser/evaluator med korrekt operatorprioritet och associativitet.
-- Stöd för unärt plus/minus.
-- Grundläggande felmodell för ogiltig syntax och division med noll.
-- Gräns för uttryckslängd enligt arkitekturen.
-- Enhetstester för normala fall, prioritet, parenteser och fel.
-- Ingen användning av `eval`, `Function` eller dynamisk kodexekvering.
+- [ ] Existing numeric expressions behave unchanged.
+- [ ] `x` can be evaluated from explicit context.
+- [ ] Missing `x` context produces a controlled error.
+- [ ] Required CI is green.
 
-**Ej i detta steg:**
+#### Dependencies
 
-- trigonometriska funktioner,
-- procent,
-- historik/UI.
-
-**Verifiering:**
-
-- omfattande expression-engine-tester passerar,
-- befintlig projektverifiering passerar.
-
-**Klart när:** Grundberäkningarna kan användas från TypeScript-API:t helt utan React/DOM.
+None beyond the green baseline.
 
 ---
 
-### DEV-003 – Avancerad matematik och formattering
+### DEV-014 – Graph sampling domain
 
-**Mål:** Färdigställa beräkningsmotorn för v1:s vetenskapliga funktioner.
+#### Objective
 
-**Omfattning:**
+Create a pure, testable graph sampler that converts an expression and viewport into drawable curve segments.
 
-- Potenser och kvadrat.
-- Kvadratrot.
-- Procent enligt definierad v1-semantik.
-- `sin`, `cos`, `tan`.
-- `log`, `ln`.
-- `1/x`.
-- Konstanterna `π` och `e`.
-- DEG/RAD-stöd.
-- Domänfel för exempelvis negativa rötter och ogiltiga logaritmer.
-- Numeric Formatter för avrundning, `-0`, mycket stora/små tal och vetenskaplig notation.
-- Tester för numeriska gränsfall och kända regressionsfall.
+#### Scope
 
-**Verifiering:**
+**Included**
+- Sample a configurable x-range at a density derived from viewport width.
+- Evaluate each sample through the expression engine.
+- Split segments at domain errors/non-finite results.
+- Detect large jumps sufficiently to avoid obvious false lines across asymptotes.
+- Return data independent of React/Canvas.
+- Unit tests for linear/quadratic/trigonometric curves and discontinuities such as `1/x` and `tan(x)`.
 
-- expression-engine- och formatteringstester passerar,
-- representativa vetenskapliga uttryck verifieras mot kända resultat,
-- full lint/test/build passerar.
+**Not included**
+- Canvas rendering.
+- Pan/zoom gestures.
 
-**Klart när:** Hela matematikscope för v1 finns som testbar domänfunktionalitet.
+#### Verification
 
----
+- Sampler unit tests including discontinuities/domain errors.
+- Existing engine regression suite.
+- Full CI.
 
-### DEV-004 – Calculator state och lokal persistens
+#### Done criteria
 
-**Mål:** Implementera applikationslogiken mellan UI och expression engine.
+- [ ] Sampler returns stable drawable segments for common functions.
+- [ ] Domain errors do not abort the whole graph.
+- [ ] Obvious discontinuities are not connected.
 
-**Omfattning:**
+#### Dependencies
 
-- State-modell för aktuellt uttryck, resultat och fel.
-- Flöden för inmatning, `=`, backspace och clear.
-- Växling Enkel/Avancerad.
-- DEG/RAD-state.
-- Minnesfunktioner `MC`, `MR`, `M+`, `M-`.
-- Historik för avancerat läge, max 100 poster.
-- Persistence Adapter för settings, memory och history i `localStorage`.
-- Defensiv hantering av blockerad/korrupt lagring.
-- Schema/version för persistenta data.
-- Enhetstester för state-transitions och persistens.
-
-**Verifiering:**
-
-- state- och storage-tester passerar,
-- beräkning fungerar även när storage simuleras som otillgänglig,
-- full lint/test/build passerar.
-
-**Klart när:** UI kan drivas via en stabil application-state-API utan att känna till matematik- eller storage-detaljer.
+DEV-013.
 
 ---
 
-### DEV-005 – Enkel-läge UI
+### DEV-015 – Graph canvas component
 
-**Mål:** Leverera den första kompletta användbara miniräknaren.
+#### Objective
 
-**Omfattning:**
+Render graph sampler output as a lightweight responsive 2D graph.
 
-- Display för uttryck och resultat.
-- Stora tydliga knappar för `0–9`, decimal, `+`, `−`, `×`, `÷`, `=`, backspace och clear.
-- Tydlig Enkel/Avancerad-växling, där avancerade funktioner inte syns i Enkel-läge.
-- Mobil-först-layout med användbara tryckytor.
-- Desktop-layout utan att tappa enkelheten.
-- Grundläggande visuella tillstånd för aktiv knapp, fel och resultat.
-- Komponenttester för centrala användarflöden.
+#### Scope
 
-**Verifiering:**
+**Included**
+- Canvas-based graph surface.
+- x/y axes and restrained grid.
+- Mapping mathematical coordinates to device pixels.
+- Curve rendering from sampler segments.
+- Device-pixel-ratio aware rendering.
+- Accessible text/label describing the currently graphed expression.
+- Empty/help state when no graphable expression is active.
 
-- UC-001 kan genomföras helt i UI:t,
-- Enkel-läget fungerar på smal och bred viewport,
-- full lint/test/build passerar.
+**Not included**
+- Multiple curves.
+- Analytical features such as roots/intersections.
+- Gesture interaction.
 
-**Klart när:** En användare kan använda appen som traditionell miniräknare utan avancerade kontroller i vägen.
+#### Verification
 
----
+- Component tests for state/labels where deterministic.
+- Focused browser/E2E smoke test for rendered graph surface.
+- Full CI.
 
-### DEV-006 – Avancerat läge UI
+#### Done criteria
 
-**Mål:** Exponera hela v1:s vetenskapliga funktionalitet utan att försämra Enkel-läget.
+- [ ] A supplied graph model renders without layout overflow.
+- [ ] Axes and curve remain legible in light and dark themes.
+- [ ] Rendering remains client-only/offline-compatible.
 
-**Omfattning:**
+#### Dependencies
 
-- Knappar/kontroller för parenteser, procent, potens, kvadratrot, trigonometriska funktioner, logaritmer, `π`, `e`, `1/x` och `±`.
-- DEG/RAD-kontroll.
-- Minnesfunktioner och minnesindikering.
-- Historikpanel med återanvändning av tidigare resultat/uttryck enligt specifikationen.
-- Rensa historik.
-- Anpassad layout för mobil respektive större skärm.
-- Tester för centrala avancerade flöden.
-
-**Verifiering:**
-
-- UC-002, UC-003 och UC-004 kan genomföras i UI:t,
-- enkel/avancerad växling bevarar definierad state,
-- full lint/test/build passerar.
-
-**Klart när:** Samtliga v1-funktioner är åtkomliga genom användargränssnittet.
+DEV-014.
 
 ---
 
-### DEV-007 – Responsivitet, tangentbord och tillgänglighet
+### DEV-016 – Responsive graph workspace
 
-**Mål:** Göra appen bekväm och robust på både mobil och desktop.
+#### Objective
 
-**Omfattning:**
+Integrate graphing into the calculator with the agreed stable landscape interaction model.
 
-- Fullt definierat tangentbordsstöd för relevanta siffror/operatorer och Enter/Backspace/Escape.
-- Fokusindikering och logisk tabbordning.
-- Semantiska namn/ARIA där native-semantik inte räcker.
-- Kontroll av kontrast och text-/touch-target-storlek.
-- Ljust, mörkt och systemstyrt tema.
-- Persistens av temaval.
-- Responsiv finjustering för små mobilskärmar och bred desktop.
-- Respekt för relevanta användarpreferenser, exempelvis reducerad animation om animation används.
+#### Scope
 
-**Verifiering:**
+**Included**
+- Add `x` to the Functions surface.
+- Detect expressions that reference `x`.
+- Portrait: keep the compact calculator; allow `x` expression input and provide a subtle indication that the graph is available in landscape.
+- Landscape: use a stable left calculator column containing expression/result, numeric keypad and `Funktioner`/`Historik` actions.
+- Keep the numeric keypad at the same location whether graphing is active or not.
+- Landscape without `x`: secondary area presents scientific controls.
+- Landscape with `x`: secondary area presents the graph by default.
+- While graphing, `Funktioner` opens scientific controls in/over the secondary area without moving the calculator column.
+- Preserve existing safe-area behavior.
 
-- huvudsakliga flöden fungerar utan mus,
-- tillgänglighetstestning av centrala komponenter passerar,
-- visuell/manual kontroll i representativa viewport-storlekar,
-- full lint/test/build passerar.
+**Not included**
+- Pan/zoom.
+- Multiple functions.
 
-**Klart när:** UI:t uppfyller v1:s UX- och tillgänglighetsmål på både touch- och tangentbordsenheter.
+#### Verification
 
----
+- Component/UI tests for `x` and responsive states.
+- Playwright portrait regression.
+- Playwright phone landscape and iPad/desktop landscape layout checks.
+- Assert keypad position is stable before/after graph activation.
+- Full CI.
 
-### DEV-008 – PWA, installation och offline
+#### Done criteria
 
-**Mål:** Göra applikationen installerbar och offlinekapabel.
+- [ ] Basic calculator UX is unchanged in portrait until graph functionality is intentionally used.
+- [ ] `x` activates graph presentation automatically in landscape.
+- [ ] Numeric keypad does not move when graph presentation changes.
+- [ ] Existing Function/History behavior remains available.
 
-**Omfattning:**
+#### Dependencies
 
-- Konfigurera `vite-plugin-pwa`/Workbox.
-- Web App Manifest med namn, ikoner och displayinställningar.
-- Precache av app shell och nödvändiga statiska resurser.
-- Kontrollerad update-prompt/reload-strategi.
-- Offline-start efter första lyckade onlinebesöket.
-- UI-hantering för tillgänglig ny version om det behövs.
-- Dokumenterade lokala instruktioner för att verifiera PWA-installation/offline.
-
-**Verifiering:**
-
-- produktion build genererar manifest/service worker,
-- installerbarhetskrav kontrolleras,
-- appen startar och räknar utan nätverk efter initial laddning,
-- full lint/test/build passerar.
-
-**Klart när:** UC-005 är verifierat i en verklig webbläsarkontext.
+DEV-015.
 
 ---
 
-### DEV-009 – End-to-end, felhantering och härdning
+### DEV-017 – Graph viewport interaction
 
-**Mål:** Verifiera helheten och minska regressionsrisk inför release.
+#### Objective
 
-**Omfattning:**
+Make the graph practically explorable while preserving the stable calculator layout.
 
-- Sätt upp Playwright.
-- E2E för grundberäkning, avancerad beräkning, mode switch, historik, minne och tangentbord.
-- E2E/offline-kontroll där miljön medger det.
-- Regressionstester för fel- och edge cases från specifikationen.
-- Säkerställ att orimligt/ogiltigt input inte kraschar appen.
-- Kontrollera persistens efter reload.
-- Granska bundle/dependencies och ta bort oanvända delar.
+#### Scope
 
-**Verifiering:**
+**Included**
+- Drag/pan in graph area.
+- Wheel and/or pinch zoom as supported by the browser input model.
+- Reset viewport control.
+- Reasonable default viewport, initially around `x = -10..10` with matching readable y-scale.
+- Re-sampling after viewport changes.
+- Keep gestures confined to graph area so calculator controls remain predictable.
 
-- unit/component/E2E passerar,
-- lint och build passerar,
-- inga kända blockerande v1-fel kvarstår.
+**Not included**
+- Persistent graph viewport between sessions.
+- Trace/cursor analytics.
 
-**Klart när:** De viktigaste acceptance criteria i funktionella specifikationen är automatiskt eller dokumenterat manuellt verifierade.
+#### Verification
 
----
+- Unit tests for viewport transforms.
+- Browser tests for reset and representative pan/zoom interactions.
+- Manual acceptance on touch device remains recommended.
+- Full CI.
 
-### DEV-010 – Release readiness v1
+#### Done criteria
 
-**Mål:** Göra projektet redo som v1-releasekandidat.
+- [ ] User can inspect different graph regions without affecting calculator input controls.
+- [ ] Reset returns to deterministic default viewport.
+- [ ] No page-scroll/safe-area regression in landscape.
 
-**Omfattning:**
+#### Dependencies
 
-- Slutlig genomgång mot samtliga Must-krav och acceptance criteria.
-- Uppdatera README med installation, utveckling, test, build och PWA-verifiering.
-- Dokumentera kända begränsningar för JavaScript `Number` och PWA-installation på olika plattformar.
-- Säkerställ versionsinformation och release notes/changelog.
-- Kör komplett verifieringssvit från ren installation.
-- Kontrollera att ingen utvecklings-/debugfunktion ligger kvar i produktion.
-
-**Verifiering:**
-
-- ren install + lint + test + build + E2E passerar,
-- v1-checklista är komplett,
-- inga blockerare återstår.
-
-**Klart när:** Projektet kan märkas som release candidate för v1 och distribueras till statisk HTTPS-hosting.
+DEV-016.
 
 ---
 
-### DEV-011 – Release-styrd GitHub Pages-publicering
+### DEV-018 – Graphing acceptance and release readiness
 
-**Mål:** Publicera den färdiga PWA:n automatiskt när en GitHub Release publiceras.
+#### Objective
 
-**Omfattning:**
+Close the change series with regression coverage, documentation and releasable current state.
 
-- GitHub Actions-workflow för `release.published` och manuell reservstart.
-- Pages-behörigheter, artefaktuppladdning och deployment environment.
-- Produktionsbygge med repository-korrekt basväg `/pwa-calculator/`.
-- Publik Pages-länk och publiceringsinstruktioner i README och driftdokumentation.
+#### Scope
 
-**Verifiering:**
+- E2E happy paths for `x`, graph activation, Functions overlay and orientation-specific behavior.
+- Regression coverage for ordinary numeric/scientific calculations, history, memory, themes, offline and PWA build.
+- Update README, functional specification and architecture to final implemented graph behavior.
+- Update `.system-builder/work-status.yaml` and change record.
+- Document known graph limitations and manual real-device checks.
 
-- vanlig verifieringssvit passerar,
-- separat Pages-build genereras med korrekt basväg,
-- workflow-YAML valideras,
-- GitHub Actions på slutlig commit passerar.
+#### Verification
 
-**Klart när:** En publicerad GitHub Release startar ett reproducerbart Pages-deployment och den förväntade adressen är dokumenterad.
+- Full CI: lint, typecheck, unit/component, build/pages build and E2E.
+- Manual acceptance checklist for iPhone-sized portrait/landscape and iPad/desktop landscape.
+- No unresolved blockers.
 
----
+#### Done criteria
 
-### DEV-012 – Pages miljöskydd
+- [ ] All Must graphing acceptance behavior is implemented and verified.
+- [ ] Existing calculator acceptance remains green.
+- [ ] Canonical docs describe the implemented current state.
+- [ ] Change series is ready to merge/release.
 
-**Mål:** Låta release-publiceringen fungera med `github-pages`-miljöns regel som endast tillåter deployment från `main`.
+#### Dependencies
 
-**Omfattning:**
+DEV-017.
 
-- Separera release-triggern från deployment-workflowen.
-- Låt release-jobbet dispatcha deployment-workflowen med `ref: main`.
-- Begränsa release-jobbets token till `actions: write` och `contents: read`.
-- Dokumentera det tvåstegade Actions-flödet.
+## Cross-cutting verification
 
-**Verifiering:**
+Every graphing step must preserve:
 
-- workflow-YAML valideras,
-- full CI passerar,
-- en ny publicerad release startar dispatcher-jobbet och därefter Pages-deploymenten från `main`.
+- safe parsing without `eval`/`Function`,
+- existing numeric-expression semantics,
+- offline/client-only operation,
+- local-only user data,
+- phone landscape safe-area handling,
+- stable basic keypad usability,
+- light/dark theme compatibility.
 
-**Klart när:** Release-taggen behöver inte längre godkännas av Pages-miljöns deployment-regel.
+## Plan-change rules
 
-## 5. Beroenden mellan steg
+If DEV-014 demonstrates that reliable discontinuity handling requires a different sampling/rendering approach, update this plan before UI integration. Do not hide sampling uncertainty inside the Canvas component.
 
-```text
-DEV-001
-  -> DEV-002
-      -> DEV-003
-          -> DEV-004
-              -> DEV-005
-                  -> DEV-006
-                      -> DEV-007
-                          -> DEV-008
-                              -> DEV-009
-                                  -> DEV-010
-                                      -> DEV-011
-                                          -> DEV-012
-```
-
-Ordningen är avsiktlig: matematik och state byggs och verifieras innan UI:t blir komplext, medan PWA-lagret läggs på först när den vanliga webbapplikationen är stabil.
-
-## 6. Definition of Done per DEV-steg
-
-Ett steg får markeras `completed` först när:
-
-- stegets accepterade scope är implementerat,
-- relevanta tester finns och passerar,
-- befintliga tester fortfarande passerar,
-- lint/typecheck/build passerar när de finns tillgängliga,
-- dokumentation/state är uppdaterad,
-- inga nya blockerare lämnas odokumenterade,
-- en komplett uppdaterad projekt-zip kan levereras.
-
-## 7. Exekveringsstatus
-
-Aktuell och maskinläsbar exekveringsstatus finns i `.system-builder/work-status.yaml`. Planen behålls som definition av stegens scope, beroenden, verifiering och klart-kriterier.
+If a third-party graph library becomes necessary, record the dependency/size/security trade-off before introducing it.
