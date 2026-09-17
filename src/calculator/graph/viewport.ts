@@ -1,6 +1,8 @@
-import type { GraphRenderViewport } from './GraphCanvas'
+import type { GraphViewport } from './sampleGraph'
 
-export const DEFAULT_GRAPH_VIEWPORT: GraphRenderViewport = {
+export type GraphMathViewport = Pick<GraphViewport, 'xMin' | 'xMax' | 'yMin' | 'yMax'>
+
+export const DEFAULT_GRAPH_VIEWPORT: GraphMathViewport = {
   xMin: -10,
   xMax: 10,
   yMin: -10,
@@ -11,10 +13,10 @@ const MIN_SPAN = 1e-4
 const MAX_SPAN = 1e6
 
 export function panGraphViewport(
-  viewport: GraphRenderViewport,
+  viewport: GraphMathViewport,
   deltaPixels: { x: number; y: number },
   size: { width: number; height: number },
-): GraphRenderViewport {
+): GraphMathViewport {
   validateSize(size)
   const xSpan = viewport.xMax - viewport.xMin
   const ySpan = viewport.yMax - viewport.yMin
@@ -29,10 +31,10 @@ export function panGraphViewport(
 }
 
 export function zoomGraphViewport(
-  viewport: GraphRenderViewport,
+  viewport: GraphMathViewport,
   factor: number,
   anchor: { x: number; y: number } = { x: 0.5, y: 0.5 },
-): GraphRenderViewport {
+): GraphMathViewport {
   if (!Number.isFinite(factor) || factor <= 0) throw new Error('Graph zoom factor must be positive and finite.')
   const xSpan = clampSpan((viewport.xMax - viewport.xMin) * factor)
   const ySpan = clampSpan((viewport.yMax - viewport.yMin) * factor)
@@ -49,7 +51,7 @@ export function zoomGraphViewport(
   }
 }
 
-export function isDefaultGraphViewport(viewport: GraphRenderViewport): boolean {
+export function isDefaultGraphViewport(viewport: GraphMathViewport): boolean {
   return viewport.xMin === DEFAULT_GRAPH_VIEWPORT.xMin &&
     viewport.xMax === DEFAULT_GRAPH_VIEWPORT.xMax &&
     viewport.yMin === DEFAULT_GRAPH_VIEWPORT.yMin &&
