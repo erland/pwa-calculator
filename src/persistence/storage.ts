@@ -1,7 +1,5 @@
 import type { AngleMode } from '../calculator/engine/types'
 
-export type Theme = 'system' | 'light' | 'dark'
-
 export interface HistoryEntry {
   id: string
   expression: string
@@ -11,10 +9,11 @@ export interface HistoryEntry {
 
 export interface PersistedState {
   angleMode: AngleMode
-  theme: Theme
   memory: number | null
   history: HistoryEntry[]
 }
+
+type LegacyTheme = 'system' | 'light' | 'dark'
 
 interface Envelope {
   version: 1
@@ -23,12 +22,14 @@ interface Envelope {
 
 interface LegacyEnvelope {
   version: 1
-  state: PersistedState & { mode?: 'simple' | 'advanced' }
+  state: PersistedState & {
+    theme?: LegacyTheme
+    mode?: 'simple' | 'advanced'
+  }
 }
 
 export const DEFAULT_PERSISTED_STATE: PersistedState = {
   angleMode: 'DEG',
-  theme: 'system',
   memory: null,
   history: [],
 }
@@ -47,8 +48,8 @@ export function loadPersistedState(storage: StorageLike | null = getBrowserStora
     if (!raw) return { ...DEFAULT_PERSISTED_STATE }
     const value: unknown = JSON.parse(raw)
     if (!isEnvelope(value)) return { ...DEFAULT_PERSISTED_STATE }
-    const { angleMode, theme, memory, history } = value.state
-    return { angleMode, theme, memory, history: history.slice(0, 100) }
+    const { angleMode, memory, history } = value.state
+    return { angleMode, memory, history: history.slice(0, 100) }
   } catch {
     return { ...DEFAULT_PERSISTED_STATE }
   }
@@ -79,10 +80,11 @@ function isEnvelope(value: unknown): value is LegacyEnvelope {
   if (envelope.version !== 1 || !envelope.state || typeof envelope.state !== 'object') return false
   const state = envelope.state as Partial<LegacyEnvelope['state']>
   const modeIsCompatible = state.mode === undefined || state.mode === 'simple' || state.mode === 'advanced'
+  const themeIsCompatible = state.theme === undefined || state.theme === 'system' || state.theme === 'light' || state.theme === 'dark'
   return (
     modeIsCompatible &&
+    themeIsCompatible &&
     (state.angleMode === 'DEG' || state.angleMode === 'RAD') &&
-    (state.theme === 'system' || state.theme === 'light' || state.theme === 'dark') &&
     (state.memory === null || typeof state.memory === 'number') &&
     Array.isArray(state.history) &&
     state.history.every(isHistoryEntry)
