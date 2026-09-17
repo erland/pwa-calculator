@@ -18,6 +18,15 @@ describe('calculator state', () => {
     expect(state.error).toBeNull()
   })
 
+  it('starts a new graph expression when x is entered after a completed calculation', () => {
+    let state = createCalculatorState(DEFAULT_PERSISTED_STATE)
+    state = calculatorReducer(state, { type: 'append', value: '12+7' })
+    state = calculatorReducer(state, { type: 'evaluate' })
+    state = calculatorReducer(state, { type: 'append', value: 'x' })
+    expect(state.expression).toBe('x')
+    expect(state.justEvaluated).toBe(false)
+  })
+
   it('stores calculation history in the unified calculator mode', () => {
     vi.spyOn(Date, 'now').mockReturnValue(123)
     let state = createCalculatorState(DEFAULT_PERSISTED_STATE)
