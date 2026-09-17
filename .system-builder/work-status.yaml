@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/graphing-support.md
-  selected_step: DEV-015
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -25,10 +25,11 @@ progress:
     - CHG-UNIFIED-CALCULATOR
     - DEV-013
     - DEV-014
-  in_progress: DEV-015
+    - DEV-015
+  in_progress: null
   next:
-    recommended: DEV-015
-    reason: "Implementera en återanvändbar Canvas-komponent som ritar axlar, grid och sampler-segment utan att ännu integrera den slutliga landskapslayouten."
+    recommended: DEV-016
+    reason: "Canvas-komponenten är verifierad och frikopplad från layouten. Nästa steg är att integrera x-inmatning och den stabila landskapsarbetsytan där grafen ersätter den sekundära funktionsytan utan att flytta sifferknappsatsen."
 blockers: []
 verification:
   last_status: passed
@@ -36,11 +37,11 @@ verification:
   commands:
     - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
     - "DEV-013 GitHub Actions CI #30/#31: passed"
-    - "DEV-014 npm run verify in GitHub Actions CI #34: passed"
-    - "DEV-014 npm run build:pages in GitHub Actions CI #34: passed"
-    - "DEV-014 npm run test:e2e in GitHub Actions CI #34: passed"
-    - "DEV-014 final PR-head GitHub Actions CI #37: passed"
-  notes: "DEV-015 pågår. Canvas-komponenten ska konsumera samplade segment, vara DPI-medveten och responsiv, rita grid/axlar/kurva samt exponera en tillgänglig beskrivning utan att ännu kopplas in i kalkylatorns landskapslayout."
+    - "DEV-014 GitHub Actions CI #34/#37: passed"
+    - "DEV-015 npm run verify in GitHub Actions CI #41: passed"
+    - "DEV-015 npm run build:pages in GitHub Actions CI #41: passed"
+    - "DEV-015 npm run test:e2e in GitHub Actions CI #41: passed"
+  notes: "DEV-015 adds a reusable GraphCanvas that consumes already sampled graph segments, maps mathematical coordinates to CSS pixels with inverted y-axis, draws bounded nice-step grid lines, axes and curves, scales the backing store for devicePixelRatio, redraws on resize/theme changes, exposes an accessible graph description and provides a compact empty/help state. The final calculator landscape integration remains intentionally deferred to DEV-016."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-015 selected after green DEV-014 CI #34/#37."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-015 verified by CI #41 on commit eb276bc55bc632d53c3bb9673e8fc59ffd5d1840."
