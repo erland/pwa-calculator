@@ -6,7 +6,7 @@ En responsiv och installerbar PWA som kombinerar traditionell vardagsräkning, v
 
 Grundläggande siffer- och operatorfunktioner är alltid direkt tillgängliga. Vetenskapliga funktioner, DEG/RAD, minne och historik visas eller fälls fram utifrån tillgängligt skärmutrymme: på små porträttskärmar hålls de sekundära funktionerna undan tills de behövs, medan landskap och större skärmar kan visa mer samtidigt.
 
-Grafstöd aktiveras av uttrycket i stället för av ett separat grafläge. Variabeln `x` finns under **Funktioner** och kan även matas in från tangentbordet. På telefon i porträtt förblir kalkylatorn kompakt; ett `x`-uttryck visar en diskret indikation om att grafen finns i landskap. I landskap ligger kalkylator och sifferknappsats stabilt i vänsterkolumnen medan högerkolumnen automatiskt visar grafen. Utan `x` används samma sekundäryta för vetenskapliga funktioner.
+Grafstöd aktiveras av uttrycket i stället för av ett separat grafläge. Variabeln `x` finns under **Funktioner** och kan även matas in från tangentbordet. På telefon i porträtt förblir kalkylatorn kompakt; ett `x`-uttryck visar en diskret indikation om att grafen finns i landskap. I landskap ligger graf/vetenskapliga funktioner i vänster sekundäryta medan kalkylatorn och sifferknappsatsen ligger stabilt till höger. När vetenskapliga funktioner visas bottenjusteras deras knappsats mot sifferknappsatsen.
 
 Grafen kan panoreras genom drag, zoomas med browserns hjul-/pekinteraktion och återställas till standardområdet `-10..10` på båda axlarna. Grafprovtagning, rendering och övrig matematik sker lokalt utan backend.
 
@@ -75,7 +75,7 @@ För att kontrollera offlinefunktionen:
 
 ## Lokal data
 
-Tema, vinkelenhet, minne och de 100 senaste slutförda beräkningarna lagras versionsmärkt i `localStorage`. Grafens aktuella viewport och pågående uttryck är temporära och persisteras inte. Äldre lagringsdata som innehåller det tidigare fältet `mode` accepteras defensivt och fältet ignoreras. Korrupt eller blockerad lagring återställs defensivt och får inte hindra kärnberäkningen.
+Vinkelenhet, minne och de 100 senaste slutförda beräkningarna lagras versionsmärkt i `localStorage`. Tema följer systemets färgschema och sparas inte som användarinställning. Grafens aktuella viewport och pågående uttryck är temporära och persisteras inte. Äldre lagringsdata som innehåller tidigare fält som `theme` eller `mode` accepteras defensivt och dessa fält ignoreras. Korrupt eller blockerad lagring återställs defensivt och får inte hindra kärnberäkningen.
 
 ## Kända begränsningar
 
