@@ -30,10 +30,11 @@ progress:
     - DEV-017
     - DEV-018
     - CHG-GRAPHING-SUPPORT
+    - DEV-019
   in_progress: null
   next:
-    recommended: DEV-019
-    reason: "Den nya compact-responsive CHANGE-serien är planerad från mergad graphing-baseline. Första säkra steget är att ta bort header/theme UI och förenkla state/persistens till systemstyrt tema med bakåtkompatibel läsning av legacy theme-data."
+    recommended: DEV-020
+    reason: "Header och användarstyrt tema är borttagna, systemtema och legacy storage-migrering är verifierade. Nästa steg är att vända landskapslayouten så sekundärytan ligger till vänster, kalkylatorn till höger och scientific-kontrollerna bottenjusteras."
 blockers: []
 verification:
   last_status: passed
@@ -42,7 +43,10 @@ verification:
     - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
     - "Graphing PR final CI #73 passed before merge"
     - "Deploy GitHub Pages run on baseline commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f: passed"
-  notes: "CHG-COMPACT-RESPONSIVE-LAYOUT is planned as DEV-019–DEV-022. Target behavior: no app header/theme selector; theme follows prefers-color-scheme; legacy persisted theme is ignored without losing angleMode/memory/history; landscape secondary workspace moves left and calculator right; scientific controls bottom-align; 375x812 portrait with expanded Functions fits without page scroll."
+    - "DEV-019 GitHub Actions CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93: npm run verify passed"
+    - "DEV-019 GitHub Actions CI #83: npm run build:pages passed"
+    - "DEV-019 GitHub Actions CI #83: npm run test:e2e passed"
+  notes: "DEV-019 removes the application header/title and theme selector, removes theme from calculator runtime state and new persisted state, accepts and ignores valid legacy v1 theme/mode fields while preserving angleMode/memory/history, and drives light/dark presentation directly from prefers-color-scheme. Browser coverage verifies system color-scheme switching and that theme is no longer persisted."
 source_state:
   drift: none
-  reference: "main 27a27a9646576c37b4eeec6ecf451ba5de49e88f; graphing support merged via PR #5."
+  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019 verified by CI #83 on commit 7488a37df5a3bea60aedd07a3b514d2203b50c93."
