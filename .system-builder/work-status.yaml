@@ -27,10 +27,11 @@ progress:
     - DEV-014
     - DEV-015
     - DEV-016
+    - DEV-017
   in_progress: null
   next:
-    recommended: DEV-017
-    reason: "Den responsiva grafarbetsytan är integrerad och verifierad. Nästa steg är viewportinteraktion med pan, zoom och reset utan att påverka kalkylatorns stabila vänsterkolumn."
+    recommended: DEV-018
+    reason: "Grafens viewportinteraktion med pan, zoom och deterministisk reset är verifierad. Nästa steg är slutlig graphing-acceptans, dokumentationssynk och release readiness för hela change-serien."
 blockers: []
 verification:
   last_status: passed
@@ -40,10 +41,12 @@ verification:
     - "DEV-013 GitHub Actions CI #30/#31: passed"
     - "DEV-014 GitHub Actions CI #34/#37: passed"
     - "DEV-015 GitHub Actions CI #41/#44: passed"
-    - "DEV-016 npm run verify in GitHub Actions CI #50: passed"
-    - "DEV-016 npm run build:pages in GitHub Actions CI #50: passed"
-    - "DEV-016 npm run test:e2e in GitHub Actions CI #50: passed"
-  notes: "DEV-016 adds x to the Functions surface and keyboard input, detects graphable expressions, keeps portrait compact with a landscape hint, and uses a stable landscape calculator column plus a secondary workspace. Without x the secondary area shows scientific controls; with x it shows the sampled Canvas graph. Funktioner temporarily replaces the graph in the secondary area without moving the numeric keypad. Playwright verifies stable keypad coordinates on phone/iPad landscape, integrated Canvas visibility, portrait behavior, no overflow and keyboard x activation."
+    - "DEV-016 GitHub Actions CI #50: passed"
+    - "DEV-017 initial CI #62: verify failed on react-hooks/set-state-in-effect; repaired in same step"
+    - "DEV-017 npm run verify in GitHub Actions CI #63: passed"
+    - "DEV-017 npm run build:pages in GitHub Actions CI #63: passed"
+    - "DEV-017 npm run test:e2e in GitHub Actions CI #63: passed"
+  notes: "DEV-017 adds pure viewport transforms for pan/zoom with bounded spans, pointer-drag panning, wheel zoom around the pointer position, deterministic reset to -10..10 on both axes, resampling after viewport changes, touch-action confinement to the graph surface, and browser coverage that verifies interaction without moving the numeric keypad or creating page overflow."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-016 verified by CI #50 on commit 956e4e83a6197c5f608ede7dd48ddaccc5b15d76."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-017 verified by CI #63 on commit ca6c8b29821d2433537c8df33d1b8fcac95ab32f."
