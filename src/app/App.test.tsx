@@ -5,22 +5,21 @@ import { describe, expect, it } from 'vitest'
 import { App } from './App'
 
 describe('Calculator UI', () => {
-  it('completes the simple calculation flow', async () => {
+  it('completes a basic calculation without a mode selector', async () => {
     const user = userEvent.setup()
     render(<App />)
+    expect(screen.queryByRole('navigation', { name: 'Miniräknarläge' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '1' }))
     await user.click(screen.getByRole('button', { name: '2' }))
     await user.click(screen.getByRole('button', { name: 'Addition' }))
     await user.click(screen.getByRole('button', { name: '7' }))
     await user.click(screen.getByRole('button', { name: 'Beräkna' }))
     expect(screen.getByRole('status')).toHaveTextContent('19')
-    expect(screen.queryByRole('region', { name: 'Avancerade funktioner' })).not.toBeInTheDocument()
   })
 
-  it('supports advanced functions, history and memory', async () => {
+  it('supports advanced functions, history and memory in the same calculator', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await user.click(screen.getByRole('button', { name: 'Avancerad' }))
     await user.click(screen.getByRole('button', { name: 'sin' }))
     await user.click(screen.getByRole('button', { name: '3' }))
     await user.click(screen.getByRole('button', { name: '0' }))
@@ -56,11 +55,8 @@ describe('Calculator UI', () => {
     expect(localStorage.getItem('calculator-pwa:v1')).toContain('"theme":"dark"')
   })
 
-  it('has no automatically detectable accessibility violations in its main views', async () => {
-    const user = userEvent.setup()
+  it('has no automatically detectable accessibility violations', async () => {
     const { container } = render(<App />)
-    expect((await axe.run(container)).violations).toEqual([])
-    await user.click(screen.getByRole('button', { name: 'Avancerad' }))
     expect((await axe.run(container)).violations).toEqual([])
   })
 })
