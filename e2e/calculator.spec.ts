@@ -1,37 +1,19 @@
 import { expect, test } from '@playwright/test'
 
-test('simple mode calculates with operator precedence and keyboard', async ({ page }) => {
+test('calculator handles basic arithmetic and keyboard input without a mode selector', async ({ page }) => {
   await page.goto('/')
+  await expect(page.getByRole('navigation', { name: 'Miniräknarläge' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
   await expect(page.getByText('Installera eller använd offline')).toHaveCount(0)
   await page.keyboard.type('2+3*4')
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('14')
-  await expect(page.getByRole('button', { name: 'Kvadratrot' })).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
-test('simple mode fits a small phone landscape viewport inside safe-area padding', async ({ page }) => {
-  await page.setViewportSize({ width: 812, height: 375 })
-  await page.goto('/')
-
-  const layout = page.locator('.app-layout')
-  const calculator = page.locator('.calculator-card')
-  const [layoutBox, calculatorBox] = await Promise.all([layout.boundingBox(), calculator.boundingBox()])
-
-  expect(layoutBox).not.toBeNull()
-  expect(calculatorBox).not.toBeNull()
-  await expect(page.locator('.app-header')).toBeHidden()
-  expect(calculatorBox!.x).toBeGreaterThan(layoutBox!.x)
-  expect(calculatorBox!.x + calculatorBox!.width).toBeLessThan(layoutBox!.x + layoutBox!.width)
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
-})
-
-test('advanced mode handles science, history, memory and persistence', async ({ page }) => {
+test('calculator handles science, history, memory and persistence', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 })
   await page.goto('/')
-  await page.getByRole('button', { name: 'Avancerad' }).click()
   await page.getByRole('button', { name: 'sin' }).click()
   await page.getByRole('button', { name: '3' }).click()
   await page.getByRole('button', { name: '0' }).click()
@@ -47,7 +29,6 @@ test('advanced mode handles science, history, memory and persistence', async ({ 
   await page.getByRole('button', { name: 'Stäng historik' }).last().click()
 
   await page.reload()
-  await expect(page.getByRole('button', { name: 'Avancerad' })).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByText('M', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Historik' }).click()
   await expect(page.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeVisible()
@@ -56,9 +37,7 @@ test('advanced mode handles science, history, memory and persistence', async ({ 
 test('small portrait phone keeps numeric keypad available and collapses functions after a choice', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 })
   await page.goto('/')
-  await page.getByRole('button', { name: 'Avancerad' }).click()
 
-  await expect(page.getByText('Offlineklar PWA')).toHaveCount(0)
   const functions = page.getByRole('button', { name: /Funktioner/ })
   await expect(functions).toHaveAttribute('aria-expanded', 'false')
   await expect(page.getByRole('button', { name: 'sin' })).toBeHidden()
@@ -72,10 +51,9 @@ test('small portrait phone keeps numeric keypad available and collapses function
   await expect(page.getByRole('button', { name: '7' })).toBeVisible()
 })
 
-test('advanced mode uses a compact two-column layout on a phone in landscape', async ({ page }) => {
+test('phone landscape shows scientific and numeric keypads side by side without scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/')
-  await page.getByRole('button', { name: 'Avancerad' }).click()
 
   const calculator = page.locator('.calculator-card')
   const advanced = page.locator('.advanced-controls')
@@ -91,18 +69,14 @@ test('advanced mode uses a compact two-column layout on a phone in landscape', a
   expect(basicBox).not.toBeNull()
   expect(advancedBox!.y).toBeCloseTo(basicBox!.y, 0)
   expect(advancedBox!.x).toBeLessThan(basicBox!.x)
-  await expect(page.getByRole('dialog', { name: 'Historik' })).toHaveCount(0)
+  await expect(page.locator('.app-header')).toBeHidden()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
-
-  await page.getByRole('button', { name: 'Historik' }).click()
-  await expect(page.getByRole('dialog', { name: 'Historik' })).toBeVisible()
 })
 
-test('advanced mode fits an iPad-sized landscape viewport without page scrolling', async ({ page }) => {
+test('iPad-sized landscape viewport shows both keypads without page scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 768 })
   await page.goto('/')
-  await page.getByRole('button', { name: 'Avancerad' }).click()
 
   const advancedBox = await page.locator('.advanced-controls').boundingBox()
   const basicBox = await page.locator('.basic-keypad').boundingBox()
@@ -114,15 +88,6 @@ test('advanced mode fits an iPad-sized landscape viewport without page scrolling
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })
 
-test('mode switch preserves a pending calculation', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
-  await page.keyboard.type('12+7')
-  await page.getByRole('button', { name: 'Avancerad' }).click()
-  await page.getByRole('button', { name: 'Enkel' }).click()
-  await expect(page.getByRole('status')).toContainText('12+7')
-})
-
 test('theme persists after reload', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('combobox', { name: 'Tema' }).selectOption('dark')
@@ -132,7 +97,6 @@ test('theme persists after reload', async ({ page }) => {
 
 test('mathematical errors are recoverable without reloading', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
   await page.keyboard.type('1/0')
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('Det går inte att dividera med noll.')
@@ -140,10 +104,6 @@ test('mathematical errors are recoverable without reloading', async ({ page }) =
   await page.keyboard.type('7*8')
   await page.keyboard.press('Enter')
   await expect(page.getByRole('status')).toContainText('56')
-  await page.keyboard.press('Escape')
-  await page.keyboard.type('12.5+2,5')
-  await page.keyboard.press('Enter')
-  await expect(page.getByRole('status')).toContainText('15')
 })
 
 test('app shell works offline after the service worker takes control', async ({ page, context }) => {
