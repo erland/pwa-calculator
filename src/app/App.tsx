@@ -20,13 +20,13 @@ export function App() {
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
   useEffect(() => applyTheme(state.theme), [state.theme])
-  useEffect(() => {
-    if (state.mode !== 'advanced') {
-      setFunctionsOpen(false)
-      setHistoryOpen(false)
-    }
-  }, [state.mode])
   useLayoutEffect(() => bindKeyboard(dispatch), [])
+
+  const switchToSimple = () => {
+    setFunctionsOpen(false)
+    setHistoryOpen(false)
+    dispatch({ type: 'set-mode', mode: 'simple' })
+  }
 
   return (
     <>
@@ -45,7 +45,7 @@ export function App() {
         </header>
 
         <nav className="segmented mode-switch" aria-label="Miniräknarläge">
-          <button type="button" aria-pressed={state.mode === 'simple'} onClick={() => dispatch({ type: 'set-mode', mode: 'simple' })}>Enkel</button>
+          <button type="button" aria-pressed={state.mode === 'simple'} onClick={switchToSimple}>Enkel</button>
           <button type="button" aria-pressed={state.mode === 'advanced'} onClick={() => dispatch({ type: 'set-mode', mode: 'advanced' })}>Avancerad</button>
         </nav>
 
