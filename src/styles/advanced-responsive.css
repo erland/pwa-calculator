@@ -1,6 +1,69 @@
-/* Compact advanced-mode layout for phones and small tablets.
- * The calculator logic stays unchanged; this file only adapts presentation.
+/* Responsive advanced-mode layout.
+ * Primary calculator controls stay visible; secondary functions and history
+ * use on-demand panels when screen space is constrained.
  */
+
+.mode-advanced .workspace {
+  grid-template-columns: minmax(0, 42rem);
+  justify-content: center;
+}
+
+.advanced-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: .45rem;
+  margin-bottom: .55rem;
+}
+
+.panel-toggle {
+  min-height: 2.6rem;
+  padding: 0 .85rem;
+  border: 1px solid var(--border);
+  border-radius: .7rem;
+  color: var(--accent-dark);
+  background: var(--surface-soft);
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.functions-toggle {
+  display: none;
+}
+
+.history-overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.history-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: rgba(9, 17, 31, .42);
+  cursor: default;
+}
+
+.history-overlay .history-panel {
+  position: relative;
+  z-index: 1;
+  width: min(24rem, calc(100% - 2rem));
+  height: 100%;
+  max-height: none;
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 1.1rem 0 0 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
 
 @media (max-width: 760px) {
   .mode-advanced .display {
@@ -20,12 +83,105 @@
   }
 }
 
-@media (max-width: 410px) and (orientation: portrait) {
+/* Small phones in portrait keep the numeric keypad stable and expose the
+ * scientific controls only while they are needed. */
+@media (max-width: 480px) and (orientation: portrait) {
+  .app-layout.mode-advanced {
+    padding-top: .55rem;
+  }
+
+  .mode-advanced .app-header {
+    margin-bottom: .55rem;
+  }
+
+  .mode-advanced .app-header h1 {
+    font-size: 1.45rem;
+  }
+
+  .mode-advanced .theme-picker select {
+    min-height: 2.35rem;
+  }
+
+  .mode-advanced .mode-switch {
+    margin-bottom: .55rem;
+  }
+
+  .mode-advanced .mode-switch button {
+    min-height: 2.35rem;
+  }
+
+  .mode-advanced .calculator-card {
+    padding: .65rem;
+  }
+
+  .mode-advanced .display {
+    min-height: 5.25rem;
+    margin-bottom: .5rem;
+    padding: .65rem;
+  }
+
+  .mode-advanced .result {
+    font-size: clamp(1.8rem, 9vw, 2.5rem);
+  }
+
+  .mode-advanced .advanced-toolbar {
+    justify-content: stretch;
+    margin-bottom: .5rem;
+  }
+
+  .mode-advanced .panel-toggle {
+    flex: 1;
+    min-height: 2.45rem;
+  }
+
+  .mode-advanced .functions-toggle {
+    display: block;
+  }
+
+  .mode-advanced .advanced-panel[data-open="false"] {
+    display: none;
+  }
+
+  .mode-advanced .advanced-panel[data-open="true"] {
+    display: block;
+    margin-bottom: .5rem;
+  }
+
+  .mode-advanced .advanced-controls {
+    margin-bottom: 0;
+    padding: .5rem;
+  }
+
   .mode-advanced .advanced-keypad {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  .mode-advanced .calculator-key {
+    min-height: 3.15rem;
+  }
+
+  .mode-advanced .key-function {
+    min-height: 2.55rem;
+  }
+
+  .mode-advanced .install-help {
+    display: none;
+  }
+
+  .history-overlay {
+    align-items: flex-end;
+  }
+
+  .history-overlay .history-panel {
+    width: 100%;
+    height: auto;
+    max-height: 72dvh;
+    border-radius: 1.1rem 1.1rem 0 0;
+  }
 }
 
+/* Phone landscape: keep both keypads side by side but remove the permanent
+ * history column. */
 @media (orientation: landscape) and (max-height: 600px) and (max-width: 950px) {
   body {
     min-height: 100dvh;
@@ -37,10 +193,6 @@
     padding: .25rem 0;
   }
 
-  /* In a short landscape viewport the calculator itself is the primary UI.
-   * Theme selection remains available after rotating back to portrait, while
-   * the mode switch stays visible so advanced mode can be left immediately.
-   */
   .mode-advanced .app-header {
     display: none;
   }
@@ -56,15 +208,14 @@
   }
 
   .mode-advanced .workspace {
-    grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem);
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
     gap: .4rem;
   }
 
   .mode-advanced .calculator-card {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     gap: .4rem;
     padding: .45rem;
   }
@@ -74,6 +225,24 @@
     min-height: 3.7rem;
     margin-bottom: 0;
     padding: .35rem .65rem;
+  }
+
+  .mode-advanced .advanced-toolbar {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+
+  .mode-advanced .functions-toggle {
+    display: none;
+  }
+
+  .mode-advanced .history-toggle {
+    min-height: 1.85rem;
+    padding: 0 .65rem;
+  }
+
+  .mode-advanced .advanced-panel {
+    min-width: 0;
   }
 
   .mode-advanced .expression {
@@ -143,28 +312,40 @@
     font-size: .78rem;
   }
 
-  .mode-advanced .history-panel {
-    max-height: none;
-    min-height: 0;
-    overflow: auto;
-    padding: .55rem;
-  }
-
-  .mode-advanced .history-panel h2 {
-    font-size: .9rem;
-  }
-
-  .mode-advanced .history-list {
-    gap: .25rem;
-    margin-top: .35rem;
-  }
-
-  .mode-advanced .history-list button {
-    gap: .12rem;
-    padding: .4rem;
-  }
-
   .mode-advanced .install-help {
     display: none;
+  }
+}
+
+/* Tablets and similarly sized landscape viewports use their width instead of
+ * stacking scientific and numeric keypads vertically. */
+@media (orientation: landscape) and (min-width: 761px) and (min-height: 601px) {
+  .mode-advanced .workspace {
+    grid-template-columns: minmax(0, 60rem);
+  }
+
+  .mode-advanced .calculator-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
+    grid-template-rows: auto auto 1fr;
+    gap: .65rem;
+  }
+
+  .mode-advanced .display,
+  .mode-advanced .advanced-toolbar {
+    grid-column: 1 / -1;
+  }
+
+  .mode-advanced .advanced-toolbar {
+    margin-bottom: 0;
+  }
+
+  .mode-advanced .advanced-controls {
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .mode-advanced .basic-keypad {
+    align-content: stretch;
   }
 }
