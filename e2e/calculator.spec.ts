@@ -28,6 +28,34 @@ test('advanced mode handles science, history, memory and persistence', async ({ 
   await expect(page.getByText('M', { exact: true })).toBeVisible()
 })
 
+test('advanced mode uses a compact two-column layout on a phone in landscape', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Avancerad' }).click()
+
+  const calculator = page.locator('.calculator-card')
+  const advanced = page.locator('.advanced-controls')
+  const basic = page.locator('.basic-keypad')
+  const history = page.locator('.history-panel')
+
+  const [calculatorBox, advancedBox, basicBox, historyBox] = await Promise.all([
+    calculator.boundingBox(),
+    advanced.boundingBox(),
+    basic.boundingBox(),
+    history.boundingBox(),
+  ])
+
+  expect(calculatorBox).not.toBeNull()
+  expect(advancedBox).not.toBeNull()
+  expect(basicBox).not.toBeNull()
+  expect(historyBox).not.toBeNull()
+  expect(advancedBox!.y).toBeCloseTo(basicBox!.y, 0)
+  expect(advancedBox!.x).toBeLessThan(basicBox!.x)
+  expect(historyBox!.x).toBeGreaterThan(calculatorBox!.x + calculatorBox!.width - 1)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
+})
+
 test('mode switch preserves a pending calculation', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Beräkna' })).toBeVisible()
