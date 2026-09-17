@@ -267,6 +267,7 @@
     width: 100%;
     height: auto;
     margin-bottom: 0;
+    padding-bottom: 0;
   }
 }
 
@@ -330,6 +331,7 @@
   .mode-advanced .advanced-controls {
     min-width: 0;
     padding: .35rem;
+    padding-bottom: 0;
   }
 
   .mode-advanced .setting-row {
