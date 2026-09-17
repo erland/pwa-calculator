@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from 'react'
 import type { GraphPoint, GraphSegment, GraphViewport } from './sampleGraph'
 import './GraphCanvas.css'
 
@@ -72,13 +72,13 @@ export function GraphCanvas({
     ? `Graf för uttrycket ${graphableExpression}`
     : `Graf för uttrycket ${graphableExpression}. Ingen kurva är synlig i det aktuella området.`
 
-  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {
     if (!onPan) return
     event.currentTarget.setPointerCapture(event.pointerId)
     dragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY }
   }
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (event: ReactPointerEvent<HTMLCanvasElement>) => {
     const drag = dragRef.current
     if (!onPan || !drag || drag.pointerId !== event.pointerId) return
     const rect = event.currentTarget.getBoundingClientRect()
@@ -87,11 +87,11 @@ export function GraphCanvas({
     onPan(delta, { width: Math.max(1, rect.width), height: Math.max(1, rect.height) })
   }
 
-  const finishPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const finishPointer = (event: ReactPointerEvent<HTMLCanvasElement>) => {
     if (dragRef.current?.pointerId === event.pointerId) dragRef.current = null
   }
 
-  const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
+  const handleWheel = (event: ReactWheelEvent<HTMLCanvasElement>) => {
     if (!onZoom) return
     event.preventDefault()
     const rect = event.currentTarget.getBoundingClientRect()
