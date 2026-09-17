@@ -4,6 +4,7 @@ import { App } from './app/App'
 import { setupPwa } from './pwa/setupPwa'
 import './styles/app.css'
 import './styles/advanced-responsive.css'
+import './styles/advanced-tablet-compact.css'
 
 setupPwa()
 
