@@ -3,7 +3,7 @@ active_work:
   mode: CHANGE
   plan: docs/development-plan.md
   change_request: .system-builder/changes/graphing-support.md
-  selected_step: DEV-018
+  selected_step: null
 progress:
   completed:
     - CRT-001
@@ -28,13 +28,15 @@ progress:
     - DEV-015
     - DEV-016
     - DEV-017
-  in_progress: DEV-018
+    - DEV-018
+    - CHG-GRAPHING-SUPPORT
+  in_progress: null
   next:
     recommended: null
-    reason: "DEV-018 är sista planerade steget. Slutlig dokumentationssynk är gjord och full CI på den samlade PR-headen återstår innan change-serien kan markeras completed."
+    reason: "Graphing change-serien DEV-013–DEV-018 är implementerad, verifierad och dokumenterad. PR #5 är redo för merge; manuell real-device touch/safe-area-kontroll är rekommenderad men inte ett känt blockerande fel."
 blockers: []
 verification:
-  last_status: running
+  last_status: passed
   baseline: green
   commands:
     - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
@@ -45,7 +47,8 @@ verification:
     - "DEV-017 initial CI #62: verify failed on react-hooks/set-state-in-effect; repaired in same step"
     - "DEV-017 GitHub Actions CI #63: verify/build:pages/e2e passed"
     - "Post-DEV-017 PR-head CI #65: verify/build:pages/e2e passed"
-  notes: "DEV-018 has synchronized README, architecture, changelog, release-readiness and the graphing change record with the delivered behavior. Functional specification already contains FR-034–FR-043 and AC-015–AC-021 matching the implementation. Known limitations and a truthful, still-unchecked physical-device touch/safe-area checklist are documented. Awaiting full CI on the final documentation/status head."
+    - "DEV-018 final acceptance CI #71 on commit 5132ed8bfd81cd74e0cab72e01350c7e5492cb32: verify/build:pages/e2e passed"
+  notes: "Graphing support is complete for the initial scope: explicit x evaluation, bounded/discontinuity-aware sampling, DPI/theme-aware Canvas rendering, automatic landscape graph workspace with stable numeric keypad, Functions overlay behavior, pointer pan, pointer-centered wheel zoom, deterministic reset, full calculator/PWA regression coverage, canonical documentation sync, known limitations and a manual physical-device checklist."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-018 in progress pending final full CI."
+  reference: "GitHub PR #5 feature/graphing-support; DEV-013–DEV-018 complete. Final acceptance CI #71 passed before completion-status commit."
