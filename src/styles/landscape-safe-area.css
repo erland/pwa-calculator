@@ -1,0 +1,65 @@
+/* Landscape ergonomics for installed iOS PWAs and short phone viewports. */
+
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 950px) {
+  body {
+    min-height: 100dvh;
+  }
+
+  .app-layout,
+  .app-layout.mode-advanced {
+    width: 100%;
+    min-height: 100dvh;
+    padding-top: .25rem;
+    padding-right: max(.4rem, env(safe-area-inset-right));
+    padding-bottom: .25rem;
+    padding-left: max(.4rem, env(safe-area-inset-left));
+  }
+
+  .mode-simple .app-header {
+    display: none;
+  }
+
+  .mode-simple .mode-switch {
+    width: min(100%, 22rem);
+    margin-bottom: .25rem;
+    padding: .18rem;
+  }
+
+  .mode-simple .mode-switch button {
+    min-height: 1.85rem;
+  }
+
+  .mode-simple .workspace {
+    grid-template-columns: minmax(0, 31rem);
+    gap: .3rem;
+  }
+
+  .mode-simple .calculator-card {
+    padding: .45rem;
+  }
+
+  .mode-simple .display {
+    min-height: 3.7rem;
+    margin-bottom: .35rem;
+    padding: .35rem .65rem;
+  }
+
+  .mode-simple .expression {
+    font-size: .8rem;
+  }
+
+  .mode-simple .result {
+    margin-top: .15rem;
+    font-size: clamp(1.45rem, 5vw, 2.1rem);
+  }
+
+  .mode-simple .basic-keypad {
+    gap: .25rem;
+  }
+
+  .mode-simple .calculator-key {
+    min-height: 2.45rem;
+    border-radius: .55rem;
+    font-size: .95rem;
+  }
+}
