@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { App } from './app/App'
 import { setupPwa } from './pwa/setupPwa'
 import './styles/app.css'
+import './styles/advanced-responsive.css'
 
 setupPwa()
 
