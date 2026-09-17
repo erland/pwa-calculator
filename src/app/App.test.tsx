@@ -27,7 +27,11 @@ describe('Calculator UI', () => {
     await user.click(screen.getByRole('button', { name: ')' }))
     await user.click(screen.getByRole('button', { name: 'Beräkna' }))
     expect(screen.getByRole('status')).toHaveTextContent('0,5')
+
+    await user.click(screen.getByRole('button', { name: 'Historik' }))
     expect(screen.getByRole('button', { name: /Återanvänd resultatet 0,5/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Stäng historik' }))
+
     await user.click(screen.getByRole('button', { name: 'M+' }))
     expect(screen.getByText('M')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'MC' }))
