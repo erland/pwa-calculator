@@ -136,12 +136,13 @@ Use the space freed by header removal to make expanded scientific functions prac
 - Numeric keypad and full scientific controls visible/usable.
 - Portrait graph hint regression.
 - Full CI.
+- DEV-021 CI #101 passed with dedicated 375×812 expanded-layout and graph-hint coverage.
 
 #### Done criteria
 
-- [ ] Expanded Functions and numeric keypad fit without page scroll at 375×812.
-- [ ] Controls remain readable and touch-usable.
-- [ ] Existing portrait calculator and graph-hint behavior remains intact.
+- [x] Expanded Functions and numeric keypad fit without page scroll at 375×812.
+- [x] Controls remain readable and touch-usable.
+- [x] Existing portrait calculator and graph-hint behavior remains intact.
 
 #### Dependencies
 
