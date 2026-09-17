@@ -2,8 +2,8 @@ schema_version: 1
 active_work:
   mode: CHANGE
   plan: docs/development-plan.md
-  change_request: .system-builder/changes/unified-calculator-mode.md
-  selected_step: null
+  change_request: .system-builder/changes/graphing-support.md
+  selected_step: DEV-013
 progress:
   completed:
     - CRT-001
@@ -23,23 +23,19 @@ progress:
     - DEV-011
     - DEV-012
     - CHG-UNIFIED-CALCULATOR
-  in_progress: null
+  in_progress: DEV-013
   next:
-    recommended: null
-    reason: "Ändringen till ett enhetligt responsivt kalkylatorgränssnitt är implementerad, dokumenterad och verifierad. PR #4 är redo för merge när senaste CI-körningen är grön."
+    recommended: DEV-013
+    reason: "Variabelstöd i expression engine är första riskreducerande grunden för grafprovtagning. Steget är implementerat på work branch men väntar på required CI-verifiering."
 blockers: []
 verification:
-  last_status: passed
+  last_status: pending
   baseline: green
   commands:
-    - "npm run lint (passed in GitHub Actions PR #4)"
-    - "npm run typecheck (passed in GitHub Actions PR #4)"
-    - "npm run test (passed: 40 tests in 5 files in GitHub Actions PR #4)"
-    - "npm run build (passed; manifest and service worker generated in GitHub Actions PR #4)"
-    - "npm run build:pages (passed in GitHub Actions PR #4)"
-    - "npm run test:e2e (passed in GitHub Actions desktop and mobile profiles after responsive desktop/tablet fix)"
-    - "GitHub Actions run 35250393495 / CI #24 (passed on commit 81df538b3c3a659dc37c12a3c17ac70b7dc456aa before documentation-only cleanup)"
-  notes: "PR #4 tar bort användarvalet Enkel/Avancerad och mode-state, gör vetenskapliga funktioner responsivt tillgängliga, visar historik on demand och behåller kompatibilitet med äldre localStorage-data som innehåller mode. Dokumentationssynken efter CI #24 ändrar endast README, funktionell specifikation, arkitektur och denna statusfil; en sista CI-körning ska verifiera PR-head före merge."
+    - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
+    - "DEV-013 expression-engine tests: pending CI"
+    - "DEV-013 lint/typecheck/full tests/build: pending CI"
+  notes: "Graphing CHANGE-serien använder ett stabilt vänsterområde för kalkylatorn och en sekundär landskapsyta för functions/graph. DEV-013 introducerar endast explicit x-variabelcontext i expression engine; ingen graph UI exponeras ännu."
 source_state:
   drift: none
-  reference: "GitHub PR #4 feature/unified-calculator-mode; funktionell kod verifierad i CI #24 på 81df538b3c3a659dc37c12a3c17ac70b7dc456aa. Dokumentationscleanup pågår på samma PR-head."
+  reference: "GitHub branch feature/graphing-support from main 7061ba865bad3dc104bddfff7f7d3bb3176a4d24; active graphing change CHG-GRAPHING-SUPPORT."
