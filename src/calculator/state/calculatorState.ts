@@ -1,7 +1,7 @@
 import { evaluateExpression } from '../engine/evaluate'
 import { CalculatorError, type AngleMode } from '../engine/types'
 import { formatNumber } from '../formatting/formatNumber'
-import type { HistoryEntry, PersistedState, Theme } from '../../persistence/storage'
+import type { HistoryEntry, PersistedState } from '../../persistence/storage'
 
 export interface CalculatorState extends PersistedState {
   expression: string
@@ -18,7 +18,6 @@ export type CalculatorAction =
   | { type: 'backspace' }
   | { type: 'toggle-sign' }
   | { type: 'set-angle'; angleMode: AngleMode }
-  | { type: 'set-theme'; theme: Theme }
   | { type: 'memory-clear' }
   | { type: 'memory-recall' }
   | { type: 'memory-add' }
@@ -47,7 +46,6 @@ export function calculatorReducer(state: CalculatorState, action: CalculatorActi
     case 'backspace': return { ...state, expression: state.expression.slice(0, -1), error: null, justEvaluated: false }
     case 'toggle-sign': return { ...state, expression: state.expression ? `-(${state.expression})` : '-', error: null, justEvaluated: false }
     case 'set-angle': return { ...state, angleMode: action.angleMode }
-    case 'set-theme': return { ...state, theme: action.theme }
     case 'memory-clear': return { ...state, memory: null }
     case 'memory-recall': {
       if (state.memory === null) return state

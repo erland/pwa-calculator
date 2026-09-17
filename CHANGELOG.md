@@ -2,6 +2,25 @@
 
 Alla betydande förändringar dokumenteras här.
 
+## Ej släppt – compact responsive layout
+
+### Ändrat
+
+- Apptitel/header och temaväljare är borttagna från kalkylatorytan.
+- Ljust/mörkt tema följer nu systemets `prefers-color-scheme`; nya persistensposter lagrar inte längre `theme`.
+- Legacy localStorage med tidigare `theme`- och `mode`-fält accepteras fortsatt och dessa fält ignoreras utan att DEG/RAD, minne eller historik tappas.
+- I landskap ligger graph/scientific-sekundärytan till vänster och den stabila kalkylatorn/sifferknappsatsen till höger.
+- Scientific-knappsatsen bottenjusteras mot sifferknappsatsen i landskap.
+- Små porträttvyer använder kompakt spacing och fem scientific-kolumner; på 375×812 ryms fullt expanderade Funktioner tillsammans med hela sifferknappsatsen utan page scroll.
+
+### Verifierat
+
+- Telefonlandskap 844×390: vänster/höger-ordning, stabil keypad-position, graph/functions-växling och no-overflow.
+- iPad-landskap 1024×768: samma spatiala modell och bottom alignment.
+- Porträtt 375×812: hela scientific-panelen och hela numeric keypad synliga utan vertikal sidscroll.
+- Systemtema växlar med browserns färgschemapreferens och temapreferens skrivs inte till localStorage.
+- Befintliga calculator-, graph-, history-, memory-, persistence-, PWA- och offline-regressioner är gröna.
+
 ## Ej släppt – grafstöd
 
 ### Tillagt
@@ -14,11 +33,6 @@ Alla betydande förändringar dokumenteras här.
 - Diskret porträttindikering för `x`-uttryck utan permanent grafyta.
 - Panorering genom drag, zoom runt pekarposition och återställning till standardviewport `-10..10`.
 - Enhets-, komponent- och Playwright-täckning för expression engine, sampling, graf-rendering, responsiv layout och viewportinteraktion.
-
-### Ändrat
-
-- Landskapsytan använder display, åtgärder och sifferknappsats i en stabil kalkylatorkolumn i stället för att låta uttryck/resultat ta hela bredden.
-- Vetenskapliga funktioner används som sekundäryta när ingen graf är aktiv och kan öppnas tillfälligt över grafytan när grafen visas.
 
 ### Kända begränsningar
 

@@ -47,12 +47,11 @@ describe('Calculator UI', () => {
     expect(screen.getByRole('status')).toHaveTextContent('56')
   })
 
-  it('persists theme selection', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Tema' }), 'dark')
-    expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(localStorage.getItem('calculator-pwa:v1')).toContain('"theme":"dark"')
+  it('has no application header or user-selectable theme control', () => {
+    const { container } = render(<App />)
+    expect(container.querySelector('.app-header')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Tema' })).not.toBeInTheDocument()
+    expect(document.documentElement.dataset.theme).toBeUndefined()
   })
 
   it('has no automatically detectable accessibility violations', async () => {

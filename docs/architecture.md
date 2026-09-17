@@ -9,7 +9,8 @@ Arkitekturen ska prioritera:
 3. stabil responsiv layout där grundknappsatsen inte flyttar sig när sekundär funktionalitet ändras,
 4. helt lokal/offlinekapabel funktion utan backend,
 5. liten dependency- och drift-yta,
-6. tydliga domängränser mellan beräkning, grafprovtagning, viewportinteraktion och rendering.
+6. tydliga domängränser mellan beräkning, grafprovtagning, viewportinteraktion och rendering,
+7. systemstyrt tema utan onödigt applikations-state.
 
 ## 2. Systemkontext
 
@@ -26,6 +27,8 @@ flowchart LR
     Sampler --> Engine
     Graph --> Canvas[Graph Canvas]
     UI --> Storage[(localStorage)]
+    System[System color scheme] --> CSS[Responsive/theme CSS]
+    CSS --> UI
     Browser[Service Worker / PWA] --> UI
 ```
 
@@ -40,11 +43,13 @@ Ansvarar för:
 - expression/result display,
 - grundknappsats,
 - `Funktioner` och `Historik`,
-- DEG/RAD, minne och tema,
+- DEG/RAD och minne,
 - responsiv presentation,
 - safe-area-hantering,
 - orienterings-/viewportberoende graph workspace,
 - tillgänglig semantik och input/fokus.
+
+Applikationsheader och temaväljare ingår inte längre i kalkylatorytan. Ljust/mörkt färgschema härleds av CSS från `prefers-color-scheme`.
 
 UI:t implementerar inte matematiska regler eller grafprovtagning.
 
@@ -57,27 +62,15 @@ Ansvarar för:
 - redigering, clear/backspace och `=`,
 - DEG/RAD,
 - minne,
-- historik,
-- tema/persistenskoordination.
+- historik.
 
-Graph presentation härleds från aktuellt uttryck och viewport och lagras inte som ett separat calculator mode. `x` behandlas som början på ett nytt uttryck efter en slutförd numerisk beräkning.
+Tema ingår inte i runtime-state. Graph presentation härleds från aktuellt uttryck och viewport och lagras inte som ett separat calculator mode. `x` behandlas som början på ett nytt uttryck efter en slutförd numerisk beräkning.
 
 ### 3.3 Expression Engine
 
-Ansvarar för säker parser/evaluator för:
+Ansvarar för säker parser/evaluator för tal/operatorer, parenteser, procent/potenser, vetenskapliga funktioner, `π`, `e`, DEG/RAD och variabeln `x` via explicit evaluation context.
 
-- tal och operatorer,
-- parenteser och unära operatorer,
-- procent/potenser,
-- `sin`, `cos`, `tan`, `log`, `ln`, `sqrt`, invers och kvadrat,
-- `π` och `e`,
-- DEG/RAD,
-- variabeln `x` via explicit evaluation context,
-- kontrollerade syntax-, domän-, divisions- och resultatfel.
-
-Motorn får inte använda `eval`, `Function` eller dynamisk kodexekvering.
-
-Domän-API:
+Motorn använder inte `eval`, `Function` eller dynamisk kodexekvering.
 
 ```text
 evaluateExpression(expression, angleMode, variables?) -> number
@@ -88,76 +81,37 @@ Uttryck utan variabler behåller befintlig semantik. Om `x` refereras utan expli
 
 ### 3.4 Numeric Formatter
 
-Ansvarar för presentation av numeriska resultat, avrundning, `-0`, mycket stora/små tal och vetenskaplig notation. Grafdomänen använder råa `number`-värden och ska inte formatera varje sample via UI-formattering.
+Ansvarar för presentation av numeriska resultat, avrundning, `-0`, mycket stora/små tal och vetenskaplig notation. Grafdomänen använder råa `number`-värden.
 
 ### 3.5 Graph Sampler
 
-Graph Sampler är ett rent domänlager mellan expression engine och rendering.
+Graph Sampler är ett rent domänlager mellan expression engine och rendering. Det tar emot uttryck, angle mode och matematisk viewport, genererar begränsade x-samples, utvärderar via Expression Engine med `{ x }`, bryter segment vid matematiska domän-/resultatfel och undviker uppenbara falska förbindelser över diskontinuiteter.
 
-Ansvar:
-
-- ta emot uttryck, angle mode och matematisk viewport,
-- generera representativa x-samples med begränsad densitet,
-- utvärdera uttrycket genom Expression Engine med `{ x }`,
-- behandla domän-/resultatfel som avbrott i kurvan,
-- dela output i drawable segments,
-- undvika uppenbara falska förbindelser över asymptoter/diskontinuiteter,
-- vara oberoende av React, DOM och Canvas.
-
-Exempel på output:
-
-```text
-GraphSampleResult
-  segments[]
-    points[] { x, y }
-```
-
-Sampler-strategin kan bytas utan att UI/Canvas behöver känna till parserdetaljer.
+Sampler är oberoende av React, DOM och Canvas.
 
 ### 3.6 Graph Viewport
 
-Viewportlagret är ren matematik och ansvarar för:
-
-- standardviewport `x/y = -10..10`,
-- översättning av drag i pixlar till matematisk panorering,
-- zoom runt en normaliserad pekarposition,
-- min/max-gränser för viewportens spann,
-- kontroll av om viewporten är i standardläge.
-
-Viewporten är temporär och persisteras inte i initial scope.
+Viewportlagret är ren matematik och ansvarar för standardviewport `x/y = -10..10`, pan från pixel-delta, zoom runt pekarposition, min/max-span samt kontroll av standardläge. Viewporten är temporär och persisteras inte.
 
 ### 3.7 Graph Canvas
 
-Graph Canvas ansvarar för visning och browserinteraktion:
-
-- matematisk koordinat → pixelkoordinat,
-- axlar och grid,
-- rendering av segment,
-- device pixel ratio,
-- tema,
-- pointer-drag för panorering,
-- hjulzoom runt pekarens position,
-- reset-kontroll,
-- confinement av touchgest till graph surface via `touch-action`.
-
-Canvas evaluerar inte uttryck och avgör inte matematiska diskontinuiteter. Interaktionen skickar viewportförändringar till applikationslagret, vilket provar om grafen och renderar om den.
+Graph Canvas ansvarar för koordinattransform, axlar/grid, kurvsegment, device pixel ratio, theme-aware färger, pointer-drag, hjulzoom och reset. Canvas evaluerar inte uttryck och avgör inte diskontinuiteter.
 
 ### 3.8 Persistence Adapter
 
-`localStorage` kapslas bakom befintlig adapter och lagrar:
+`localStorage` kapslas bakom adapter och lagrar:
 
-- tema,
 - DEG/RAD,
 - minne,
 - max 100 historikposter.
 
-Grafstödet kräver ingen schemaändring. Aktuellt uttryck, graph samples och viewport är session-/UI-state och persisteras inte.
+Aktuellt uttryck, graph samples, graph viewport och tema persisteras inte.
 
-Legacy-data som innehåller äldre mode-fält ska fortsatt kunna läsas defensivt och ignoreras.
+Legacy version-1-data får innehålla tidigare `theme`- och `mode`-fält. Adaptern accepterar och ignorerar dem samtidigt som giltigt angle mode, minne och historik bevaras.
 
 ### 3.9 PWA / Service Worker
 
-`vite-plugin-pwa`/Workbox levererar app shell och resurser offline. Grafstöd kräver inga nya nätverksanrop och ingår därför i samma statiska/offlinekapabla bundle.
+`vite-plugin-pwa`/Workbox levererar app shell och resurser offline. Grafstöd och responsive/theme CSS kräver inga nätverksanrop efter att app shell är cachat.
 
 ## 4. Responsiv workspace-arkitektur
 
@@ -165,30 +119,32 @@ Legacy-data som innehåller äldre mode-fält ska fortsatt kunna läsas defensiv
 
 - Grundknappsats är primär.
 - Vetenskapliga funktioner visas via `Funktioner` på små skärmar.
+- Ingen permanent appheader eller temakontroll tar höjd.
+- Ett separat portrait-compact override laddas sist och används endast via viewport/orientation media queries, inte device detection.
+- Vid 375×812 används fem scientific-kolumner och komprimerad vertikal spacing så fullt expanderade Funktioner plus hela sifferknappsatsen ryms utan page scroll.
 - `x` kan matas in via funktionsytan eller tangentbordet.
-- Ingen permanent graph surface i initial scope.
-- Ett grafbart uttryck visar diskret att grafen finns i landskap.
+- Ingen permanent graph surface visas; ett grafbart uttryck visar diskret att grafen finns i landskap.
 
 ### Landskap
 
 Layouten består av två stabila områden:
 
 ```text
-┌────────────────────┬────────────────────────┐
-│ Calculator column  │ Secondary workspace    │
-│ display/result     │ functions OR graph     │
-│ actions            │                        │
-│ numeric keypad     │                        │
-└────────────────────┴────────────────────────┘
+┌────────────────────────┬────────────────────┐
+│ Secondary workspace    │ Calculator column  │
+│ functions OR graph     │ display/result     │
+│                        │ actions             │
+│ scientific keypad      │ numeric keypad     │
+└────────────────────────┴────────────────────┘
 ```
 
-Calculator column behåller samma geometri när secondary workspace växlar innehåll.
+Secondary workspace ligger till vänster. Calculator column ligger till höger och behåller samma geometri när secondary workspace växlar innehåll.
 
-Utan `x` visar secondary workspace vetenskapliga funktioner permanent.
+Utan `x` visar vänsterytan vetenskapliga funktioner. Scientific-panelen är bottenjusterad och dess knappsats nederkant linjerar med numeric keypad inom normal pixelavrundning.
 
-Med `x` visas grafen som standard. `Funktioner` ersätter då grafen tillfälligt i secondary workspace utan att flytta numeric keypad. Historik förblir on demand som overlay/drawer.
+Med `x` visas grafen som standard. `Funktioner` ersätter grafen tillfälligt i vänsterytan utan att flytta numeric keypad. Historik förblir on demand som overlay/drawer.
 
-Denna geometri verifieras i Playwright genom att sifferknappsatsens position jämförs före och efter grafaktivering samt när funktionspanelen öppnas ovanpå grafytan.
+Telefonlandskap använder befintlig safe-area-CSS. Samma vänster/höger-modell gäller för iPad/desktop-landskap.
 
 ## 5. Dataflöden
 
@@ -229,29 +185,40 @@ pointer drag / wheel
 
 Graph gestures är begränsade till graph surface och förändrar inte calculator controls. Reset återgår deterministiskt till standardviewporten.
 
+### 5.4 Systemtema
+
+```text
+OS/browser color scheme
+→ prefers-color-scheme
+→ CSS variables
+→ React/Canvas presentation
+```
+
+Ingen theme action, theme selector eller theme persistence behövs. Canvas läser de aktuella CSS-färgerna och ritar om vid theme change.
+
 ## 6. Data och ägarskap
 
 Persistenta objekt:
 
-- settings: `angleMode`, `theme`,
+- settings: `angleMode`,
 - memory,
 - history.
 
-Temporära graph-objekt:
+Temporära objekt:
 
+- current expression/result/error,
+- system-derived presentation theme,
 - current graphable expression,
 - mathematical viewport,
-- sampled segments.
+- sampled graph segments.
 
-Expression engine äger matematiksemantik. Graph Sampler äger sampling/discontinuity-policy. Viewportlagret äger koordinattransformation för pan/zoom. Canvas äger pixelrendering och browsergesttolkning. UI äger layout/presentation.
+Expression engine äger matematiksemantik. Graph Sampler äger sampling/discontinuity-policy. Viewportlagret äger pan/zoom-transformer. Canvas äger pixelrendering och browsergesttolkning. UI/CSS äger layout/presentation.
 
 ## 7. Felmodell
 
-Direkt kalkylatorutvärdering visar kontrollerade fel för syntax, division med noll, domän, saknad variabel och icke-visningsbart resultat.
+Direkt kalkylatorutvärdering visar kontrollerade fel för syntax, division med noll, domän, saknad variabel och icke-visningsbart resultat. Graph Sampler behandlar motsvarande fel för enskilda `x`-värden som lokala sampling gaps när det är matematiskt rimligt.
 
-Graph Sampler behandlar motsvarande fel för enskilda `x`-värden som lokala sampling gaps när det är matematiskt rimligt.
-
-Ett programmerings-/systemfel får inte döljas som en matematisk diskontinuitet.
+Korrupt localStorage eller legacy-fält får inte blockera appstart.
 
 ## 8. Säkerhetsarkitektur
 
@@ -261,17 +228,11 @@ Ett programmerings-/systemfel får inte döljas som en matematisk diskontinuitet
 - inga secrets,
 - lokal beräkningsdata,
 - dependencies låses i lockfil,
-- Canvas renderar endast intern numerisk data och text som redan är UI-kontrollerad.
+- Canvas renderar endast intern numerisk data och UI-kontrollerad text.
 
 ## 9. Prestanda
 
-Graphing introducerar upprepad expression evaluation. Därför gäller:
-
-- sampling density är begränsad/proportionerlig till viewport,
-- viewportens spann är begränsat för att undvika patologiska zoomlägen,
-- DOM-element per graph sample undviks; Canvas används,
-- omprovtagning sker efter viewportförändring,
-- Web Worker införs inte initialt men kan övervägas om mätning på verklig mobil hårdvara visar UI-blockering.
+Graphing introducerar upprepad expression evaluation. Sampling density och viewportspan är därför begränsade. Canvas används i stället för DOM-element per sample. Portrait compactness uppnås med CSS och medför ingen extra runtime-beräkning.
 
 ## 10. Deployment och drift
 
@@ -281,7 +242,7 @@ Deploymentmodellen förändras inte:
 Source → Vite build → statiska filer → GitHub Pages/HTTPS → PWA cache
 ```
 
-Graphing kräver ingen serverkonfiguration, migration eller ny extern tjänst.
+Compact-responsive-serien kräver ingen serverkonfiguration, migration eller extern tjänst.
 
 ## 11. Teknikval
 
@@ -291,10 +252,9 @@ Graphing kräver ingen serverkonfiguration, migration eller ny extern tjänst.
 - egen explicit expression parser/evaluator
 - HTML Canvas 2D för graph rendering
 - localStorage bakom adapter
+- CSS media queries / `prefers-color-scheme`
 - vite-plugin-pwa/Workbox
 - Vitest + React Testing Library + Playwright
-
-Ett externt plottingbibliotek ska endast införas om den interna Canvas-lösningen inte ger tillräcklig korrekthet eller underhållbarhet. Ett sådant byte kräver ny dependency-/bundle-/security-bedömning.
 
 ## 12. Arkitekturbeslut
 
@@ -312,25 +272,29 @@ Ett externt plottingbibliotek ska endast införas om den interna Canvas-lösning
 - ARCH-012: landscape calculator column är spatialt stabil; secondary workspace byter mellan functions och graph.
 - ARCH-013: graph viewport-transformationer är rena domänfunktioner; pointer/wheel events stannar i Canvas/UI-lagret.
 - ARCH-014: graph viewport är temporär och återställs deterministiskt, inte persisterad.
+- ARCH-015: användarstyrt theme state/persistens är borttaget; systemets `prefers-color-scheme` är enda theme source of truth.
+- ARCH-016: landscape secondary workspace ligger vänster och stabil calculator column höger.
+- ARCH-017: scientific controls bottenjusteras mot numeric keypad i landskap.
+- ARCH-018: constrained portrait compactness implementeras som viewportbaserad CSS override, utan device detection.
 
 ## 13. Viktiga trade-offs
 
-### Graph endast i initial landskapsyta
+### Systemtema i stället för användarval
 
-Det håller phone portrait enkelt och ger grafen meningsfull yta. Nackdelen är att användaren behöver rotera en smal telefon för att se grafen. Uttrycket och `x`-input fungerar dock fortfarande i porträtt så rotationen förlorar inte arbetet.
+Det minskar UI- och state-yta och frigör vertikalt utrymme. Nackdelen är att appen inte längre kan ha ett färgschema som avviker från systemet.
+
+### Fem scientific-kolumner i kompakt porträtt
+
+Det sparar en hel funktionsrad på 375×812 och gör fullt expanderat läge möjligt utan page scroll. Trade-offen är något smalare scientific-knappar, men de behåller verifierad läsbar/touchbar höjd.
+
+### Graf endast i landskap
+
+Det håller phone portrait enkelt och ger grafen meningsfull yta. Uttrycket och `x`-input fungerar fortfarande i porträtt så rotationen förlorar inte arbetet.
 
 ### Canvas kontra SVG/plotting library
 
-Canvas ger liten dependency-yta och lämpar sig för många sampled points. Det ger mindre native DOM-semantik, vilket kompenseras med tillgängliga kontroller/labels utanför canvas.
-
-### Sampling kontra symbolisk analys
-
-Initial version provar funktionen numeriskt i stället för att analysera den symboliskt. Det håller scope rimligt men kräver försiktig discontinuity-policy och betyder att perfekt identifiering av alla asymptoter inte garanteras.
-
-### Temporär viewport kontra persistens
-
-Viewporten återställs när grafsessionen lämnas och sparas inte mellan sessioner. Det minskar state-/migrationsytan och ger ett förutsägbart startläge, på bekostnad av att användaren inte kan återuppta en tidigare pan/zoom-position.
+Canvas ger liten dependency-yta och lämpar sig för många sampled points. Mindre native DOM-semantik kompenseras med tillgängliga kontroller och labels.
 
 ## 14. Öppna arkitekturfrågor
 
-Inga blockerande arkitekturfrågor återstår för den initiala graphing-serien. Verklig touchkänsla och prestanda på olika mobila enheter ska fortsatt följas upp som manuell acceptans och kan motivera framtida optimering utan att ändra nuvarande domängränser.
+Inga blockerande arkitekturfrågor återstår. Verklig touchkänsla, safe-area och densitet på fysisk iPhone/iPad ska fortsatt följas upp som rekommenderad manuell acceptans och kan motivera framtida finjustering utan att ändra domängränserna.

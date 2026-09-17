@@ -7,7 +7,7 @@ import { AdvancedKeypad } from '../components/AdvancedKeypad'
 import { BasicKeypad } from '../components/BasicKeypad'
 import { HistoryPanel } from '../components/HistoryPanel'
 import { UpdatePrompt } from '../components/UpdatePrompt'
-import { loadPersistedState, savePersistedState, type PersistedState, type Theme } from '../persistence/storage'
+import { loadPersistedState, savePersistedState, type PersistedState } from '../persistence/storage'
 
 export function App() {
   const [state, dispatch] = useReducer(calculatorReducer, undefined, () => createCalculatorState(loadPersistedState()))
@@ -25,31 +25,17 @@ export function App() {
   }, [graphActive, graphViewport, state.angleMode, state.expression])
   const persisted = useMemo<PersistedState>(() => ({
     angleMode: state.angleMode,
-    theme: state.theme,
     memory: state.memory,
     history: state.history,
-  }), [state.angleMode, state.theme, state.memory, state.history])
+  }), [state.angleMode, state.memory, state.history])
 
   useEffect(() => { savePersistedState(persisted) }, [persisted])
-  useEffect(() => applyTheme(state.theme), [state.theme])
   useLayoutEffect(() => bindKeyboard(dispatch), [])
 
   return (
     <>
       <a className="skip-link" href="#calculator">Hoppa till miniräknaren</a>
       <main className={`app-layout mode-advanced${graphActive ? ' graph-active' : ''}${functionsOpen ? ' functions-open' : ''}`}>
-        <header className="app-header">
-          <h1>Miniräknaren</h1>
-          <label className="theme-picker">
-            <span>Tema</span>
-            <select value={state.theme} onChange={(event) => dispatch({ type: 'set-theme', theme: event.target.value as Theme })}>
-              <option value="system">System</option>
-              <option value="light">Ljust</option>
-              <option value="dark">Mörkt</option>
-            </select>
-          </label>
-        </header>
-
         <div className="workspace">
           <section id="calculator" className="calculator-card" aria-label="Miniräknare">
             <div className="display" role="status" aria-live="polite" aria-atomic="true">
@@ -121,12 +107,6 @@ function containsVariableX(expression: string): boolean {
 
 function displayExpression(expression: string): string {
   return expression.replaceAll('*', '×').replaceAll('/', '÷').replaceAll('pi', 'π').replaceAll('.', ',')
-}
-
-function applyTheme(theme: Theme): void {
-  document.documentElement.dataset.theme = theme
-  const dark = theme === 'dark' || (theme === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches)
-  document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
 }
 
 function bindKeyboard(dispatch: (action: CalculatorAction) => void): () => void {

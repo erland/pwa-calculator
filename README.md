@@ -4,9 +4,9 @@ En responsiv och installerbar PWA som kombinerar traditionell vardagsräkning, v
 
 **Publicerad app:** [https://erland.github.io/pwa-calculator/](https://erland.github.io/pwa-calculator/)
 
-Grundläggande siffer- och operatorfunktioner är alltid direkt tillgängliga. Vetenskapliga funktioner, DEG/RAD, minne och historik visas eller fälls fram utifrån tillgängligt skärmutrymme: på små porträttskärmar hålls de sekundära funktionerna undan tills de behövs, medan landskap och större skärmar kan visa mer samtidigt.
+Grundläggande siffer- och operatorfunktioner är alltid direkt tillgängliga. Vetenskapliga funktioner, DEG/RAD, minne och historik visas eller fälls fram utifrån tillgängligt skärmutrymme: på små porträttskärmar hålls de sekundära funktionerna undan tills de behövs, medan landskap och större skärmar kan visa mer samtidigt. Kalkylatorytan har ingen permanent titel/header eller temaväljare; färgschemat följer systemet. På 375×812 ryms hela expanderade Funktioner-panelen tillsammans med hela sifferknappsatsen utan page scroll.
 
-Grafstöd aktiveras av uttrycket i stället för av ett separat grafläge. Variabeln `x` finns under **Funktioner** och kan även matas in från tangentbordet. På telefon i porträtt förblir kalkylatorn kompakt; ett `x`-uttryck visar en diskret indikation om att grafen finns i landskap. I landskap ligger kalkylator och sifferknappsats stabilt i vänsterkolumnen medan högerkolumnen automatiskt visar grafen. Utan `x` används samma sekundäryta för vetenskapliga funktioner.
+Grafstöd aktiveras av uttrycket i stället för av ett separat grafläge. Variabeln `x` finns under **Funktioner** och kan även matas in från tangentbordet. På telefon i porträtt förblir kalkylatorn kompakt; ett `x`-uttryck visar en diskret indikation om att grafen finns i landskap. I landskap ligger graf/vetenskapliga funktioner i vänster sekundäryta medan kalkylatorn och sifferknappsatsen ligger stabilt till höger. När vetenskapliga funktioner visas bottenjusteras deras knappsats mot sifferknappsatsen.
 
 Grafen kan panoreras genom drag, zoomas med browserns hjul-/pekinteraktion och återställas till standardområdet `-10..10` på båda axlarna. Grafprovtagning, rendering och övrig matematik sker lokalt utan backend.
 
@@ -75,15 +75,16 @@ För att kontrollera offlinefunktionen:
 
 ## Lokal data
 
-Tema, vinkelenhet, minne och de 100 senaste slutförda beräkningarna lagras versionsmärkt i `localStorage`. Grafens aktuella viewport och pågående uttryck är temporära och persisteras inte. Äldre lagringsdata som innehåller det tidigare fältet `mode` accepteras defensivt och fältet ignoreras. Korrupt eller blockerad lagring återställs defensivt och får inte hindra kärnberäkningen.
+Vinkelenhet, minne och de 100 senaste slutförda beräkningarna lagras versionsmärkt i `localStorage`. Tema följer systemets färgschema och sparas inte som användarinställning. Grafens aktuella viewport och pågående uttryck är temporära och persisteras inte. Äldre lagringsdata som innehåller tidigare fält som `theme` eller `mode` accepteras defensivt och dessa fält ignoreras. Korrupt eller blockerad lagring återställs defensivt och får inte hindra kärnberäkningen.
 
 ## Kända begränsningar
 
 - JavaScript `Number` använder IEEE-754 och ger inte godtycklig precision eller exakt finansiell decimalaritmetik.
 - Grafstödet visar en realvärd funktion av `x` åt gången; flera samtidiga kurvor, symbolisk algebra, komplexa tal och grafanalys som nollställen/skärningspunkter/derivator ingår inte.
 - Grafen bygger på numerisk sampling. Domänfel och uppenbara diskontinuiteter segmenteras, men alla matematiska asymptoter kan inte garanteras bli symboliskt identifierade.
-- Den fulla grafytan visas i initial scope i landskap, inte permanent i telefonporträtt.
+- Den fulla grafytan visas i landskap, inte permanent i telefonporträtt.
 - Grafens viewport sparas inte mellan sessioner.
+- Appens ljust/mörkt-tema följer systeminställningen och kan inte väljas separat i appen.
 - PWA-installationens meny och funktion varierar mellan webbläsare och operativsystem. Webbappen fungerar även utan en särskild installationsknapp.
 - PWA och service worker kräver HTTPS i produktion; `localhost` är undantaget för utveckling.
 

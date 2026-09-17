@@ -2,7 +2,7 @@ schema_version: 1
 active_work:
   mode: CHANGE
   plan: docs/development-plan.md
-  change_request: .system-builder/changes/graphing-support.md
+  change_request: .system-builder/changes/compact-responsive-layout.md
   selected_step: null
 progress:
   completed:
@@ -30,25 +30,30 @@ progress:
     - DEV-017
     - DEV-018
     - CHG-GRAPHING-SUPPORT
+    - DEV-019
+    - DEV-020
+    - DEV-021
+    - DEV-022
+    - CHG-COMPACT-RESPONSIVE-LAYOUT
   in_progress: null
   next:
     recommended: null
-    reason: "Graphing change-serien DEV-013–DEV-018 är implementerad, verifierad och dokumenterad. PR #5 är redo för merge; manuell real-device touch/safe-area-kontroll är rekommenderad men inte ett känt blockerande fel."
+    reason: "Compact-responsive CHANGE-serien DEV-019–DEV-022 är implementerad, dokumenterad och verifierad. Ingen ytterligare planerad utveckling återstår före merge."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
-    - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
-    - "DEV-013 GitHub Actions CI #30/#31: passed"
-    - "DEV-014 GitHub Actions CI #34/#37: passed"
-    - "DEV-015 GitHub Actions CI #41/#44: passed"
-    - "DEV-016 GitHub Actions CI #50: passed"
-    - "DEV-017 initial CI #62: verify failed on react-hooks/set-state-in-effect; repaired in same step"
-    - "DEV-017 GitHub Actions CI #63: verify/build:pages/e2e passed"
-    - "Post-DEV-017 PR-head CI #65: verify/build:pages/e2e passed"
-    - "DEV-018 final acceptance CI #71 on commit 5132ed8bfd81cd74e0cab72e01350c7e5492cb32: verify/build:pages/e2e passed"
-  notes: "Graphing support is complete for the initial scope: explicit x evaluation, bounded/discontinuity-aware sampling, DPI/theme-aware Canvas rendering, automatic landscape graph workspace with stable numeric keypad, Functions overlay behavior, pointer pan, pointer-centered wheel zoom, deterministic reset, full calculator/PWA regression coverage, canonical documentation sync, known limitations and a manual physical-device checklist."
+    - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
+    - "DEV-019 GitHub Actions CI #83: verify/build:pages/e2e passed"
+    - "DEV-020 initial CI #87 found scientific keypad lower-edge offset; repaired in-step"
+    - "DEV-020 repaired CI #89: verify/build:pages/e2e passed"
+    - "DEV-021 GitHub Actions CI #101: verify/build:pages/e2e passed"
+    - "DEV-021 closing status head CI #103: verify/build:pages/e2e passed"
+    - "DEV-022 final synchronized implementation/docs head CI #110: npm run verify passed"
+    - "DEV-022 final synchronized implementation/docs head CI #110: npm run build:pages passed"
+    - "DEV-022 final synchronized implementation/docs head CI #110: npm run test:e2e passed"
+  notes: "Compact-responsive series completed. Header/theme picker removed; system color scheme is the single theme source; legacy theme/mode storage remains readable and ignored; landscape secondary workspace is left with stable calculator right; scientific keypad is bottom-aligned; 375x812 portrait supports fully expanded Functions plus complete numeric keypad without page scroll. Real-device iPhone/iPad checks remain recommended follow-up, not an automated-code blocker."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-013–DEV-018 complete. Final acceptance CI #71 passed before completion-status commit."
+  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019–DEV-022 and CHG-COMPACT-RESPONSIVE-LAYOUT complete. Final synchronized head verified by CI #110."
