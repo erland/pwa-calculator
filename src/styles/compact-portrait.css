@@ -1,0 +1,89 @@
+/* Compact portrait layout for constrained phone heights.
+ * Keep the full scientific panel and numeric keypad usable together without
+ * introducing device-specific detection. */
+@media (max-width: 480px) and (orientation: portrait) {
+  .app-layout.mode-advanced {
+    padding-top: .25rem;
+    padding-bottom: .35rem;
+  }
+
+  .mode-advanced .calculator-card {
+    padding: .5rem;
+  }
+
+  .mode-advanced .display {
+    min-height: 4.6rem;
+    margin-bottom: .35rem;
+    padding: .5rem;
+  }
+
+  .mode-advanced .result {
+    font-size: clamp(1.75rem, 8.5vw, 2.35rem);
+  }
+
+  .mode-advanced .advanced-toolbar {
+    margin-bottom: .35rem;
+  }
+
+  .mode-advanced .panel-toggle {
+    min-height: 2.35rem;
+  }
+
+  .mode-advanced .advanced-panel[data-open="true"] {
+    margin-bottom: .35rem;
+  }
+
+  .mode-advanced .advanced-controls {
+    padding: .4rem;
+  }
+
+  .mode-advanced .setting-row {
+    gap: .4rem;
+    margin-bottom: .3rem;
+    font-size: .8rem;
+  }
+
+  .mode-advanced .segmented.compact {
+    width: 8rem;
+    padding: .2rem;
+  }
+
+  .mode-advanced .segmented.compact button {
+    min-height: 2.15rem;
+    font-size: .76rem;
+  }
+
+  .mode-advanced .memory-row {
+    grid-template-columns: repeat(4, 1fr) 1.25rem;
+    gap: .25rem;
+    margin-bottom: .3rem;
+  }
+
+  .mode-advanced .memory-row button {
+    min-height: 2.2rem;
+    border-radius: .55rem;
+    font-size: .8rem;
+  }
+
+  .mode-advanced .advanced-keypad {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: .3rem;
+  }
+
+  .mode-advanced .basic-keypad {
+    gap: .4rem;
+  }
+
+  .mode-advanced .calculator-key {
+    min-height: 3rem;
+  }
+
+  .mode-advanced .key-function {
+    min-height: 2.625rem;
+    font-size: .9rem;
+  }
+
+  .mode-advanced .graph-portrait-hint {
+    margin-top: .35rem;
+  }
+}
