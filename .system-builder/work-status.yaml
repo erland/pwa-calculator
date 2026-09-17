@@ -2,7 +2,7 @@ schema_version: 1
 active_work:
   mode: CHANGE
   plan: docs/development-plan.md
-  change_request: .system-builder/changes/graphing-support.md
+  change_request: .system-builder/changes/compact-responsive-layout.md
   selected_step: null
 progress:
   completed:
@@ -32,23 +32,17 @@ progress:
     - CHG-GRAPHING-SUPPORT
   in_progress: null
   next:
-    recommended: null
-    reason: "Graphing change-serien DEV-013–DEV-018 är implementerad, verifierad och dokumenterad. PR #5 är redo för merge; manuell real-device touch/safe-area-kontroll är rekommenderad men inte ett känt blockerande fel."
+    recommended: DEV-019
+    reason: "Den nya compact-responsive CHANGE-serien är planerad från mergad graphing-baseline. Första säkra steget är att ta bort header/theme UI och förenkla state/persistens till systemstyrt tema med bakåtkompatibel läsning av legacy theme-data."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
-    - "Baseline GitHub Actions CI #29 on main commit 7061ba865bad3dc104bddfff7f7d3bb3176a4d24: passed"
-    - "DEV-013 GitHub Actions CI #30/#31: passed"
-    - "DEV-014 GitHub Actions CI #34/#37: passed"
-    - "DEV-015 GitHub Actions CI #41/#44: passed"
-    - "DEV-016 GitHub Actions CI #50: passed"
-    - "DEV-017 initial CI #62: verify failed on react-hooks/set-state-in-effect; repaired in same step"
-    - "DEV-017 GitHub Actions CI #63: verify/build:pages/e2e passed"
-    - "Post-DEV-017 PR-head CI #65: verify/build:pages/e2e passed"
-    - "DEV-018 final acceptance CI #71 on commit 5132ed8bfd81cd74e0cab72e01350c7e5492cb32: verify/build:pages/e2e passed"
-  notes: "Graphing support is complete for the initial scope: explicit x evaluation, bounded/discontinuity-aware sampling, DPI/theme-aware Canvas rendering, automatic landscape graph workspace with stable numeric keypad, Functions overlay behavior, pointer pan, pointer-centered wheel zoom, deterministic reset, full calculator/PWA regression coverage, canonical documentation sync, known limitations and a manual physical-device checklist."
+    - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
+    - "Graphing PR final CI #73 passed before merge"
+    - "Deploy GitHub Pages run on baseline commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f: passed"
+  notes: "CHG-COMPACT-RESPONSIVE-LAYOUT is planned as DEV-019–DEV-022. Target behavior: no app header/theme selector; theme follows prefers-color-scheme; legacy persisted theme is ignored without losing angleMode/memory/history; landscape secondary workspace moves left and calculator right; scientific controls bottom-align; 375x812 portrait with expanded Functions fits without page scroll."
 source_state:
   drift: none
-  reference: "GitHub PR #5 feature/graphing-support; DEV-013–DEV-018 complete. Final acceptance CI #71 passed before completion-status commit."
+  reference: "main 27a27a9646576c37b4eeec6ecf451ba5de49e88f; graphing support merged via PR #5."
