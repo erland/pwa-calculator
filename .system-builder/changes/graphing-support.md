@@ -7,6 +7,7 @@
 - Blast radius: cross-component
 - Baseline: `main` at `7061ba865bad3dc104bddfff7f7d3bb3176a4d24`
 - Baseline CI: GitHub Actions CI #29 passed
+- Working PR: #5 `feature/graphing-support`
 
 ## Goal
 
@@ -16,56 +17,93 @@ The calculator keypad remains a stable anchor. Graphing is activated by the math
 
 ## Product decisions
 
-- The variable `x` is exposed through the existing Functions surface.
+- The variable `x` is exposed through the existing Functions surface and keyboard input.
 - An expression containing `x` is considered graphable.
 - Graph rendering is a landscape workspace feature in the initial scope.
 - Portrait keeps the compact calculator; an expression may contain `x`, but the graph itself is not rendered there.
 - In landscape the numeric keypad remains in the same left-side position whether a graph is shown or not.
-- Without a graph, the right-side secondary area may show scientific controls.
-- With a graph, the right-side secondary area shows the graph by default. Functions can be opened on demand over/in that secondary area without moving the numeric keypad.
+- Without a graph, the right-side secondary area shows scientific controls.
+- With a graph, the right-side secondary area shows the graph by default. Functions can be opened on demand in that secondary area without moving the numeric keypad.
 - Expression/result presentation belongs to the calculator column in landscape instead of consuming the full viewport width.
 - History remains on demand.
+- Graph viewport is transient: default `x/y = -10..10`, pan/zoom supported, reset deterministic, no persistence.
 
-## Initial graph scope
+## Delivered scope
 
-### Must
+### DEV-013 – Variable-aware expression engine
 
-- Evaluate expressions with variable `x`.
-- Plot one real-valued expression at a time.
-- Render axes/grid and a continuous curve where the expression is defined.
-- Avoid drawing false connecting lines across domain errors/discontinuities.
-- Show graph automatically in landscape when the current expression uses `x`.
-- Keep the existing calculator usable and spatially stable while graphing.
-- Preserve safe-area handling on phone landscape.
-- Work offline with no backend or external graph service.
+- Explicit evaluation context with `x`.
+- Controlled missing-variable errors.
+- Existing numeric/scientific semantics retained.
 
-### Should
+### DEV-014 – Graph sampling domain
 
-- Pan and zoom the graph viewport.
-- Provide a simple reset-to-default viewport action.
-- Preserve current expression while rotating between portrait and landscape.
+- Pure sampling independent of React/Canvas.
+- Density bounded by viewport width.
+- Domain errors create gaps rather than failing the complete graph.
+- Obvious discontinuities/asymptote jumps split segments.
 
-### Out of scope for this change series
+### DEV-015 – Graph Canvas
+
+- Canvas 2D axes, grid and curve rendering.
+- DPI/Retina-aware backing store.
+- Theme-aware colors and accessible graph description.
+
+### DEV-016 – Responsive graph workspace
+
+- `x` under Functions and keyboard input.
+- Portrait remains compact and shows only a landscape hint for graphable expressions.
+- Landscape uses stable calculator-left / secondary-workspace-right geometry.
+- Graph appears automatically for `x` expressions.
+- Functions temporarily replace the graph in the secondary workspace without moving numeric keypad.
+
+### DEV-017 – Viewport interaction
+
+- Pointer drag pans.
+- Wheel input zooms around pointer position.
+- Pure/testable viewport transformations with bounded spans.
+- Reset returns to `-10..10` on both axes.
+- Resampling follows viewport changes.
+- Touch gestures are confined to graph surface.
+
+### DEV-018 – Acceptance/readiness
+
+- Final documentation sync across README, functional specification, architecture, changelog and release-readiness.
+- Automated graph acceptance mapped to AC-015–AC-021.
+- Existing calculator/PWA regressions retained.
+- Known limitations and manual real-device checklist documented.
+
+## Out of scope
 
 - Multiple simultaneous functions/series.
 - Function color customization.
 - Intersections, roots, extrema or derivative analysis.
 - Function tables.
 - Symbolic algebra.
+- Complex arithmetic.
 - 3D graphing.
-- Graph persistence/history beyond the existing expression/history model.
-- A full graph surface in phone portrait.
+- Graph viewport persistence/history.
+- A permanent graph surface in phone portrait.
 
-## Impact analysis
+## Verification history
 
-- Expression engine: add explicit variable evaluation context.
-- Calculator state/UI: allow `x` input without creating a separate calculator mode.
-- Graph domain: add sampling and discontinuity handling.
-- UI/layout: introduce a stable two-column landscape workspace with calculator left and secondary graph/functions surface right.
-- Tests: add engine unit tests, graph sampler/component tests and landscape E2E regression tests.
-- Persistence: no schema change required in the first scope; ordinary expression state remains transient.
-- PWA/deployment: no infrastructure change expected; graphing remains client-only and offline-capable.
+- Baseline CI #29: passed.
+- DEV-013 CI #30/#31: passed.
+- DEV-014 CI #34/#37: passed.
+- DEV-015 CI #41/#44: passed.
+- DEV-016 CI #50: passed.
+- DEV-017 CI #62 exposed a React lint blocker; repaired within the same step.
+- DEV-017 CI #63: `verify`, Pages-build and E2E passed.
+- Subsequent documentation/status heads remained subject to full PR CI before completion of DEV-018.
 
-## Risk notes
+## Risk and residual limitations
 
-The highest technical risk is graph sampling around discontinuities and domain errors, not variable parsing. The plan therefore introduces variable evaluation first, then a separately testable sampler before canvas/UI integration.
+The main technical residual risk is numerical sampling around pathological/discontinuous functions. The implementation avoids known domain gaps and obvious large jumps but is not a symbolic math system and cannot guarantee perfect asymptote detection for every expression.
+
+Touch behavior is automated through representative pointer/wheel browser tests, while final physical-device feel, notch/safe-area behavior and platform-specific pinch delivery are best checked manually on representative iPhone/iPad hardware.
+
+No backend, migration, external service or persistence-schema change was introduced.
+
+## Outcome
+
+The graphing architecture remains aligned with the original product constraint: ordinary portrait calculator use stays simple, while landscape turns available width into a graphing workspace only when the expression calls for it. The numeric keypad remains the spatial anchor throughout.
