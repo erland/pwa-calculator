@@ -45,16 +45,12 @@ Remove non-essential header chrome and simplify theming to system preference onl
 - Preserve angle mode, memory and history while reading legacy data.
 - Update unit/component/E2E tests affected by theme-state removal.
 
-**Not included**
-- Landscape column reordering.
-- Portrait spacing optimization beyond height gained by removing the header.
-
 #### Verification
 
 - Persistence migration tests including legacy `theme` values.
 - Calculator state/component regression.
 - Browser assertion that no theme selector/header remains.
-- Light/dark system-preference coverage where practical.
+- Light/dark system-preference coverage.
 - Full CI.
 
 #### Done criteria
@@ -64,10 +60,6 @@ Remove non-essential header chrome and simplify theming to system preference onl
 - [x] New persisted state does not require/write `theme`.
 - [x] Existing persisted data with a theme field loads without data loss.
 - [x] Header/title no longer consumes calculator layout space.
-
-#### Dependencies
-
-Green merged graphing baseline.
 
 ---
 
@@ -82,12 +74,9 @@ Make landscape feel more natural by placing the active calculator on the right a
 **Included**
 - Reverse the landscape grid so graph/scientific workspace is left and calculator display/actions/numeric keypad are right.
 - Keep numeric keypad coordinates stable when switching between scientific controls and graph.
-- Bottom-align scientific controls so the scientific keypad visually starts from the same lower baseline as the numeric keypad.
+- Bottom-align scientific controls so the scientific keypad visually shares the numeric keypad's lower baseline.
 - Preserve phone safe-area handling and no-scroll constraints.
 - Apply the same spatial model to phone and iPad/desktop landscape.
-
-**Not included**
-- Changes to graph engine, graph gestures or button semantics.
 
 #### Verification
 
@@ -95,7 +84,6 @@ Make landscape feel more natural by placing the active calculator on the right a
 - iPad-landscape position/alignment assertions.
 - Graph activation + Functions switching keeps numeric keypad fixed.
 - No horizontal/vertical page overflow.
-- Full CI.
 - Initial CI #87 exposed a 6.6–8.2 px lower-edge offset caused by scientific-panel bottom padding; repaired in-step and reverified by CI #89.
 
 #### Done criteria
@@ -104,10 +92,6 @@ Make landscape feel more natural by placing the active calculator on the right a
 - [x] Calculator/numeric keypad remains fixed through graph/function transitions.
 - [x] Scientific controls are bottom-aligned relative to numeric keypad.
 - [x] Safe-area/no-scroll behavior remains green.
-
-#### Dependencies
-
-DEV-019.
 
 ---
 
@@ -121,32 +105,24 @@ Use the space freed by header removal to make expanded scientific functions prac
 
 **Included**
 - Tune portrait spacing/button sizing only as needed to fit the complete expanded Functions panel plus numeric keypad.
-- Primary acceptance viewport: 375×812 CSS pixels (iPhone 13 mini class).
+- Primary acceptance viewport: 375×812 CSS pixels.
 - Preserve readable display/result and touch-friendly controls.
 - Keep Functions collapsed initially and auto-collapse behavior unchanged.
 - Preserve graph-in-landscape hint behavior for `x` expressions.
-
-**Not included**
-- Device-specific branches.
-- Permanent graph surface in portrait.
 
 #### Verification
 
 - Playwright at 375×812 with Functions expanded: `documentElement.scrollHeight <= innerHeight`.
 - Numeric keypad and full scientific controls visible/usable.
 - Portrait graph hint regression.
-- Full CI.
-- DEV-021 CI #101 passed with dedicated 375×812 expanded-layout and graph-hint coverage.
+- DEV-021 CI #101 passed with dedicated expanded-layout and graph-hint coverage.
+- Closing status-head CI #103 passed.
 
 #### Done criteria
 
 - [x] Expanded Functions and numeric keypad fit without page scroll at 375×812.
 - [x] Controls remain readable and touch-usable.
 - [x] Existing portrait calculator and graph-hint behavior remains intact.
-
-#### Dependencies
-
-DEV-019.
 
 ---
 
@@ -166,23 +142,21 @@ Close the change series with full regression evidence and documentation matching
 
 #### Verification
 
-- Full CI: lint, typecheck, unit/component, build/pages build and Playwright E2E.
+- Final synchronized implementation/docs head CI #110: `npm run verify` passed.
+- Final synchronized implementation/docs head CI #110: Pages-build passed.
+- Final synchronized implementation/docs head CI #110: Playwright E2E passed.
 - No unresolved blockers.
 
 #### Done criteria
 
-- [ ] All compact-layout acceptance behavior is implemented and verified.
-- [ ] Existing calculator/graph/PWA acceptance remains green.
-- [ ] Canonical docs describe system-only theme and final responsive layout.
-- [ ] Change series is ready to merge.
-
-#### Dependencies
-
-DEV-020 and DEV-021.
+- [x] All compact-layout acceptance behavior is implemented and verified.
+- [x] Existing calculator/graph/PWA acceptance remains green.
+- [x] Canonical docs describe system-only theme and final responsive layout.
+- [x] Change series is ready to merge.
 
 ## Cross-cutting verification
 
-Every step must preserve:
+The completed series preserves:
 
 - calculator and graph mathematics,
 - stable numeric keypad behavior,
