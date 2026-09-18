@@ -127,6 +127,8 @@ Legacy version-1-data får innehålla tidigare `theme`- och `mode`-fält. Adapte
 
 ### Landskap
 
+På iPad-klassade landskapsvyer inom 761–1100 px bredd och 601–820 px höjd sträcks workspace och calculator-card till nära hela `100dvh`. Numeric keypad använder flexibla rader för att absorbera överskottshöjd, medan scientific-panel och graph workspace följer samma vertikala geometri. Telefonlandskap med `max-height: 600px` använder fortsatt den separata kompakta regeln.
+
 Layouten består av två stabila områden:
 
 ```text
@@ -276,6 +278,7 @@ Compact-responsive-serien kräver ingen serverkonfiguration, migration eller ext
 - ARCH-016: landscape secondary workspace ligger vänster och stabil calculator column höger.
 - ARCH-017: scientific controls bottenjusteras mot numeric keypad i landskap.
 - ARCH-018: constrained portrait compactness implementeras som viewportbaserad CSS override, utan device detection.
+- ARCH-019: iPad-class tablet landscape använder samma spatiala modell men sträcker app/workspace/calculator-card mot `100dvh`; numeric keypad delar återstående höjd i flexibla rader medan telefonreglerna förblir separata.
 
 ## 13. Viktiga trade-offs
 
