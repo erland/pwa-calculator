@@ -54,4 +54,6 @@ The existing shorter-tablet landscape rule deliberately compacts display and key
 - No phone-specific media query was changed.
 - CI #118 passed full verify, Pages build and Playwright E2E; 1024×768 uses at least 90% of viewport height with no page overflow, while 844×390 and 375×812 regressions remain green.
 
-Next: DEV-024 final acceptance and documentation sync.
+## DEV-024 completion
+
+Canonical documentation, change record, development plan and System Builder state are synchronized with the verified tablet-landscape behavior. Real-device iPad Pro 9.7 verification remains recommended follow-up and is not claimed as completed.
