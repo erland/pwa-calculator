@@ -1,167 +1,106 @@
-# Development plan – Compact responsive layout
+# Development plan – Tablet landscape vertical utilization
 
 ## Goal and delivery scope
 
-Refine the merged graphing UI so constrained portrait screens devote maximum height to the calculator, while landscape uses a more natural left secondary workspace / right calculator arrangement.
+Improve vertical space utilization for iPad-class landscape viewports while preserving the completed compact responsive behavior on phones.
 
-The change also removes the user-selectable theme preference and lets light/dark presentation follow the system setting exclusively.
-
-Baseline is `main` at `27a27a9646576c37b4eeec6ecf451ba5de49e88f`, containing the completed graphing change series.
+Baseline is `main` at `a406a22c8dc79bdc741f45acb2b4410c21e22aed`, with main CI #115 and Pages deployment green.
 
 ## Planning assumptions
 
-- Existing graphing, arithmetic, scientific, history, memory and offline behavior must remain unchanged.
-- Responsive behavior is viewport/orientation based; no device detection.
-- iPhone 13 mini-sized portrait is a primary constrained-height acceptance viewport.
-- Numeric keypad stability remains a key landscape invariant.
-- Legacy localStorage with `theme` and/or older `mode` fields must remain readable without losing angle mode, memory or history.
-- Theme follows `prefers-color-scheme`; no explicit theme persistence remains.
+- iPad Pro 9.7 landscape is represented by approximately 1024×768 CSS pixels.
+- Existing tablet compact media query (`761–1100px` wide, `601–820px` high) is the intended scope boundary.
+- Phone landscape remains governed by the separate `max-height: 600px` rules and must not change.
+- Phone portrait acceptance at 375×812 remains unchanged.
+- Existing left secondary workspace / right calculator geometry stays intact.
 
 ## Step overview
 
 | Step | Name | Primary result |
 |---|---|---|
-| DEV-019 | System-only theme and header removal | No title/theme UI; state and persistence no longer carry a user theme preference |
-| DEV-020 | Reversed landscape workspace | Secondary surface left, stable calculator right, scientific controls bottom-aligned |
-| DEV-021 | Compact portrait fit | Expanded Functions + numeric keypad fit an iPhone 13 mini-sized portrait without page scroll |
-| DEV-022 | Responsive acceptance and docs | Full regression, canonical docs/status sync and merge-ready change series |
+| DEV-023 | Tablet landscape vertical fill | 1024×768 tablet landscape stretches calculator/graph/scientific workspace to use available height without overflow |
+| DEV-024 | Tablet layout acceptance and docs | Regression evidence, canonical docs/status sync and merge-ready change |
 
 ## Development steps
 
-### DEV-019 – System-only theme and header removal
+### DEV-023 – Tablet landscape vertical fill
 
 #### Objective
 
-Remove non-essential header chrome and simplify theming to system preference only.
+Make iPad-class landscape layouts use the available vertical viewport instead of remaining content-height.
 
 #### Scope
 
 **Included**
-- Remove the visible application header/title and theme selector from `App`.
-- Remove `theme` from calculator application state/actions.
-- Remove `theme` from the current persisted state shape.
-- Keep the existing light/dark CSS design, driven by `prefers-color-scheme`.
-- Accept legacy v1 storage containing `theme: system|light|dark` and ignore that field.
-- Preserve angle mode, memory and history while reading legacy data.
-- Update unit/component/E2E tests affected by theme-state removal.
+- Adjust only tablet-landscape responsive CSS.
+- Stretch app/workspace/calculator card to near full `100dvh` while retaining small outer margins.
+- Let numeric keypad rows consume available vertical space.
+- Ensure graph workspace follows the stretched card height.
+- Preserve scientific bottom alignment.
+- Keep display/toolbars proportionate rather than simply scaling all fonts.
+- Add Playwright geometry assertions at 1024×768.
+- Re-run existing phone portrait/landscape geometry regressions.
+
+**Not included**
+- Changes to React state or calculator logic.
+- Changes to graph engine/gestures.
+- Phone layout redesign.
 
 #### Verification
 
-- Persistence migration tests including legacy `theme` values.
-- Calculator state/component regression.
-- Browser assertion that no theme selector/header remains.
-- Light/dark system-preference coverage.
+- Playwright 1024×768:
+  - calculator card/workspace uses >= 90% of viewport height,
+  - secondary workspace left / calculator right,
+  - scientific and numeric keypad lower edges aligned,
+  - graph activation does not move numeric keypad,
+  - no page overflow.
+- Existing 844×390 phone-landscape assertions remain green.
+- Existing 375×812 portrait assertions remain green.
 - Full CI.
+- DEV-023 CI #118 passed: `npm run verify`, Pages-build and Playwright E2E, including 1024×768 vertical-fill geometry plus existing 844×390 and 375×812 regressions.
 
 #### Done criteria
 
-- [x] No user-selectable theme control remains.
-- [x] UI follows system light/dark preference.
-- [x] New persisted state does not require/write `theme`.
-- [x] Existing persisted data with a theme field loads without data loss.
-- [x] Header/title no longer consumes calculator layout space.
+- [x] iPad-class landscape visibly uses most of available vertical space.
+- [x] Numeric/scientific/graph areas stretch without overflow or geometry drift.
+- [x] Phone portrait and phone landscape remain unchanged in behavior.
+- [x] Full CI green.
 
 ---
 
-### DEV-020 – Reversed landscape workspace
+### DEV-024 – Tablet layout acceptance and docs
 
 #### Objective
 
-Make landscape feel more natural by placing the active calculator on the right and the secondary graph/scientific workspace on the left.
+Close the change with regression evidence and documentation matching the final tablet landscape behavior.
 
 #### Scope
 
-**Included**
-- Reverse the landscape grid so graph/scientific workspace is left and calculator display/actions/numeric keypad are right.
-- Keep numeric keypad coordinates stable when switching between scientific controls and graph.
-- Bottom-align scientific controls so the scientific keypad visually shares the numeric keypad's lower baseline.
-- Preserve phone safe-area handling and no-scroll constraints.
-- Apply the same spatial model to phone and iPad/desktop landscape.
+- Review responsive E2E coverage across 375×812, 844×390 and 1024×768.
+- Re-run calculator, graph, persistence and PWA regressions.
+- Update README/functional specification/architecture/release-readiness/change record where the tablet layout behavior is materially described.
+- Update `.system-builder/work-status.yaml`.
+- Record real-device iPad Pro 9.7 follow-up as recommended unless actually verified.
 
 #### Verification
 
-- Phone-landscape Playwright position assertions.
-- iPad-landscape position/alignment assertions.
-- Graph activation + Functions switching keeps numeric keypad fixed.
-- No horizontal/vertical page overflow.
-- Initial CI #87 exposed a 6.6–8.2 px lower-edge offset caused by scientific-panel bottom padding; repaired in-step and reverified by CI #89.
-
-#### Done criteria
-
-- [x] Secondary workspace is left of the calculator in landscape.
-- [x] Calculator/numeric keypad remains fixed through graph/function transitions.
-- [x] Scientific controls are bottom-aligned relative to numeric keypad.
-- [x] Safe-area/no-scroll behavior remains green.
-
----
-
-### DEV-021 – Compact portrait fit
-
-#### Objective
-
-Use the space freed by header removal to make expanded scientific functions practical on constrained portrait phones.
-
-#### Scope
-
-**Included**
-- Tune portrait spacing/button sizing only as needed to fit the complete expanded Functions panel plus numeric keypad.
-- Primary acceptance viewport: 375×812 CSS pixels.
-- Preserve readable display/result and touch-friendly controls.
-- Keep Functions collapsed initially and auto-collapse behavior unchanged.
-- Preserve graph-in-landscape hint behavior for `x` expressions.
-
-#### Verification
-
-- Playwright at 375×812 with Functions expanded: `documentElement.scrollHeight <= innerHeight`.
-- Numeric keypad and full scientific controls visible/usable.
-- Portrait graph hint regression.
-- DEV-021 CI #101 passed with dedicated expanded-layout and graph-hint coverage.
-- Closing status-head CI #103 passed.
-
-#### Done criteria
-
-- [x] Expanded Functions and numeric keypad fit without page scroll at 375×812.
-- [x] Controls remain readable and touch-usable.
-- [x] Existing portrait calculator and graph-hint behavior remains intact.
-
----
-
-### DEV-022 – Responsive acceptance and docs
-
-#### Objective
-
-Close the change series with full regression evidence and documentation matching the simplified UI.
-
-#### Scope
-
-- Review E2E coverage for portrait, phone landscape, iPad landscape, graph transitions and system theme.
-- Re-run calculator, persistence, PWA/offline and graph regressions.
-- Update README, functional specification, architecture, changelog and release-readiness.
-- Update change record and `.system-builder/work-status.yaml`.
-- Record real-device follow-up for iPhone 13 mini and iPad where automated browser geometry cannot emulate physical safe areas/touch feel exactly.
-
-#### Verification
-
-- Final synchronized implementation/docs head CI #110: `npm run verify` passed.
-- Final synchronized implementation/docs head CI #110: Pages-build passed.
-- Final synchronized implementation/docs head CI #110: Playwright E2E passed.
+- Full CI: lint, typecheck, unit/component, Pages build and Playwright E2E.
 - No unresolved blockers.
+- DEV-024 final regression/doc sync uses DEV-023 CI #118 plus closing status-head CI #120 as pre-final evidence; final synchronized head must also pass full CI.
 
 #### Done criteria
 
-- [x] All compact-layout acceptance behavior is implemented and verified.
-- [x] Existing calculator/graph/PWA acceptance remains green.
-- [x] Canonical docs describe system-only theme and final responsive layout.
-- [x] Change series is ready to merge.
+- [x] Tablet landscape acceptance behavior is verified.
+- [x] Existing phone/calculator/graph/PWA regression remains green.
+- [x] Canonical documentation and System Builder state are synchronized.
+- [x] Change is merge-ready.
 
 ## Cross-cutting verification
 
-The completed series preserves:
-
+Every step must preserve:
 - calculator and graph mathematics,
-- stable numeric keypad behavior,
+- system-only theme behavior,
 - history/memory/DEG-RAD persistence,
-- offline/PWA operation,
-- local-only data handling,
-- phone landscape safe-area behavior,
-- accessibility semantics for primary controls.
+- offline/PWA behavior,
+- phone safe-area handling,
+- stable numeric keypad behavior through graph/functions transitions.

@@ -3,7 +3,13 @@
 @media (orientation: landscape) and (min-width: 761px) and (max-width: 1100px) and (min-height: 601px) and (max-height: 820px) {
   .app-layout.mode-advanced {
     width: min(100% - 1rem, 70rem);
+    min-height: 100dvh;
     padding: .45rem 0;
+  }
+
+  .mode-advanced .workspace {
+    min-height: calc(100dvh - .9rem);
+    align-items: stretch;
   }
 
   .mode-advanced .app-header {
@@ -21,6 +27,7 @@
   }
 
   .mode-advanced .calculator-card {
+    min-height: calc(100dvh - .9rem);
     gap: .45rem;
     padding: .55rem;
   }
@@ -64,6 +71,7 @@
   }
 
   .mode-advanced .basic-keypad {
+    grid-template-rows: repeat(5, minmax(0, 1fr));
     gap: .35rem;
   }
 

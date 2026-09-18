@@ -99,19 +99,25 @@ test('phone landscape keeps calculator right and fixed while secondary workspace
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })
 
-test('iPad-sized landscape keeps secondary workspace left and scientific keypad bottom-aligned', async ({ page }) => {
+test('iPad-sized landscape fills the viewport while preserving workspace geometry', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 768 })
   await page.goto('/')
 
+  const card = page.locator('.calculator-card')
   const basic = page.locator('.basic-keypad')
   const advanced = page.locator('.advanced-controls')
   const advancedKeypad = page.locator('.advanced-keypad')
+  const cardBox = await card.boundingBox()
   const beforeBasic = await basic.boundingBox()
   const advancedBox = await advanced.boundingBox()
   const advancedKeypadBox = await advancedKeypad.boundingBox()
+  expect(cardBox).not.toBeNull()
   expect(beforeBasic).not.toBeNull()
   expect(advancedBox).not.toBeNull()
   expect(advancedKeypadBox).not.toBeNull()
+
+  expect(cardBox!.height).toBeGreaterThanOrEqual(768 * 0.9)
+  expect(cardBox!.y + cardBox!.height).toBeLessThanOrEqual(768)
   expect(advancedBox!.x).toBeLessThan(beforeBasic!.x)
   expect(Math.abs((advancedKeypadBox!.y + advancedKeypadBox!.height) - (beforeBasic!.y + beforeBasic!.height))).toBeLessThanOrEqual(2)
 
@@ -121,11 +127,13 @@ test('iPad-sized landscape keeps secondary workspace left and scientific keypad 
   const graphBox = await graph.boundingBox()
   expect(graphBox).not.toBeNull()
   expect(graphBox!.x).toBeLessThan(beforeBasic!.x)
+  expect(graphBox!.height).toBeGreaterThanOrEqual(768 * 0.8)
 
   const afterBasic = await basic.boundingBox()
   expect(afterBasic).not.toBeNull()
   expect(afterBasic!.x).toBeCloseTo(beforeBasic!.x, 0)
   expect(afterBasic!.y).toBeCloseTo(beforeBasic!.y, 0)
+  expect(afterBasic!.height).toBeCloseTo(beforeBasic!.height, 0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })

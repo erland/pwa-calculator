@@ -1,10 +1,10 @@
-# Release readiness – Compact responsive layout
+# Release readiness – Tablet landscape utilization
 
 ## Bedömning
 
 **READY_WITH_DEVICE_CHECK**
 
-Compact-responsive change-serien DEV-019–DEV-022 är implementerad, dokumenterad och automatiskt verifierad. Final synchronized implementation/docs head passerade CI #110 med `npm run verify`, Pages-build och Playwright E2E. Kvarvarande kontroll är en rekommenderad manuell real-device-genomgång på representativ iPhone/iPad för faktisk safe-area/touchkänsla. Den är inte ett känt kodblockerande fel.
+Tablet-landscape change-serien bygger vidare på den mergade compact-responsive-baselinen. DEV-023 är automatiskt verifierad i CI #118: 1024×768 använder minst 90 % av viewportens höjd, graph/scientific-geometrin är stabil och 844×390 samt 375×812-regressionerna är gröna. Kvarvarande kontroll är en rekommenderad manuell iPad Pro 9.7-genomgång av visuell balans och verklig touchkänsla; den är inte ett känt kodblockerande fel.
 
 ## Gates
 
@@ -79,3 +79,13 @@ Före eller strax efter merge rekommenderas följande på faktisk hårdvara:
 ## Merge/release
 
 DEV-022 och `CHG-COMPACT-RESPONSIVE-LAYOUT` är completed. PR #6 är merge-ready när även den avslutande status-/readiness-headen har grön CI. Ingen backend, migration eller deploymentskonfiguration krävs. En separat versions-/releaseändring kan göras efter merge enligt projektets normala releaseflöde.
+
+
+## Tablet landscape acceptance
+
+- 1024×768 calculator-card/workspace använder minst 90 % av viewportens höjd.
+- Graph workspace stretchar vertikalt tillsammans med kalkylatorn.
+- Numeric keypad behåller position och höjd genom graph/functions-växling.
+- Scientific keypad förblir bottenjusterad mot numeric keypad.
+- 844×390 phone landscape och 375×812 portrait är fortsatt gröna.
+- DEV-023 CI #118 och closing status CI #120 passerade `verify`, Pages-build och Playwright E2E.

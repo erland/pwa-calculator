@@ -2,7 +2,7 @@ schema_version: 1
 active_work:
   mode: CHANGE
   plan: docs/development-plan.md
-  change_request: .system-builder/changes/compact-responsive-layout.md
+  change_request: .system-builder/changes/tablet-landscape-utilization.md
   selected_step: null
 progress:
   completed:
@@ -35,25 +35,25 @@ progress:
     - DEV-021
     - DEV-022
     - CHG-COMPACT-RESPONSIVE-LAYOUT
+    - DEV-023
+    - DEV-024
+    - CHG-TABLET-LANDSCAPE-UTILIZATION
   in_progress: null
   next:
     recommended: null
-    reason: "Compact-responsive CHANGE-serien DEV-019–DEV-022 är implementerad, dokumenterad och verifierad. Ingen ytterligare planerad utveckling återstår före merge."
+    reason: "Tablet-landscape CHANGE-serien DEV-023–DEV-024 är implementerad, verifierad och dokumenterad. Ingen ytterligare planerad utveckling återstår före merge."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
-    - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
-    - "DEV-019 GitHub Actions CI #83: verify/build:pages/e2e passed"
-    - "DEV-020 initial CI #87 found scientific keypad lower-edge offset; repaired in-step"
-    - "DEV-020 repaired CI #89: verify/build:pages/e2e passed"
-    - "DEV-021 GitHub Actions CI #101: verify/build:pages/e2e passed"
-    - "DEV-021 closing status head CI #103: verify/build:pages/e2e passed"
-    - "DEV-022 final synchronized implementation/docs head CI #110: npm run verify passed"
-    - "DEV-022 final synchronized implementation/docs head CI #110: npm run build:pages passed"
-    - "DEV-022 final synchronized implementation/docs head CI #110: npm run test:e2e passed"
-  notes: "Compact-responsive series completed. Header/theme picker removed; system color scheme is the single theme source; legacy theme/mode storage remains readable and ignored; landscape secondary workspace is left with stable calculator right; scientific keypad is bottom-aligned; 375x812 portrait supports fully expanded Functions plus complete numeric keypad without page scroll. Real-device iPhone/iPad checks remain recommended follow-up, not an automated-code blocker."
+    - "Merged compact-responsive baseline main commit a406a22c8dc79bdc741f45acb2b4410c21e22aed"
+    - "Main GitHub Actions CI #115: passed"
+    - "Planning head CI #116: verify/build:pages/e2e passed"
+    - "DEV-023 CI #118: verify/build:pages/e2e passed"
+    - "DEV-023 closing status head CI #120: verify/build:pages/e2e passed"
+    - "DEV-024 final synchronized head CI #126: verify/build:pages/e2e passed"
+  notes: "Tablet-landscape 1024x768 now uses >=90% of viewport height with stretched calculator/workspace, flexible numeric keypad rows, graph height propagation and preserved scientific bottom alignment. Existing 844x390 phone-landscape and 375x812 portrait regressions remain green. Real-device iPad Pro 9.7 visual/touch check remains recommended follow-up."
 source_state:
   drift: none
-  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019–DEV-022 and CHG-COMPACT-RESPONSIVE-LAYOUT complete. Final synchronized head verified by CI #110."
+  reference: "GitHub PR #7 feature/tablet-landscape-utilization; DEV-023–DEV-024 and CHG-TABLET-LANDSCAPE-UTILIZATION complete final synchronized head verified by CI #126."
