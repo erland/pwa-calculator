@@ -43,3 +43,15 @@ The existing shorter-tablet landscape rule deliberately compacts display and key
 - New device-specific JavaScript.
 - Changes to phone portrait/landscape spacing.
 - Redesign of button semantics or navigation.
+
+
+## DEV-023 implementation result
+
+- Tablet-landscape app/workspace/calculator-card now stretch against `100dvh` within the existing 761–1100 × 601–820 scope.
+- Numeric keypad uses five equal flexible rows to consume available vertical space.
+- Scientific controls retain their lower-edge alignment with the numeric keypad.
+- Graph workspace inherits the stretched calculator-card geometry.
+- No phone-specific media query was changed.
+- CI #118 passed full verify, Pages build and Playwright E2E; 1024×768 uses at least 90% of viewport height with no page overflow, while 844×390 and 375×812 regressions remain green.
+
+Next: DEV-024 final acceptance and documentation sync.
