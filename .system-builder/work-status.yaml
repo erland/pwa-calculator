@@ -2,7 +2,7 @@ schema_version: 1
 active_work:
   mode: CHANGE
   plan: docs/development-plan.md
-  change_request: .system-builder/changes/compact-responsive-layout.md
+  change_request: .system-builder/changes/tablet-landscape-utilization.md
   selected_step: null
 progress:
   completed:
@@ -37,23 +37,17 @@ progress:
     - CHG-COMPACT-RESPONSIVE-LAYOUT
   in_progress: null
   next:
-    recommended: null
-    reason: "Compact-responsive CHANGE-serien DEV-019–DEV-022 är implementerad, dokumenterad och verifierad. Ingen ytterligare planerad utveckling återstår före merge."
+    recommended: DEV-023
+    reason: "iPad-class landscape 1024x768 träffar den kompakta tablet-regeln men calculator-card förblir content-height. Nästa steg stretchar endast tablet-landscape-layouten till viewportens höjd och verifierar att telefonbeteendet förblir oförändrat."
 blockers: []
 verification:
   last_status: passed
   baseline: green
   commands:
-    - "Merged graphing baseline main commit 27a27a9646576c37b4eeec6ecf451ba5de49e88f"
-    - "DEV-019 GitHub Actions CI #83: verify/build:pages/e2e passed"
-    - "DEV-020 initial CI #87 found scientific keypad lower-edge offset; repaired in-step"
-    - "DEV-020 repaired CI #89: verify/build:pages/e2e passed"
-    - "DEV-021 GitHub Actions CI #101: verify/build:pages/e2e passed"
-    - "DEV-021 closing status head CI #103: verify/build:pages/e2e passed"
-    - "DEV-022 final synchronized implementation/docs head CI #110: npm run verify passed"
-    - "DEV-022 final synchronized implementation/docs head CI #110: npm run build:pages passed"
-    - "DEV-022 final synchronized implementation/docs head CI #110: npm run test:e2e passed"
-  notes: "Compact-responsive series completed. Header/theme picker removed; system color scheme is the single theme source; legacy theme/mode storage remains readable and ignored; landscape secondary workspace is left with stable calculator right; scientific keypad is bottom-aligned; 375x812 portrait supports fully expanded Functions plus complete numeric keypad without page scroll. Real-device iPhone/iPad checks remain recommended follow-up, not an automated-code blocker."
+    - "Merged compact-responsive baseline main commit a406a22c8dc79bdc741f45acb2b4410c21e22aed"
+    - "Main GitHub Actions CI #115: passed"
+    - "Release/Deploy GitHub Pages on baseline commit a406a22c8dc79bdc741f45acb2b4410c21e22aed: passed"
+  notes: "New CHANGE targets only iPad-class/tablet landscape vertical utilization. Existing phone landscape max-height 600px and compact portrait 375x812 rules are explicitly out of scope and must remain behaviorally unchanged."
 source_state:
   drift: none
-  reference: "GitHub PR #6 feature/compact-responsive-layout; DEV-019–DEV-022 and CHG-COMPACT-RESPONSIVE-LAYOUT complete. Final synchronized head verified by CI #110."
+  reference: "GitHub branch feature/tablet-landscape-utilization from main a406a22c8dc79bdc741f45acb2b4410c21e22aed."
