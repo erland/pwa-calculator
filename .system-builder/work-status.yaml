@@ -35,10 +35,11 @@ progress:
     - DEV-021
     - DEV-022
     - CHG-COMPACT-RESPONSIVE-LAYOUT
+    - DEV-023
   in_progress: null
   next:
-    recommended: DEV-023
-    reason: "iPad-class landscape 1024x768 träffar den kompakta tablet-regeln men calculator-card förblir content-height. Nästa steg stretchar endast tablet-landscape-layouten till viewportens höjd och verifierar att telefonbeteendet förblir oförändrat."
+    recommended: DEV-024
+    reason: "Tablet-landscape-layouten använder nu nära hela 1024x768-viewportens höjd, numeric-gridens rader stretchar och graph/scientific-geometrin är bevarad. Nästa steg är slutlig regression, dokumentationssynk och merge readiness."
 blockers: []
 verification:
   last_status: passed
@@ -47,7 +48,9 @@ verification:
     - "Merged compact-responsive baseline main commit a406a22c8dc79bdc741f45acb2b4410c21e22aed"
     - "Main GitHub Actions CI #115: passed"
     - "Release/Deploy GitHub Pages on baseline commit a406a22c8dc79bdc741f45acb2b4410c21e22aed: passed"
-  notes: "New CHANGE targets only iPad-class/tablet landscape vertical utilization. Existing phone landscape max-height 600px and compact portrait 375x812 rules are explicitly out of scope and must remain behaviorally unchanged."
+    - "Planning head GitHub Actions CI #116: verify/build:pages/e2e passed"
+    - "DEV-023 GitHub Actions CI #118 on commit 8051b99d6ab5c88174980ab1960a25847b2043c4: verify/build:pages/e2e passed"
+  notes: "DEV-023 changes only the compact tablet-landscape media query: app/workspace/calculator-card stretch to the available dynamic viewport height and numeric keypad rows share the remaining height. Playwright verifies >=90% vertical utilization at 1024x768, graph height/stability, scientific bottom alignment, no overflow, and preserves existing phone portrait/landscape regressions."
 source_state:
   drift: none
-  reference: "GitHub branch feature/tablet-landscape-utilization from main a406a22c8dc79bdc741f45acb2b4410c21e22aed."
+  reference: "GitHub PR #7 feature/tablet-landscape-utilization; DEV-023 complete and verified by CI #118."
