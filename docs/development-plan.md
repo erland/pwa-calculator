@@ -86,13 +86,14 @@ Close the change with regression evidence and documentation matching the final t
 
 - Full CI: lint, typecheck, unit/component, Pages build and Playwright E2E.
 - No unresolved blockers.
+- DEV-024 final regression/doc sync uses DEV-023 CI #118 plus closing status-head CI #120 as pre-final evidence; final synchronized head must also pass full CI.
 
 #### Done criteria
 
-- [ ] Tablet landscape acceptance behavior is verified.
-- [ ] Existing phone/calculator/graph/PWA regression remains green.
-- [ ] Canonical documentation and System Builder state are synchronized.
-- [ ] Change is merge-ready.
+- [x] Tablet landscape acceptance behavior is verified.
+- [x] Existing phone/calculator/graph/PWA regression remains green.
+- [x] Canonical documentation and System Builder state are synchronized.
+- [x] Change is merge-ready.
 
 ## Cross-cutting verification
 
