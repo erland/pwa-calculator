@@ -36,10 +36,12 @@ progress:
     - DEV-022
     - CHG-COMPACT-RESPONSIVE-LAYOUT
     - DEV-023
+    - DEV-024
+    - CHG-TABLET-LANDSCAPE-UTILIZATION
   in_progress: null
   next:
-    recommended: DEV-024
-    reason: "Tablet-landscape-layouten använder nu nära hela 1024x768-viewportens höjd, numeric-gridens rader stretchar och graph/scientific-geometrin är bevarad. Nästa steg är slutlig regression, dokumentationssynk och merge readiness."
+    recommended: null
+    reason: "Tablet-landscape CHANGE-serien DEV-023–DEV-024 är implementerad, verifierad och dokumenterad. Ingen ytterligare planerad utveckling återstår före merge."
 blockers: []
 verification:
   last_status: passed
@@ -47,10 +49,10 @@ verification:
   commands:
     - "Merged compact-responsive baseline main commit a406a22c8dc79bdc741f45acb2b4410c21e22aed"
     - "Main GitHub Actions CI #115: passed"
-    - "Release/Deploy GitHub Pages on baseline commit a406a22c8dc79bdc741f45acb2b4410c21e22aed: passed"
-    - "Planning head GitHub Actions CI #116: verify/build:pages/e2e passed"
-    - "DEV-023 GitHub Actions CI #118 on commit 8051b99d6ab5c88174980ab1960a25847b2043c4: verify/build:pages/e2e passed"
-  notes: "DEV-023 changes only the compact tablet-landscape media query: app/workspace/calculator-card stretch to the available dynamic viewport height and numeric keypad rows share the remaining height. Playwright verifies >=90% vertical utilization at 1024x768, graph height/stability, scientific bottom alignment, no overflow, and preserves existing phone portrait/landscape regressions."
+    - "Planning head CI #116: verify/build:pages/e2e passed"
+    - "DEV-023 CI #118: verify/build:pages/e2e passed"
+    - "DEV-023 closing status head CI #120: verify/build:pages/e2e passed"
+  notes: "Tablet-landscape 1024x768 now uses >=90% of viewport height with stretched calculator/workspace, flexible numeric keypad rows, graph height propagation and preserved scientific bottom alignment. Existing 844x390 phone-landscape and 375x812 portrait regressions remain green. Real-device iPad Pro 9.7 visual/touch check remains recommended follow-up."
 source_state:
   drift: none
-  reference: "GitHub PR #7 feature/tablet-landscape-utilization; DEV-023 complete and verified by CI #118."
+  reference: "GitHub PR #7 feature/tablet-landscape-utilization; DEV-023–DEV-024 and CHG-TABLET-LANDSCAPE-UTILIZATION complete pending final synchronized-head CI."
