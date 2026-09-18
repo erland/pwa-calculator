@@ -2,6 +2,20 @@
 
 Alla betydande förändringar dokumenteras här.
 
+## Ej släppt – tablet landscape utilization
+
+### Ändrat
+
+- Tablet-landscape inom 761–1100 × 601–820 sträcker app/workspace/calculator-card mot tillgänglig `100dvh` i stället för att stanna vid content-height.
+- Numeric keypad använder fem flexibla rader för att ta vara på extra höjd; graph workspace följer samma vertikala geometri.
+- Phone landscape (`max-height: 600px`) och compact portrait är oförändrade.
+
+### Verifierat
+
+- 1024×768 använder minst 90 % av viewportens höjd utan page overflow.
+- Existing 844×390 och 375×812 responsive regressions är gröna.
+- DEV-023 CI #118 och status-head CI #120 passerade full verifiering.
+
 ## Ej släppt – compact responsive layout
 
 ### Ändrat
@@ -16,7 +30,7 @@ Alla betydande förändringar dokumenteras här.
 ### Verifierat
 
 - Telefonlandskap 844×390: vänster/höger-ordning, stabil keypad-position, graph/functions-växling och no-overflow.
-- iPad-landskap 1024×768: samma spatiala modell och bottom alignment.
+- iPad-landskap 1024×768: samma spatiala modell och bottom alignment, samt vertikal stretch så calculator-card/workspace använder minst cirka 90 % av viewportens höjd.
 - Porträtt 375×812: hela scientific-panelen och hela numeric keypad synliga utan vertikal sidscroll.
 - Systemtema växlar med browserns färgschemapreferens och temapreferens skrivs inte till localStorage.
 - Befintliga calculator-, graph-, history-, memory-, persistence-, PWA- och offline-regressioner är gröna.
