@@ -12,6 +12,7 @@ Produkten använder ett enda adaptivt gränssnitt. Skärmyta, orientering och ak
 - Vetenskapliga funktioner är tillgängliga utan att belasta huvudflödet på små porträttskärmar.
 - På 375×812 ryms expanderade Funktioner tillsammans med hela sifferknappsatsen utan sidscroll.
 - I landskap ligger sekundärytan till vänster och kalkylatorn stabilt till höger.
+- På iPad-klassade landskapsvyer runt 1024×768 ska kalkylator/workspace utnyttja merparten av viewportens höjd utan sidscroll.
 - Ett uttryck med variabeln `x` kan visas som graf i landskapsarbetsytan.
 - Sifferknappsatsen ligger stabilt kvar när grafen aktiveras eller Funktioner ersätter grafen.
 - Ljust/mörkt tema följer systemets färgschema utan användarspecifik temainställning.
@@ -205,50 +206,53 @@ Kalkylatorgränssnittet ska inte reservera permanent skärmyta för apptitel ell
 **FR-032 – Kompakt 375×812-porträtt [Must]**  
 Vid 375×812 CSS-pixlar ska hela expanderade funktionspanelen och hela grundknappsatsen kunna visas utan vertikal sidscrollning.
 
+**FR-033 – Tablet-landscape höjdanvändning [Must]**  
+På iPad-klassade landskapsvyer inom tablet-scope ska kalkylator/workspace sträckas vertikalt så att minst cirka 90 % av viewportens höjd används på 1024×768, utan att numeric/scientific alignment eller graph/functions-stabilitet bryts.
+
 ### PWA och offline
 
-**FR-033 – Installerbar PWA [Must]**  
+**FR-034 – Installerbar PWA [Must]**  
 Appen ska kunna installeras som PWA där plattformen stödjer det.
 
-**FR-034 – Offline [Must]**  
+**FR-035 – Offline [Must]**  
 Kärnfunktionerna ska fungera offline efter första fullständiga laddningen.
 
-**FR-035 – Lokal data utan konto [Must]**  
+**FR-036 – Lokal data utan konto [Must]**  
 Historik, minne och vinkelenhet ska hanteras lokalt utan konto eller serverkontakt.
 
 ### Grafstöd
 
-**FR-036 – Variabeln x [Must]**  
+**FR-037 – Variabeln x [Must]**  
 Expression engine ska kunna utvärdera identifieraren `x` när ett explicit realvärde för `x` tillhandahålls. Vanliga uttryck utan `x` ska behålla befintlig semantik.
 
-**FR-037 – Grafbart uttryck [Must]**  
+**FR-038 – Grafbart uttryck [Must]**  
 Ett aktuellt uttryck som refererar till `x` ska betraktas som grafbart. `x` ska finnas tillgänglig från funktionsytan, inte behöva ligga permanent på grundknappsatsen.
 
-**FR-038 – Graf i landskap [Must]**  
+**FR-039 – Graf i landskap [Must]**  
 Grafytan ska renderas i landskapets sekundäryta till vänster. Telefonporträtt ska inte behöva avsätta permanent grafyta.
 
-**FR-039 – Automatisk grafpresentation [Must]**  
+**FR-040 – Automatisk grafpresentation [Must]**  
 När ett grafbart uttryck är aktivt i landskap ska grafytan visas automatiskt utan separat graflägesväljare.
 
-**FR-040 – Stabil kalkylatorkolumn [Must]**  
+**FR-041 – Stabil kalkylatorkolumn [Must]**  
 Kalkylatorns display, actions och sifferknappsats ska ligga stabilt i högerkolumnen oavsett om vänsterytan visar vetenskapliga funktioner eller graf.
 
-**FR-041 – Sekundär landskapsyta [Must]**  
+**FR-042 – Sekundär landskapsyta [Must]**  
 I landskap utan aktiv graf ska vänsterytan visa vetenskapliga funktioner. När grafen är aktiv ska grafen vara standardinnehåll där och `Funktioner` kunna ersätta grafen utan att flytta grundknappsatsen.
 
-**FR-042 – Bottenlinje för scientific [Must]**  
+**FR-043 – Bottenlinje för scientific [Must]**  
 När vetenskapliga funktioner visas i landskap ska scientific-knappsatsens nederkant vara visuellt bottenjusterad mot sifferknappsatsen.
 
-**FR-043 – Grafprovtagning [Must]**  
+**FR-044 – Grafprovtagning [Must]**  
 Grafmotorn ska kunna prova uttrycket över ett synligt x-intervall och hantera enskilda domänfel utan att hela grafen fallerar.
 
-**FR-044 – Diskontinuiteter [Must]**  
+**FR-045 – Diskontinuiteter [Must]**  
 Grafen får inte medvetet förbinda kurvsegment över kända/identifierade domänfel eller uppenbara diskontinuiteter såsom asymptoter.
 
-**FR-045 – Grafviewport [Should]**  
+**FR-046 – Grafviewport [Should]**  
 Användaren bör kunna panorera och zooma grafens viewport samt återställa den till ett definierat standardläge.
 
-**FR-046 – En funktion åt gången [Must]**  
+**FR-047 – En funktion åt gången [Must]**  
 Initial grafversion ska visa högst ett aktuellt uttryck som funktion av `x`.
 
 ## 6. Affärs- och beräkningsregler
