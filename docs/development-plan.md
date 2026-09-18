@@ -57,13 +57,14 @@ Make iPad-class landscape layouts use the available vertical viewport instead of
 - Existing 844×390 phone-landscape assertions remain green.
 - Existing 375×812 portrait assertions remain green.
 - Full CI.
+- DEV-023 CI #118 passed: `npm run verify`, Pages-build and Playwright E2E, including 1024×768 vertical-fill geometry plus existing 844×390 and 375×812 regressions.
 
 #### Done criteria
 
-- [ ] iPad-class landscape visibly uses most of available vertical space.
-- [ ] Numeric/scientific/graph areas stretch without overflow or geometry drift.
-- [ ] Phone portrait and phone landscape remain unchanged in behavior.
-- [ ] Full CI green.
+- [x] iPad-class landscape visibly uses most of available vertical space.
+- [x] Numeric/scientific/graph areas stretch without overflow or geometry drift.
+- [x] Phone portrait and phone landscape remain unchanged in behavior.
+- [x] Full CI green.
 
 ---
 
